@@ -1,0 +1,14 @@
+{
+  "header": {
+    "mypage": "마이페이지",
+    "logout": "로그아웃",
+    "login": "로그인",
+    "register": "회원가입",
+    "language": "언어설정",
+    "help": "도움말"
+  },
+  "nav": {
+    "Feed": "게시글",
+    "Chatting": "채팅"
+  }
+}
