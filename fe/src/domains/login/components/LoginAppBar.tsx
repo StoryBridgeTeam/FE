@@ -1,14 +1,15 @@
-import { Box, Text, Flex } from "@chakra-ui/react";
+import { Box, Text, Flex, useBreakpointValue } from "@chakra-ui/react";
 import { FaRegBell } from "react-icons/fa6";
-import {useTranslation} from "react-i18next";
+import { useTranslation } from "react-i18next";
 
 const LoginAppBar = () => {
-  const {t} = useTranslation();
+  const { t } = useTranslation();
+  const isMobile = useBreakpointValue({ base: true, md: false });
 
   return (
     <Flex
       w="full"
-      h="80px"
+      h={isMobile ? "60px" : "80px"}
       borderBottom="1px"
       borderColor="#CDCDCD"
       justify="space-between"
@@ -17,22 +18,22 @@ const LoginAppBar = () => {
       <Text
         fontSize="2xl"
         fontWeight="700"
-        paddingTop="19px"
-        paddingLeft="40px"
+        paddingTop={isMobile ? "10px" : "20px"}
+        paddingLeft={isMobile ? "20px" : "40px"}
       >
         StoryBridge
       </Text>
       <Flex direction="row">
-        <Text lineHeight="80px" fontWeight="400">
-        {t(`login.login`)}
+        <Text lineHeight={isMobile ? "60px" : "80px"} fontWeight="400">
+          {t(`login.login`)}
         </Text>
         <Box
           as={FaRegBell}
           fontSize="xl"
           marginLeft={3}
           marginRight={8}
-          h="80px"
-        />
+          h={isMobile ? "60px" : "80px"}
+          />
       </Flex>
     </Flex>
   );
