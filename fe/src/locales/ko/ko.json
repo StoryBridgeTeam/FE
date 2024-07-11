@@ -27,4 +27,8 @@
     "failTitle": "로그인 실패",
     "failDescription": "유효하지 않은 비밀번호입니다"
   }
+  ,"logout": {
+    "successTitle": "로그아웃 성공",
+    "successDescription": "성공적으로 로그아웃되었습니다"
+  }
 }

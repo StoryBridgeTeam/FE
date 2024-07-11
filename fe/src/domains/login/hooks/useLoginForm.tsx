@@ -1,7 +1,9 @@
 import { useState } from "react";
-import { useToast } from "@chakra-ui/react";
 import { useAuthStore } from "../stores/useAuthStore";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
+import { useToastMessage } from "../../../common/hooks/useToastMessage";
+import { useHandleLogin } from "./useHandleLogin";
 
 interface LoginFormValues {
   id: string;
@@ -16,6 +18,8 @@ interface LoginFormErrors {
 
 export const useLoginForm = () => {
   const { t, i18n } = useTranslation();
+  const handleLogin = useHandleLogin();
+  const { showToast } = useToastMessage();
 
   const [values, setValues] = useState<LoginFormValues>({
     id: "",
@@ -28,17 +32,20 @@ export const useLoginForm = () => {
     passwordError: null,
   });
 
-  const toast = useToast();
-  const login = useAuthStore((state) => state.login);
-
   const handleIdChange = (value: string) => {
     if (i18n.language === "ko") {
       let formattedNumber = value.replace(/[^0-9]/g, "");
       if (formattedNumber.length > 3) {
-        formattedNumber = `${formattedNumber.slice(0, 3)}-${formattedNumber.slice(3)}`;
+        formattedNumber = `${formattedNumber.slice(
+          0,
+          3
+        )}-${formattedNumber.slice(3)}`;
       }
       if (formattedNumber.length > 8) {
-        formattedNumber = `${formattedNumber.slice(0, 8)}-${formattedNumber.slice(8)}`;
+        formattedNumber = `${formattedNumber.slice(
+          0,
+          8
+        )}-${formattedNumber.slice(8)}`;
       }
       setValues((prev) => ({
         ...prev,
@@ -117,37 +124,15 @@ export const useLoginForm = () => {
     return true;
   };
 
-  const handleLogin = () => {
+  const onSubmit = async () => {
     if (!values.id || !values.password) {
-      toast({
-        title: t("login.loginFail"),
-        description: t("login.description"),
-        status: "error",
-        duration: 3000,
-        isClosable: true,
-      });
+      showToast("login.loginFail", "login.description", "error");
       return;
     }
 
     if (validateId() && validatePassword()) {
-      const token = "dummy-token"; // 실제 토큰으로 대체
-
-      login(token, values.rememberMe);
-      toast({
-        title: t("login.successTitle"),
-        description: t("login.successDescription"),
-        status: "success",
-        duration: 3000,
-        isClosable: true,
-      });
-    } else {
-      toast({
-        title: t("login.failTitle"),
-        description: t("login.failDescription"),
-        status: "error",
-        duration: 3000,
-        isClosable: true,
-      });
+      const token = "dummy-token"; //백엔드에서 받아올 예정
+      await handleLogin(token, values.id, values.rememberMe);
     }
   };
 
@@ -160,6 +145,6 @@ export const useLoginForm = () => {
     handleIdChange,
     handlePasswordChange,
     toggleRememberMe,
-    handleLogin,
+    onSubmit,
   };
 };

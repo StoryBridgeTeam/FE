@@ -2,8 +2,9 @@ import { ChakraProvider, extendTheme } from "@chakra-ui/react";
 import LoginPage from "./domains/login/LoginPage";
 import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
 import { useAuthStore } from "./domains/login/stores/useAuthStore";
-import { useEffect } from "react";
-import PrivateRoute from "./domains/login/stores/PrivateRoute";
+import { useEffect, useState } from "react"; // useState 추가
+import PrivateRoute from "./domains/login/utils/PrivateRoute";
+import InfoPage from "./domains/info/InfoPage";
 
 const theme = extendTheme({
   fonts: {
@@ -12,24 +13,40 @@ const theme = extendTheme({
 });
 
 function App() {
-  const {checkAuth, isAuthenticated} = useAuthStore();
+  const { checkAuth, isAuthenticated, id } = useAuthStore();
+  const [initialized, setInitialized] = useState(false);
 
   useEffect(() => {
-    checkAuth();
-  }, [checkAuth]);
+    checkAuth().then(() => {
+      setInitialized(true);
+    });
+  }, []);
 
+  if (!initialized) {
+    return null;
+  }
 
   return (
     <ChakraProvider theme={theme}>
       <BrowserRouter>
-      <Routes>
-      <Route path="/login" element={<LoginPage />} />
-          <Route path="/:id" element={<PrivateRoute element={<LoginPage />} />} />
-          {/* <Route path="/:id/info" element={<PrivateRoute element={<InfoPage />} />} /> */}
+        <Routes>
+          <Route path="/login" element={<LoginPage />} />
+          <Route
+            path={`/${id}`}
+            element={<PrivateRoute element={<InfoPage />} />}
+          />
+          <Route
+            path={`/${id}/info`}
+            element={<PrivateRoute element={<InfoPage />} />}
+          />
           <Route
             path="*"
             element={
-              isAuthenticated ? <Navigate to="/:id" /> : <Navigate to="/login" />
+              isAuthenticated ? (
+                <Navigate to={`/${id}/info`} replace />
+              ) : (
+                <Navigate to="/login" replace />
+              )
             }
           />
         </Routes>
