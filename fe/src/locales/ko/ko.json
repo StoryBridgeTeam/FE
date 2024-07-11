@@ -10,5 +10,12 @@
   "nav": {
     "Feed": "게시글",
     "Chatting": "채팅"
+  },
+  "login" : {
+    "login": "로그인",
+    "email": "이메일",
+    "password": "비밀번호",
+    "info": "이메일과 비밀번호를 입력하세요.",
+    "rememberMe" : "로그인 유지하기"
   }
 }
