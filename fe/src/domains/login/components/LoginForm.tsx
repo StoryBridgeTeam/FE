@@ -24,15 +24,16 @@ const LoginForm = () => {
   const { t } = useTranslation();
 
   const {
-    email,
+    id,
     password,
     rememberMe,
+    idError,
     passwordError,
-    handleEmailChange,
+    handleIdChange,
     handlePasswordChange,
     toggleRememberMe,
     handleLogin,
-  } = useLoginForm(); // useLoginForm 훅 사용
+  } = useLoginForm();
 
   const [showPassword, setShowPassword] = React.useState(false);
 
@@ -59,11 +60,17 @@ const LoginForm = () => {
       </Text>
       <Stack spacing={4}>
         <Input
-          type="email"
-          placeholder={t(`login.email`)}
-          value={email}
-          onChange={(e) => handleEmailChange(e.target.value)}
+          type="text"
+          placeholder={t(`login.id`)}
+          value={id}
+          onChange={(e) => handleIdChange(e.target.value)}
+          isInvalid={!!idError}
         />
+        {idError && (
+          <Text fontSize="sm" color="red.500">
+            {idError}
+          </Text>
+        )}
         <InputGroup>
           <Input
             type={showPassword ? "text" : "password"}
