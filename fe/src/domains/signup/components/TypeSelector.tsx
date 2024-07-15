@@ -9,7 +9,7 @@ const TypeSelector = () => {
   return (
     <Box>
       <Text fontSize="xl" fontWeight="800" mt={6} textAlign="left">
-        {t("signup.SignupTypeSelector.title")}
+        거주 국가를 선택해주세요
       </Text>
       <Text fontSize="sm" ml={1} textAlign="left">
         Please select your country of residence.

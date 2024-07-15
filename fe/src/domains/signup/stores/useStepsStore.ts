@@ -9,7 +9,7 @@ interface StepsState {
 
 export const useStepsStore = create<StepsState>((set) => ({
   step: 1,
-  conditions: [true, false, false, false],
+  conditions: [true, false, false, false, false, false, false, true],
   nextStep: () => set((state) => ({ step: state.step + 1 })),
   setCondition: (index: number, value: boolean) =>
     set((state) => {

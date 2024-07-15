@@ -19,8 +19,12 @@
     "rememberMe": "로그인 유지하기"
   },
   "signup": {
-    "SignupTypeSelector": {
-      "title": "거주 국가를 선택해주세요"
+    "NextStepsButton": {
+      "agree": "동의",
+      "VerificationRequest": "인증요청",
+      "Verification": "인증",
+      "Next": "다음",
+      "Complete": "완료"
     },
     "TermsAgreement": {
       "title": "약관에 동의해주세요",
@@ -29,6 +33,39 @@
       "agreeRequired2": "[필수] 개인정보 수집 및 이용 동의",
       "agreeOptional1": "[선택] 프로필정보 추가 수집 동의",
       "agreeOptional2": "[선택] 광고메세지 수신 동의"
+    },
+    "VerificationCode": {
+      "title": "인증코드를 입력해주세요",
+      "placeholder": "인증코드 6자리를 입력해주세요",
+      "toast": {
+        "error": "인증 실패",
+        "description": "올바른 인증 코드를 입력해주세요"
+      }
+    },
+    "PasswordForm": {
+      "title": "비밀번호를 입력해주세요",
+      "subtitle": "영문 + 숫자 + 특수문자 조합 8~15자",
+      "passwordPlaceholder": "사용하실 비밀번호를 입력해주세요",
+      "confirmPasswordPlaceholder": "비밀번호를 한번 더 입력해주세요",
+      "engLetter": "영문",
+      "number": "숫자",
+      "specialChar": "특수문자",
+      "length": "8~16자",
+      "same": "비밀번호 일치"
+    },
+    "NicknameForm": {
+      "title": "닉네임을 입력해주세요",
+      "subtitle": "조건들 조합 3~10자",
+      "placeholder": "사용하실 닉네임을 입력해주세요",
+      "toast": {
+        "error": "닉네임 중복",
+        "description": "이미 사용중인 닉네임입니다."
+      }
+    },
+    "SignupComplete": {
+      "title": "회원가입을 성공적으로 마쳤어요!",
+      "description": "인증한 전화번호는 아이디로 사용돼요.",
+      "description2": "이곳에서 다양한 사람에 대해 알아가고, 사람들과 함께 해보세요."
     }
   }
 }

@@ -6,7 +6,7 @@ const ProgressBar = () => {
   const totalSteps = 7;
   const progressValue = (step / totalSteps) * 100;
 
-  return <Progress value={progressValue} colorScheme="blue" size="sm" />;
+  return <Progress value={progressValue} colorScheme="gray" size="sm" />;
 };
 
 export default ProgressBar;

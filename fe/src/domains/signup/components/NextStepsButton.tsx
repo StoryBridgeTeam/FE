@@ -1,43 +1,82 @@
 import { Button } from "@chakra-ui/react";
 import { useStepsStore } from "../stores/useStepsStore";
+import { useUserTypeStore } from "../stores/useUserTypeStore";
 import { usePhoneVerification } from "../hooks/usePhoneVerification";
+import { useVerificationCode } from "../hooks/useVerificationCode";
+import { useEmailVerification } from "../hooks/useEmailVerification";
+import { useTranslation } from "react-i18next";
+import { useNicknameForm } from "../hooks/useNicknameFormt";
 
 interface Step {
   currentStep: number;
 }
 
+interface ButtonProps {
+  text: string;
+  onClick: () => void;
+}
 const NextStepButton = ({ currentStep }: Step) => {
-  const { step, nextStep, conditions } = useStepsStore((state) => ({
-    step: state.step,
+  const { t } = useTranslation();
+  const { nextStep, conditions } = useStepsStore((state) => ({
     conditions: state.conditions,
     nextStep: state.nextStep,
   }));
+  const { userType } = useUserTypeStore((state) => ({
+    userType: state.userType,
+  }));
+  const { handleSendRequestPhone } = usePhoneVerification();
+  const { handleSendRequestEmail } = useEmailVerification();
+  const { checkVerificationCode } = useVerificationCode();
+  const { checkNickname } = useNicknameForm();
 
-  const { handleVerification } = usePhoneVerification();
-
-  const buttonText = () => {
+  const buttonProps = (): ButtonProps => {
     switch (currentStep) {
       case 2:
-        return "동의";
+        return { text: t("signup.NextStepsButton.agree"), onClick: nextStep };
       case 3:
-        return "인증요청";
+        if (userType === "korea") {
+          return {
+            text: t("signup.NextStepsButton.VerificationRequest"),
+            onClick: handleSendRequestPhone,
+          };
+        } else {
+          return {
+            text: t("signup.NextStepsButton.VerificationRequest"),
+            onClick: handleSendRequestEmail,
+          };
+        }
       case 4:
-        return "인증";
+        return {
+          text: t("signup.NextStepsButton.Verification"),
+          onClick: checkVerificationCode,
+        };
+      case 6:
+        return {
+          text: t("signup.NextStepsButton.Next"),
+          onClick: checkNickname,
+        };
+      case 7:
+        return {
+          text: t("signup.NextStepsButton.Complete"),
+          onClick: () => {
+            console.log("complete");
+          },
+        };
       default:
-        return "다음";
+        return { text: t("signup.NextStepsButton.Next"), onClick: nextStep };
     }
   };
 
   return (
     <Button
-      onClick={currentStep === 4 ? () => handleVerification() : nextStep}
-      isDisabled={currentStep === 4 ? false : !conditions[currentStep]}
+      onClick={buttonProps().onClick}
+      isDisabled={!conditions[currentStep]}
       w="full"
       bg="black"
       color="white"
       colorScheme="blackAlpha"
     >
-      {buttonText()}
+      {buttonProps().text}
     </Button>
   );
 };

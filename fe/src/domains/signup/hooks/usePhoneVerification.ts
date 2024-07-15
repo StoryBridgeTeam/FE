@@ -4,7 +4,7 @@ import { usePhoneVerificationStore } from "../stores/usePhoneVerificationStore";
 import { useVerificationCodeStore } from "../stores/useVerificationCodeStore";
 
 export const usePhoneVerification = () => {
-  const { nextStep } = useStepsStore();
+  const { nextStep, setCondition } = useStepsStore();
   const {
     username,
     phoneNumber,
@@ -13,82 +13,134 @@ export const usePhoneVerification = () => {
     setPhoneNumber,
     setTelecom,
   } = usePhoneVerificationStore();
-  //useLoginForm처럼 같이 쓰이는 것들은 한번에 입력받자. 타입스크립트의 장점활용하자.
-  const { verificationCode, setVerficationCode } = useVerificationCodeStore();
-  const { setCondition } = useStepsStore();
+  const { setVerficationCode } = useVerificationCodeStore();
 
-  const [inputName, setInputName] = useState("");
-  const [inputNumber, setInputNumber] = useState("");
-  const [inputTelecom, setInputTelecom] = useState("");
+  const handleNameChange = (inputName: string) => {
+    setUsername(inputName);
+  };
 
-  const [inputCode, setInputCode] = useState("");
-  // const handleNameChange = (inputName: string) => {
-  //   setInputName(inputName);
-  // };
+  const handlePhoneNumberChange = (inputNumber: string) => {
+    const numericValue = inputNumber.replace(/\D/g, ""); //하이푼 제거
+    setPhoneNumber(numericValue);
+  };
 
-  // const handlePhoneNumberChange = (inputNumber: string) => {
-  //   setInputNumber(inputNumber);
-  // };
-
-  // const handleCodeChange = (inputCode: string) => {
-  //   setInputCode(inputCode);
-  // };
-
-  //요청보내기와 같은이름으로 바꾸는게 좋나??
-  const handleSendCode = () => {
-    setInputNumber(inputNumber.replace(/-/g, "")); // 하이픈 제거
-
-    if (inputName && inputNumber && telecom) {
-      // 인증코드 발송 API 호출, d이후 setVerficationCode에 저장
-    }
+  const handleTelecomChange = (selectTelecom: string) => {
+    setTelecom(selectTelecom);
   };
 
   const isInputNameValid = (): boolean => {
-    const nameRegex = /^[a-zA-Z가-힣]+$/;
-    return nameRegex.test(inputName) && inputNumber !== "";
+    const nameRegex = /^[a-zA-Z가-힣\s]+$/;
+
+    return nameRegex.test(username);
   };
 
   const isInputNumberValid = (): boolean => {
-    setInputNumber(inputNumber.replace(/-/g, "")); // 하이픈 제거
-    return inputNumber.length === 11;
+    return phoneNumber.length === 11;
   };
 
-  const handleVerification = () => {
+  const handleSendRequestPhone = () => {
+    // 인증코드 발송 API 호출, d이후 setVerficationCode에 저장
+    setVerficationCode("123456");
     nextStep();
-
-    //비동기처리할것
-    if (inputCode === verificationCode) {
-      setUsername(inputName);
-      setPhoneNumber(inputNumber);
-
-      // nextStep();
-    }
   };
 
   useEffect(() => {
-    if (
-      isInputNameValid() &&
-      isInputNumberValid() &&
-      (telecom === "SKT" || telecom === "KT" || telecom === "LGU")
-    ) {
+    if (isInputNameValid() && isInputNumberValid() && !!telecom) {
       setCondition(3, true);
     } else {
       setCondition(3, false);
     }
-  }, [inputName, inputNumber, telecom]);
+  }, [username, phoneNumber, telecom]);
 
   return {
-    inputName,
-    inputNumber,
-    inputCode,
-    // handleNameChange,
-    // handlePhoneNumberChange,
-    // handleCodeChange,
-    setInputName,
-    setInputNumber,
-    setInputCode,
-    handleSendCode,
-    handleVerification,
-    setTelecom,
+    username,
+    phoneNumber,
+    telecom,
+    handleNameChange,
+    handlePhoneNumberChange,
+    handleTelecomChange,
+    handleSendRequestPhone,
+    isInputNameValid,
+    isInputNumberValid,
   };
 };
+
+// import { useState, useEffect } from "react";
+// import { useStepsStore } from "../stores/useStepsStore";
+// import { usePhoneVerificationStore } from "../stores/usePhoneVerificationStore";
+// import { useVerificationCodeStore } from "../stores/useVerificationCodeStore";
+
+// interface inputVerificationValues {
+//   name: string;
+//   number: string;
+//   telecom: string;
+// }
+
+// export const usePhoneVerification = () => {
+//   const { nextStep, setCondition } = useStepsStore();
+//   const { setUsername, setPhoneNumber, setTelecom } =
+//     usePhoneVerificationStore();
+
+//   const { setVerficationCode } = useVerificationCodeStore();
+
+//   const [values, setValues] = useState<inputVerificationValues>({
+//     name: "",
+//     number: "",
+//     telecom: "",
+//   });
+
+//   const handleNameChange = (value: string) => {
+//     setValues((prev) => ({
+//       ...prev,
+//       name: value,
+//     }));
+//   };
+
+//   const handlePhoneNumberChange = (value: string) => {
+//     setValues((prev) => ({
+//       ...prev,
+//       number: value,
+//     }));
+//   };
+
+//   const handleTelecomChange = (value: string) => {
+//     setValues((prev) => ({
+//       ...prev,
+//       telecom: value,
+//     }));
+//   };
+
+//   const isInputNameValid = (): boolean => {
+//     const nameRegex = /^[a-zA-Z가-힣\s]+$/;
+//     return nameRegex.test(values.name) && values.number !== "";
+//   };
+
+//   const isInputNumberValid = (): boolean => {
+//     return values.number.length === 13; // 010-1234-5678
+//   };
+
+//   const handleSendRequestPhone = () => {
+//     // 인증코드 발송 API 호출, d이후 setVerficationCode에 저장
+//     setVerficationCode("123456");
+//     nextStep();
+//   };
+
+//   useEffect(() => {
+//     if (isInputNameValid() && isInputNumberValid() && !!values.telecom) {
+//       setUsername(values.name);
+//       setPhoneNumber(values.number.replace(/-/g, "")); // 하이픈 제거
+//       setTelecom(values.telecom);
+//       setCondition(3, true);
+//     } else {
+//       setCondition(3, false);
+//     }
+//   }, [values.name, values.number, values.telecom]);
+
+//   return {
+//     inputs: values,
+//     handleNameChange,
+//     handlePhoneNumberChange,
+//     handleTelecomChange,
+//     handleSendRequestPhone,
+//   };
+// };
