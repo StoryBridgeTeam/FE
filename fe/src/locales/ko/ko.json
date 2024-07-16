@@ -11,7 +11,32 @@
     "Feed": "게시글",
     "Chatting": "채팅"
   },
-  "login": {},
+  "login": {
+    "login": "로그인",
+    "id": "전화번호",
+    "password": "비밀번호",
+    "info": "전화번호와 비밀번호를 입력하세요",
+    "rememberMe": "로그인 유지하기",
+    "passwordError": "비밀번호는 8자 이상 15자 이하이어야 하며, 영어, 숫자, 특수문자를 모두 포함해야 합니다",
+    "loginFail": "로그인 실패",
+    "description": "전화번호와 비밀번호를 모두 입력하세요",
+    "phoneError": "유효한 전화번호를 입력하세요",
+    "emailError": "유효한 이메일 주소를 입력하세요",
+    "successTitle": "로그인 성공",
+    "successDescription": "성공적으로 로그인되었습니다",
+    "failTitle": "로그인 실패",
+    "failDescription": "유효하지 않은 비밀번호입니다"
+  },
+  "logout": {
+    "successTitle": "로그아웃 성공",
+    "successDescription": "성공적으로 로그아웃되었습니다"
+  },
+  "info": {
+    "info": "자기소개서",
+    "list": "목록보기",
+    "commentPlaceHolder": "댓글을 입력하세요...",
+    "add_new": "추가하기"
+  },
   "signup": {
     "NextStepsButton": {
       "agree": "동의",
