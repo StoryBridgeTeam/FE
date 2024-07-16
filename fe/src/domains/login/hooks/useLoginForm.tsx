@@ -1,34 +1,60 @@
 import { useState } from "react";
-import { useToast } from "@chakra-ui/react";
+import { useTranslation } from "react-i18next";
+import { useToastMessage } from "../../../common/hooks/useToastMessage";
+import { useHandleLogin } from "./useHandleLogin";
 
 interface LoginFormValues {
-  email: string;
+  id: string;
   password: string;
   rememberMe: boolean;
 }
 
 interface LoginFormErrors {
+  idError: string | null;
   passwordError: string | null;
 }
 
 export const useLoginForm = () => {
+  const { t, i18n } = useTranslation();
+  const handleLogin = useHandleLogin();
+  const { showToast } = useToastMessage();
+
   const [values, setValues] = useState<LoginFormValues>({
-    email: "",
+    id: "",
     password: "",
     rememberMe: false,
   });
 
   const [errors, setErrors] = useState<LoginFormErrors>({
+    idError: null,
     passwordError: null,
   });
 
-  const toast = useToast();
-
-  const handleEmailChange = (value: string) => {
-    setValues((prev) => ({
-      ...prev,
-      email: value,
-    }));
+  const handleIdChange = (value: string) => {
+    if (i18n.language === "ko") {
+      let formattedNumber = value.replace(/[^0-9]/g, "");
+      if (formattedNumber.length > 3) {
+        formattedNumber = `${formattedNumber.slice(
+          0,
+          3
+        )}-${formattedNumber.slice(3)}`;
+      }
+      if (formattedNumber.length > 8) {
+        formattedNumber = `${formattedNumber.slice(
+          0,
+          8
+        )}-${formattedNumber.slice(8)}`;
+      }
+      setValues((prev) => ({
+        ...prev,
+        id: formattedNumber,
+      }));
+    } else {
+      setValues((prev) => ({
+        ...prev,
+        id: value,
+      }));
+    }
   };
 
   const handlePasswordChange = (value: string) => {
@@ -45,6 +71,36 @@ export const useLoginForm = () => {
     }));
   };
 
+  const validateId = () => {
+    const { id } = values;
+    if (i18n.language === "ko") {
+      const phoneRegex = /^010-[0-9]{4}-[0-9]{4}$/;
+      if (!phoneRegex.test(id)) {
+        setErrors((prev) => ({
+          ...prev,
+          idError: t("login.phoneError"),
+        }));
+        return false;
+      }
+    } else {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(id)) {
+        setErrors((prev) => ({
+          ...prev,
+          idError: t("login.emailError"),
+        }));
+        return false;
+      }
+    }
+
+    setErrors((prev) => ({
+      ...prev,
+      idError: null,
+    }));
+
+    return true;
+  };
+
   const validatePassword = () => {
     const { password } = values;
     const regex =
@@ -53,8 +109,7 @@ export const useLoginForm = () => {
     if (!regex.test(password)) {
       setErrors((prev) => ({
         ...prev,
-        passwordError:
-          "비밀번호는 8자 이상 15자 이하이어야 하며, 영어, 숫자, 특수문자를 모두 포함해야 합니다.",
+        passwordError: t("login.passwordError"),
       }));
       return false;
     }
@@ -67,44 +122,28 @@ export const useLoginForm = () => {
     return true;
   };
 
-  const handleLogin = () => {
-    if (!values.email || !values.password) {
-      toast({
-        title: "로그인 실패",
-        description: "이메일과 비밀번호를 모두 입력해주세요.",
-        status: "error",
-        duration: 3000,
-        isClosable: true,
-      });
+  const onSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
+    if (!values.id || !values.password) {
+      showToast("login.loginFail", "login.description", "error");
       return;
     }
 
-    if (validatePassword()) {
-      console.log("Email:", values.email);
-      console.log("Password:", values.password);
-      console.log("Remember Me:", values.rememberMe);
-      // 여기에 실제 로그인 처리 로직을 추가할 수 있습니다.
-      // 예를 들어, 서버로 요청을 보내고 응답을 처리하는 등의 동작을 수행합니다.
-    } else {
-      // 비밀번호 유효성 검사 실패 시
-      toast({
-        title: "로그인 실패",
-        description: "유효하지 않은 비밀번호입니다.",
-        status: "error",
-        duration: 3000,
-        isClosable: true,
-      });
+    if (validateId() && validatePassword()) {
+      const token = "dummy-token"; //백엔드에서 받아올 예정
+      await handleLogin(token, values.id, values.rememberMe);
     }
   };
 
   return {
-    email: values.email,
+    id: values.id,
     password: values.password,
     rememberMe: values.rememberMe,
+    idError: errors.idError,
     passwordError: errors.passwordError,
-    handleEmailChange,
+    handleIdChange,
     handlePasswordChange,
     toggleRememberMe,
-    handleLogin,
+    onSubmit,
   };
 };

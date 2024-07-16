@@ -7,8 +7,15 @@ const LoginPage = () => {
 
   return (
     <Flex minH="100vh" align="center" direction="column">
-      <LoginAppBar field2="login.login"/>
-      <VStack spacing={8} w="full" justify="center" mt={isMobile ? 0 : 50}>
+      <LoginAppBar field2="login.login" />
+      <VStack
+        mt={isMobile ? "50px" : "60px"}
+        minH={isMobile ? "calc(100vh - 50px)" : "calc(100vh - 60px)"}
+        spacing={8}
+        w="full"
+        justify="center"
+        align={"center"}
+      >
         <LoginForm />
       </VStack>
     </Flex>

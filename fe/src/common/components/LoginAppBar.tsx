@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import { Box, Text, Flex, useBreakpointValue } from "@chakra-ui/react";
 import { FaRegBell } from "react-icons/fa6";
 import { useTranslation } from "react-i18next";
@@ -18,21 +18,26 @@ const LoginAppBar: React.FC<LoginAppBarProps> = ({
 }) => {
   const { t } = useTranslation();
   const isMobile = useBreakpointValue({ base: true, md: false });
+  const appBarHeight = isMobile ? "50px" : "60px";
 
   return (
     <Flex
       w="full"
-      h={isMobile ? "60px" : "80px"}
+      h={appBarHeight}
       borderBottom="1px"
       borderColor="#CDCDCD"
       justify="space-between"
       direction="row"
+      position="fixed"
+      top="0"
+      bg="white"
+      zIndex="1000"
     >
       <Text
         fontSize="2xl"
         fontWeight="700"
-        paddingTop={isMobile ? "10px" : "20px"}
-        paddingLeft={isMobile ? "20px" : "40px"}
+        paddingTop={isMobile ? "5px" : "10px"}
+        paddingLeft={isMobile ? "15px" : "20px"}
       >
         StoryBridge
       </Text>
@@ -40,7 +45,8 @@ const LoginAppBar: React.FC<LoginAppBarProps> = ({
         {field1 && (
           <Text
             marginLeft={3}
-            lineHeight={isMobile ? "60px" : "80px"}
+            fontSize={isMobile ? "xs" : "md"}
+            lineHeight={appBarHeight}
             fontWeight="400"
             cursor="pointer"
             onClick={field1OnClick}
@@ -51,7 +57,8 @@ const LoginAppBar: React.FC<LoginAppBarProps> = ({
         {field2 && (
           <Text
             marginLeft={3}
-            lineHeight={isMobile ? "60px" : "80px"}
+            fontSize={isMobile ? "xs" : "md"}
+            lineHeight={appBarHeight}
             fontWeight="400"
             cursor="pointer"
             onClick={field2OnClick}
@@ -61,10 +68,10 @@ const LoginAppBar: React.FC<LoginAppBarProps> = ({
         )}
         <Box
           as={FaRegBell}
-          fontSize="xl"
+          fontSize="lg"
           marginLeft={3}
           marginRight={8}
-          h={isMobile ? "60px" : "80px"}
+          h={appBarHeight}
         />
       </Flex>
     </Flex>
