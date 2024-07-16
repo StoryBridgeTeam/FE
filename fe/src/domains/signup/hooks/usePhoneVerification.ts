@@ -7,9 +7,13 @@ export const usePhoneVerification = () => {
   const { nextStep, setCondition } = useStepsStore();
   const {
     username,
+    gender,
+    birthDate,
     phoneNumber,
     telecom,
     setUsername,
+    setGender,
+    setBirthDate,
     setPhoneNumber,
     setTelecom,
   } = usePhoneVerificationStore();
@@ -17,6 +21,14 @@ export const usePhoneVerification = () => {
 
   const handleNameChange = (inputName: string) => {
     setUsername(inputName);
+  };
+
+  const handleGenderChange = (inputGender: string) => {
+    setGender(inputGender);
+  };
+
+  const handleBirthDateChange = (inputDate: string) => {
+    setBirthDate(inputDate);
   };
 
   const handlePhoneNumberChange = (inputNumber: string) => {
@@ -34,6 +46,10 @@ export const usePhoneVerification = () => {
     return nameRegex.test(username);
   };
 
+  const isInputDateValid = (): boolean => {
+    return birthDate.length === 8;
+  };
+
   const isInputNumberValid = (): boolean => {
     return phoneNumber.length === 11;
   };
@@ -44,24 +60,40 @@ export const usePhoneVerification = () => {
     nextStep();
   };
 
+  const isInputValid = (): boolean => {
+    return (
+      isInputNameValid() &&
+      isInputDateValid() &&
+      isInputNumberValid() &&
+      !!gender &&
+      !!telecom
+    );
+  };
+
   useEffect(() => {
-    if (isInputNameValid() && isInputNumberValid() && !!telecom) {
+    if (isInputValid()) {
       setCondition(3, true);
+      console.log(username + gender + birthDate + phoneNumber + telecom);
     } else {
       setCondition(3, false);
     }
-  }, [username, phoneNumber, telecom]);
+  }, [username, gender, birthDate, phoneNumber, telecom]);
 
   return {
     username,
+    gender,
+    birthDate,
     phoneNumber,
     telecom,
     handleNameChange,
+    handleGenderChange,
+    handleBirthDateChange,
     handlePhoneNumberChange,
     handleTelecomChange,
     handleSendRequestPhone,
     isInputNameValid,
     isInputNumberValid,
+    isInputDateValid,
   };
 };
 
