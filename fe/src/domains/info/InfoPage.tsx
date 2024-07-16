@@ -1,35 +1,39 @@
-import { Box, Flex, useBreakpointValue } from "@chakra-ui/react";
+import { Flex, useBreakpointValue } from "@chakra-ui/react";
 import LoginAppBar from "../../common/components/LoginAppBar";
 import { useAuthStore } from "../login/stores/useAuthStore";
-import { useTranslation } from "react-i18next";
 import { useToastMessage } from "../../common/hooks/useToastMessage";
-function InfoPage() {
+import { FC } from "react";
+import MainContent from "./components/MainContent";
+import ProfileSidebar from "./components/ProfileSideBar";
+const InfoPage: FC = () => {
   const isMobile = useBreakpointValue({ base: true, md: false });
   const logout = useAuthStore((state) => state.logout);
   const { showToast } = useToastMessage();
-  const { t } = useTranslation();
+
   return (
-    <Flex minH="100vh" align="center" direction="column">
+    <Flex minH="100vh" direction="column">
       <LoginAppBar
         field1="header.mypage"
         field2="header.logout"
         field2OnClick={() => {
           logout();
-          showToast("logout.successTitle", "logout.successDescription", "success");
+          showToast(
+            "logout.successTitle",
+            "logout.successDescription",
+            "success"
+          );
         }}
       />
-      <Box
-        w="1120px"
-        h="999px"
-        border="1px"
-        borderTop="0px"
-        borderColor="#CDCDCD"
+      <Flex
+        mt={isMobile ? "50px" : "60px"}
+        minH={isMobile ? "calc(100vh - 50px)" : "calc(100vh - 60px)"}
+        direction={isMobile ? "column" : "row"}
       >
-        <Flex h="500px" border="1px" borderColor={"red"}>
-          sdfsd
-        </Flex>
-      </Box>
+        
+        <MainContent />
+      </Flex>
     </Flex>
   );
-}
+};
+
 export default InfoPage;

@@ -26,9 +26,15 @@
     "successDescription": "성공적으로 로그인되었습니다",
     "failTitle": "로그인 실패",
     "failDescription": "유효하지 않은 비밀번호입니다"
-  }
-  ,"logout": {
+  },
+  "logout": {
     "successTitle": "로그아웃 성공",
     "successDescription": "성공적으로 로그아웃되었습니다"
+  },
+  "info": {
+    "info": "자기소개서",
+    "list": "목록보기",
+    "commentPlaceHolder": "댓글을 입력하세요...",
+    "add_new": "추가하기"
   }
 }

@@ -1,7 +1,7 @@
-import { useHandleLogin } from "./useHandleLogin";
+//import { useHandleLogin } from "./useHandleLogin";
 
 export const useSocialLogin= () => {
-  const handleLogin = useHandleLogin();
+ // const handleLogin = useHandleLogin();
   const handleGoogleLogin = () => {
     console.log("Google login clicked");
     // const onSubmit = async () => {

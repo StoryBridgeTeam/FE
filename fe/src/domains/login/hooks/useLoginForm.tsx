@@ -1,7 +1,5 @@
 import { useState } from "react";
-import { useAuthStore } from "../stores/useAuthStore";
 import { useTranslation } from "react-i18next";
-import { useNavigate } from "react-router-dom";
 import { useToastMessage } from "../../../common/hooks/useToastMessage";
 import { useHandleLogin } from "./useHandleLogin";
 
@@ -124,7 +122,8 @@ export const useLoginForm = () => {
     return true;
   };
 
-  const onSubmit = async () => {
+  const onSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
     if (!values.id || !values.password) {
       showToast("login.loginFail", "login.description", "error");
       return;

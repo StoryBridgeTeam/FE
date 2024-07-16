@@ -1,4 +1,3 @@
-// PasswordInput.tsx
 import React, { useState } from "react";
 import {
   Input,
@@ -37,6 +36,8 @@ const PasswordInput: React.FC<PasswordInputProps> = ({
           value={password}
           onChange={(e) => handlePasswordChange(e.target.value)}
           isInvalid={!!passwordError}
+          autoComplete="current-password"
+          id="password"
         />
         <InputRightElement width="3rem">
           <IconButton

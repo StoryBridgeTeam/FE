@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import Cookies from "js-cookie";
 
 interface AuthState {
   isAuthenticated: boolean;
@@ -14,27 +15,24 @@ export const useAuthStore = create<AuthState>((set) => ({
   token: null,
   id: null,
   login: (token: string, id: string, rememberMe: boolean) => {
-    const expires = rememberMe ? 30 * 24 * 60 * 60 * 1000 : 30 * 60 * 1000;
-    const expiryDate = new Date().getTime() + expires;
-    localStorage.setItem("token", token);
-    localStorage.setItem("id", id);
-    localStorage.setItem("expiry", expiryDate.toString());
+    const expires = rememberMe ? 30 : 0.5; // 30 days or 30 minutes
+    Cookies.set("token", token, { expires, secure: true, sameSite: "Strict" });
+    Cookies.set("id", id, { expires, secure: true, sameSite: "Strict" });
     set({ isAuthenticated: true, token, id });
   },
   logout: () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("id");
-    localStorage.removeItem("expiry");
+    Cookies.remove("token");
+    Cookies.remove("id");
     set({ isAuthenticated: false, token: null, id: null });
   },
   checkAuth: async () => {
-    const token = localStorage.getItem("token");
-    const id = localStorage.getItem("id");
-    const expiry = localStorage.getItem("expiry");
-    if (token && id && expiry && new Date().getTime() < parseInt(expiry)) {
+    const token = Cookies.get("token");
+    const id = Cookies.get("id");
+
+    if (token && id) {
       set({ isAuthenticated: true, token, id });
     } else {
-      set({ isAuthenticated: false, token: null });
+      set({ isAuthenticated: false, token: null, id: null });
     }
   },
 }));
