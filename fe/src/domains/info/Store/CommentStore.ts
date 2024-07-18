@@ -1,22 +1,23 @@
 import create from "zustand";
 
-// `timestamp`를 문자열로 저장하여 직렬화 문제를 해결합니다.
-interface NormalComment {
+interface Comment {
   text: string;
-  timestamp: string; // Date 객체를 문자열로 변환
+  timestamp: string;
   username: string;
+  startIndex?: number;
+  endIndex?: number;
 }
 
-interface NormalCommentStore {
-  comments: NormalComment[];
+interface CommentStore {
+  comments: Comment[];
   addComment: (
-    comment: Omit<NormalComment, "timestamp"> & { timestamp: string }
+    comment: Omit<Comment, "timestamp"> & { timestamp: string }
   ) => void;
   deleteComment: (index: number) => void;
   updateComment: (index: number, text: string) => void;
 }
 
-export const useNormalCommentStore = create<NormalCommentStore>((set) => ({
+export const useCommentStore = create<CommentStore>((set) => ({
   comments: [],
   addComment: (comment) =>
     set((state) => ({ comments: [...state.comments, comment] })),

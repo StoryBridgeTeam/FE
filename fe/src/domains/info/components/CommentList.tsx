@@ -1,3 +1,4 @@
+import React, { useState, useEffect, useRef } from "react";
 import {
   Box,
   Flex,
@@ -7,7 +8,6 @@ import {
   MenuButton,
   MenuList,
   MenuItem,
-  useDisclosure,
   Button,
   Input,
   Modal,
@@ -16,22 +16,33 @@ import {
   ModalHeader,
   ModalBody,
   ModalFooter,
+  useDisclosure,
+  Tag,
+  TagLabel,
 } from "@chakra-ui/react";
 import { BiDotsVerticalRounded } from "react-icons/bi";
 import { Trash, Edit } from "tabler-icons-react";
 import { formatDistanceToNow } from "date-fns";
-import { useNormalCommentStore } from "../Store/NormalCommentStore";
-import { useEffect, useRef, useState } from "react";
+import { useCommentStore } from "../Store/CommentStore";
 import { useToastMessage } from "../../../common/hooks/useToastMessage";
+import { useTranslation } from "react-i18next";
 
-const NormalCommentList = () => {
-  const { comments, deleteComment, updateComment } = useNormalCommentStore();
+interface CommentListProps {
+  content: string;
+  highlightComment: (startIndex: number, endIndex: number) => void;
+}
+
+const CommentList: React.FC<CommentListProps> = ({
+  content,
+  highlightComment,
+}) => {
+  const { comments, deleteComment, updateComment } = useCommentStore();
   const commentsEndRef = useRef<HTMLDivElement | null>(null);
   const [editIndex, setEditIndex] = useState<number | null>(null);
   const [editText, setEditText] = useState<string>("");
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { showToast } = useToastMessage();
-
+  const { t } = useTranslation();
   const handleEdit = (index: number, text: string) => {
     setEditIndex(index);
     setEditText(text);
@@ -44,7 +55,11 @@ const NormalCommentList = () => {
       setEditIndex(null);
       setEditText("");
       onClose();
-      showToast("Comment Updatd", "Your Comment has been updated", "success");
+      showToast(
+        t(`info.commentUpdated`),
+        t(`info.commentUpdatedMessage`),
+        "success"
+      );
     }
   };
 
@@ -54,11 +69,27 @@ const NormalCommentList = () => {
     }
   }, [comments]);
 
+  const getHighlightedText = (startIndex?: number, endIndex?: number) => {
+    if (startIndex !== undefined && endIndex !== undefined) {
+      return content.substring(startIndex, endIndex);
+    }
+    return "";
+  };
+
+  const handleTagClick = (
+    startIndex: number | undefined,
+    endIndex: number | undefined
+  ) => {
+    if (startIndex !== undefined && endIndex !== undefined) {
+      highlightComment(startIndex, endIndex);
+    }
+  };
+
   return (
     <>
-      <Box border="1px" borderColor="#EEEEEE" minH="28vh" p={4} mb={"82px"}>
+      <Box border="1px" borderColor="#EEEEEE" p={4} mb={"82px"} h={"100%"}>
         {comments.map((comment, index) => (
-          <Box marginBottom={5} key={index}>
+          <Box marginBottom={5} key={index} id={`comment-${index}`}>
             <Flex align="center">
               <Avatar
                 size="sm"
@@ -96,14 +127,42 @@ const NormalCommentList = () => {
                   </MenuItem>
                   <MenuItem
                     icon={<Trash />}
-                    onClick={() => deleteComment(index)}
+                    onClick={() => {
+                      deleteComment(index);
+                      showToast(
+                        t(`info.commentDelete`),
+                        t(`info.commentDeleteMessage`),
+                        "success"
+                      );
+                    }}
                   >
                     Delete
                   </MenuItem>
                 </MenuList>
               </Menu>
             </Flex>
-            <Text mt={1} marginLeft={10} pr={5}>
+            {comment.startIndex !== undefined &&
+              comment.endIndex !== undefined && (
+                <Tag
+                  mt={1}
+                  size="md"
+                  fontSize="xs"
+                  colorScheme="gray"
+                  borderRadius="full"
+                  mb={2}
+                  marginLeft={10}
+                  pr={5}
+                  cursor="pointer"
+                  onClick={() =>
+                    handleTagClick(comment.startIndex, comment.endIndex)
+                  }
+                >
+                  <TagLabel color={"gray"}>
+                    {getHighlightedText(comment.startIndex, comment.endIndex)}
+                  </TagLabel>
+                </Tag>
+              )}
+            <Text marginLeft={10} pr={5}>
               {comment.text}
             </Text>
           </Box>
@@ -135,4 +194,4 @@ const NormalCommentList = () => {
   );
 };
 
-export default NormalCommentList;
+export default CommentList;

@@ -1,15 +1,37 @@
-// CommentInput.tsx
-import { Box, Container, Flex, Input, Button, Avatar } from "@chakra-ui/react";
-import { useState, useRef, useEffect } from "react";
+import React, { useState, useEffect } from "react";
+import {
+  Box,
+  Container,
+  Flex,
+  Input,
+  Button,
+  Avatar,
+  Tag,
+  TagLabel,
+  TagCloseButton,
+} from "@chakra-ui/react";
 import { Send } from "tabler-icons-react";
-import { useNormalCommentStore } from "../Store/NormalCommentStore";
 import { useTranslation } from "react-i18next";
 
-const CommentInput = () => {
+interface CommentInputProps {
+  selectedText: { text: string; startIndex: number; endIndex: number } | null;
+  onSubmit: (text: string) => void;
+  onClearSelectedText: () => void;
+}
+
+const CommentInput: React.FC<CommentInputProps> = ({
+  selectedText,
+  onSubmit,
+  onClearSelectedText,
+}) => {
   const [comment, setComment] = useState("");
-  const addComment = useNormalCommentStore((state) => state.addComment);
-  const commentsEndRef = useRef<HTMLDivElement | null>(null);
   const { t } = useTranslation();
+
+  useEffect(() => {
+    if (selectedText) {
+      setComment("");
+    }
+  }, [selectedText]);
 
   const handleCommentChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setComment(e.target.value);
@@ -17,16 +39,8 @@ const CommentInput = () => {
 
   const handleCommentSubmit = () => {
     if (comment.trim()) {
-      const newComment = {
-        text: comment,
-        timestamp: new Date().toISOString(),
-        username: "User Name",
-      };
-      addComment(newComment);
+      onSubmit(comment);
       setComment("");
-      if (commentsEndRef.current) {
-        commentsEndRef.current.scrollIntoView({ behavior: "smooth" });
-      }
     }
   };
 
@@ -54,19 +68,25 @@ const CommentInput = () => {
             src="https://image.idus.com/image/files/da17e0c53a4e480284c5d49932722e5a.jpg"
             mr={2}
           />
-          <Input
-            value={comment}
-            onChange={handleCommentChange}
-            onKeyDown={handleKeyDown}
-            placeholder={t(`info.commentPlaceHolder`)}
-            mr={3}
-          />
+          <Box flex="1" mr={3}>
+            {selectedText && (
+              <Tag size="md" colorScheme="blue" borderRadius="full" mb={2}>
+                <TagLabel>{selectedText.text}</TagLabel>
+                <TagCloseButton onClick={onClearSelectedText} />
+              </Tag>
+            )}
+            <Input
+              value={comment}
+              onChange={handleCommentChange}
+              onKeyDown={handleKeyDown}
+              placeholder={t(`info.commentPlaceHolder`)}
+            />
+          </Box>
           <Button onClick={handleCommentSubmit}>
             <Send />
           </Button>
         </Flex>
       </Container>
-      <div ref={commentsEndRef} />
     </Box>
   );
 };

@@ -72,19 +72,22 @@ const MainContent: FC = () => {
     setMockData((prevData) => prevData.filter((item) => item.id !== id));
   };
 
-  const handleInputChange = (id: number, field: string, value: string) => {
-    setMockData((prevData) =>
-      prevData.map((data) =>
-        data.id === id ? { ...data, [field]: value } : data
-      )
-    );
-  };
-
   const handleAddNewClick = () => {
     const newId = mockData.length + 1;
     const newMockData: MockData = { id: newId, title: "", content: "" };
     setMockData([...mockData, newMockData]);
     setIsEditing(true);
+  };
+
+  const handleSaveDetail = (
+    id: number,
+    updatedData: { title: string; content: string }
+  ) => {
+    setMockData((prevData) =>
+      prevData.map((item) =>
+        item.id === id ? { ...item, ...updatedData } : item
+      )
+    );
   };
 
   return (
@@ -93,10 +96,13 @@ const MainContent: FC = () => {
       <Container maxW="4xl" mt={5}>
         {selectedId ? (
           <>
-            <Flex w="full" justifyContent="flex-end" alignItems="center">
-              <Button onClick={handleBackClick}>{t(`info.list`)}</Button>
-            </Flex>
-            <DetailPage id={selectedId} />
+            
+            <DetailPage
+              id={selectedId}
+              data={mockData.find((item) => item.id === selectedId)!}
+              onSave={handleSaveDetail}
+              onBack={handleBackClick}
+            />
           </>
         ) : (
           <>
@@ -122,13 +128,14 @@ const MainContent: FC = () => {
                 content={data.content}
                 isEditing={isEditing}
                 onClick={handleSectionClick}
-                onChange={handleInputChange}
                 onDelete={handleDelete}
               />
             ))}
-            <Flex justifyContent="center" mt={3} mb={8}>
-              <Button onClick={handleAddNewClick}>{t(`info.add_new`)}</Button>
-            </Flex>
+            {isEditing ? (
+              <Flex justifyContent="center" mt={3} mb={8}>
+                <Button onClick={handleAddNewClick}>{t(`info.add_new`)}</Button>
+              </Flex>
+            ) : undefined}
           </>
         )}
       </Container>
