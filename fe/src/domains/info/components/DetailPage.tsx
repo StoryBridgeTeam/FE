@@ -11,10 +11,9 @@ import {
 import { Edit, Check } from "tabler-icons-react";
 import { useTranslation } from "react-i18next";
 import { renderContentWithHighlights } from "./renderContentWithHighlights";
-import { useTextSelection } from "../Store/useTextSelection";
+import { useTextSelection } from "../hook/useTextSelection";
 import CommentInput from "./CommentInput";
 import CommentList from "./CommentList";
-import { mockData } from "../infoData"; // Assuming this is where your mock data is imported
 import { useCommentStore } from "../Store/CommentStore";
 
 interface DetailPageProps {
@@ -39,7 +38,6 @@ const DetailPage: React.FC<DetailPageProps> = ({
   const { comments } = useCommentStore();
   const { t } = useTranslation();
   const isMobile = useBreakpointValue({ base: true, md: false });
-
   const [editedTitle, setEditedTitle] = useState(data.title);
   const [editedContent, setEditedContent] = useState(data.content);
   const [isEditing, setIsEditing] = useState(false);
@@ -158,7 +156,7 @@ const DetailPage: React.FC<DetailPageProps> = ({
         </Box>
         <Box flex="1">
           <CommentList
-            content={mockData.content}
+            content={data.content}
             highlightComment={scrollToHighlightedText}
           />
         </Box>

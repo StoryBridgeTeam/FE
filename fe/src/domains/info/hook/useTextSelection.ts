@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useCommentStore } from "./CommentStore";
+import { useCommentStore } from "../Store/CommentStore";
 
 export const useTextSelection = () => {
   const [selectedText, setSelectedText] = useState<{
@@ -7,6 +7,8 @@ export const useTextSelection = () => {
     startIndex: number;
     endIndex: number;
   } | null>(null);
+
+  const comments = useCommentStore((state) => state.comments);
 
   const handleMouseUp = () => {
     const selection = window.getSelection();
@@ -18,7 +20,23 @@ export const useTextSelection = () => {
 
       const text = selection.toString();
       if (text.trim().length > 0) {
-        setSelectedText({ text, startIndex: startOffset, endIndex: endOffset });
+        const intersects = comments.some(
+          (comment) =>
+            comment.startIndex !== undefined &&
+            comment.endIndex !== undefined &&
+            startOffset < comment.startIndex &&
+            endOffset > comment.startIndex
+        );
+
+        if (!intersects && startOffset < endOffset) {
+          setSelectedText({
+            text,
+            startIndex: startOffset,
+            endIndex: endOffset,
+          });
+        } else {
+          window.getSelection()?.removeAllRanges();
+        }
       }
     }
   };
@@ -26,7 +44,7 @@ export const useTextSelection = () => {
   const getOffset = (node: Node, offset: number): number => {
     let totalOffset = 0;
 
-    const traverseNodes = (currentNode: Node) => {
+    const traverseNodes = (currentNode: Node): boolean => {
       if (currentNode.nodeType === Node.TEXT_NODE) {
         if (currentNode === node) {
           totalOffset += offset;

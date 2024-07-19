@@ -30,7 +30,11 @@ export const renderContentWithHighlights = (
           id={`highlight-${index}`}
           key={`highlight-${index}`}
           className="highlight"
-          style={{ backgroundColor: "yellow", cursor: "pointer" }}
+          style={{
+            backgroundColor: "yellow",
+            cursor: "pointer",
+            userSelect: "none",
+          }}
           onClick={() =>
             scrollToHighlightedText(comment.startIndex, comment.endIndex)
           }
