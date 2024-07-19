@@ -17,6 +17,7 @@ import CommentList from "./CommentList";
 import { useCommentStore } from "../Store/CommentStore";
 
 interface DetailPageProps {
+  isEdit: boolean;
   id: number;
   data: { title: string; content: string };
   onSave: (id: number, updatedData: { title: string; content: string }) => void;
@@ -24,6 +25,7 @@ interface DetailPageProps {
 }
 
 const DetailPage: React.FC<DetailPageProps> = ({
+  isEdit,
   id,
   data,
   onSave,
@@ -40,7 +42,7 @@ const DetailPage: React.FC<DetailPageProps> = ({
   const isMobile = useBreakpointValue({ base: true, md: false });
   const [editedTitle, setEditedTitle] = useState(data.title);
   const [editedContent, setEditedContent] = useState(data.content);
-  const [isEditing, setIsEditing] = useState(false);
+  const [isEditing, setIsEditing] = useState(isEdit);
 
   const handleEditClick = () => {
     setIsEditing(true);
@@ -127,7 +129,11 @@ const DetailPage: React.FC<DetailPageProps> = ({
           {isEditing ? (
             <Input
               value={editedTitle}
-              onChange={(e) => setEditedTitle(e.target.value)}
+              onChange={(e) => {
+                if (e.target.value.length <= 20) {
+                  setEditedTitle(e.target.value);
+                }
+              }}
               fontSize="lg"
               fontWeight="bold"
             />

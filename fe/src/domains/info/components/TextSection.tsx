@@ -47,16 +47,19 @@ const TextSection: FC<TextSectionProps> = ({
           />
         ) : undefined}
       </Flex>
-        <Box
-          bg="#EEEEEE"
-          mt={4}
-          p={5}
-          borderRadius="30"
-          onClick={() => onClick(id)}
-          whiteSpace="pre-wrap"
-        >
-          <Text>{content}</Text>
-        </Box>
+      <Box
+        bg="#EEEEEE"
+        mt={4}
+        p={5}
+        borderRadius="30"
+        onClick={() => onClick(id)}
+        whiteSpace="pre-wrap"
+        maxH="15em"
+        overflow="hidden"
+        textOverflow="ellipsis"
+      >
+        <Text noOfLines={6}>{content}</Text>
+      </Box>
     </Box>
   );
 };

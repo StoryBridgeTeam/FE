@@ -5,7 +5,7 @@ import {
   Flex,
   useBreakpointValue,
 } from "@chakra-ui/react";
-import { FC, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import { Edit, Check } from "tabler-icons-react";
 import DetailPage from "./DetailPage";
 import { useTranslation } from "react-i18next";
@@ -75,6 +75,7 @@ const MainContent: FC = () => {
     const newMockData: MockData = { id: newId, title: "", content: "" };
     setMockData([...mockData, newMockData]);
     setIsEditing(true);
+    setSelectedId(newId);
   };
 
   const handleSaveDetail = (
@@ -94,12 +95,12 @@ const MainContent: FC = () => {
       <Container maxW="4xl" mt={5}>
         {selectedId ? (
           <>
-            
             <DetailPage
               id={selectedId}
               data={mockData.find((item) => item.id === selectedId)!}
               onSave={handleSaveDetail}
               onBack={handleBackClick}
+              isEdit={isEditing}
             />
           </>
         ) : (
