@@ -1,5 +1,6 @@
 import { ChakraProvider, extendTheme } from "@chakra-ui/react";
 import LoginPage from "./domains/login/LoginPage";
+import SignupPage from "./domains/signup/SignupPage";
 import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
 import { useAuthStore } from "./domains/login/stores/useAuthStore";
 import { useEffect, useState } from "react";
@@ -8,7 +9,7 @@ import InfoPage from "./domains/info/InfoPage";
 
 const theme = extendTheme({
   fonts: {
-    body: "Inter, sans-serif",
+    body: "Inter, sans-serif", // 전역 body 요소에 적용될 글꼴
   },
 });
 
@@ -30,6 +31,7 @@ function App() {
     <ChakraProvider theme={theme}>
       <BrowserRouter>
         <Routes>
+          <Route path="/signup" element={<SignupPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route
             path="/:id"
