@@ -5,7 +5,7 @@ import {
   Flex,
   useBreakpointValue,
 } from "@chakra-ui/react";
-import { FC, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import { Edit, Check } from "tabler-icons-react";
 import DetailPage from "./DetailPage";
 import { useTranslation } from "react-i18next";
@@ -22,9 +22,7 @@ const initialMockData: MockData[] = [
   {
     id: 1,
     title: "000 항목",
-    content: `[대회 이름]에 참가하게 된 동기는 [대회 참여 동기] 때문입니다. 이 대회는 [대회에 대한 설명 및 목표]라는 점에서 저의 관심을 끌었습니다. 특히, [특정 요소]가 저에게 매우 매력적으로 다가왔습니다.
-대회를 준비하면서, 저는 [준비 과정]에 주력했습니다. 처음에는 [어려움]에 부딪혔지만, [문제 해결 방법]을 통해 극복할 수 있었습니다. 팀원들과의 협업도 중요한 부분이었는데, 우리는 [팀워크 경험]을 통해 서로의 강점을 최대한 활용했습니다.
-대회 기간 동안, 저는 [구체적인 활동]을 통해 많은 것을 배웠습니다.이 대회를 통해 저는 [개인적인 성장 또는 배운 점]을 느꼈고, 앞으로의 목표를 더욱 명확히 할 수 있었습니다.`,
+    content: `[대회 이름]에 참가하게 된 동기는 [대회 참여 동기] 때문입니다. 이 대회는 [대회에 대한 설명 및 목표]라는 점에서 저의 관심을 끌었습니다. 특히, [특정 요소]가 저에게 매우 매력적으로 다가왔습니다. 대회를 준비하면서, 저는 [준비 과정]에 주력했습니다. 처음에는 [어려움]에 부딪혔지만, [문제 해결 방법]을 통해 극복할 수 있었습니다. 팀원들과의 협업도 중요한 부분이었는데, 우리는 [팀워크 경험]을 통해 서로의 강점을 최대한 활용했습니다. 대회 기간 동안, 저는 [구체적인 활동]을 통해 많은 것을 배웠습니다.이 대회를 통해 저는 [개인적인 성장 또는 배운 점]을 느꼈고, 앞으로의 목표를 더욱 명확히 할 수 있었습니다.`,
   },
   {
     id: 2,
@@ -72,19 +70,23 @@ const MainContent: FC = () => {
     setMockData((prevData) => prevData.filter((item) => item.id !== id));
   };
 
-  const handleInputChange = (id: number, field: string, value: string) => {
-    setMockData((prevData) =>
-      prevData.map((data) =>
-        data.id === id ? { ...data, [field]: value } : data
-      )
-    );
-  };
-
   const handleAddNewClick = () => {
     const newId = mockData.length + 1;
     const newMockData: MockData = { id: newId, title: "", content: "" };
     setMockData([...mockData, newMockData]);
     setIsEditing(true);
+    setSelectedId(newId);
+  };
+
+  const handleSaveDetail = (
+    id: number,
+    updatedData: { title: string; content: string }
+  ) => {
+    setMockData((prevData) =>
+      prevData.map((item) =>
+        item.id === id ? { ...item, ...updatedData } : item
+      )
+    );
   };
 
   return (
@@ -93,10 +95,13 @@ const MainContent: FC = () => {
       <Container maxW="4xl" mt={5}>
         {selectedId ? (
           <>
-            <Flex w="full" justifyContent="flex-end" alignItems="center">
-              <Button onClick={handleBackClick}>{t(`info.list`)}</Button>
-            </Flex>
-            <DetailPage id={selectedId} />
+            <DetailPage
+              id={selectedId}
+              data={mockData.find((item) => item.id === selectedId)!}
+              onSave={handleSaveDetail}
+              onBack={handleBackClick}
+              isEdit={isEditing}
+            />
           </>
         ) : (
           <>
@@ -122,13 +127,14 @@ const MainContent: FC = () => {
                 content={data.content}
                 isEditing={isEditing}
                 onClick={handleSectionClick}
-                onChange={handleInputChange}
                 onDelete={handleDelete}
               />
             ))}
-            <Flex justifyContent="center" mt={3} mb={8}>
-              <Button onClick={handleAddNewClick}>{t(`info.add_new`)}</Button>
-            </Flex>
+            {isEditing ? (
+              <Flex justifyContent="center" mt={3} mb={8}>
+                <Button onClick={handleAddNewClick}>{t(`info.add_new`)}</Button>
+              </Flex>
+            ) : undefined}
           </>
         )}
       </Container>

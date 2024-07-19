@@ -6,7 +6,7 @@ import {
   Divider,
   Text,
   useBreakpointValue,
-  Input,
+  Textarea,
   IconButton,
 } from "@chakra-ui/react";
 import { FC, useState } from "react";
@@ -15,10 +15,9 @@ import { useParams } from "react-router-dom";
 import { useAuthStore } from "../../login/stores/useAuthStore";
 
 const ProfileSidebar: FC = () => {
-  const { id } = useParams<{ id: string }>(); 
+  const { id } = useParams<{ id: string }>();
   const { id: userId } = useAuthStore((state) => state);
   const isMobile = useBreakpointValue({ base: true, md: false });
-
 
   const [isEditing, setIsEditing] = useState(false);
   const [name, setName] = useState("이름");
@@ -57,16 +56,7 @@ const ProfileSidebar: FC = () => {
         )}
       </Flex>
       <ProfileImage />
-      {isEditing ? (
-        <Input
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          size="md"
-          textAlign="center"
-        />
-      ) : (
-        <Heading size="md">{name}</Heading>
-      )}
+      <Heading size="md">{name}</Heading>
       <Divider borderColor="#C5C5C5" />
       <InfoSection
         title="About Me"
@@ -122,7 +112,7 @@ const InfoSection: FC<{
       {title}
     </Box>
     {isEditing ? (
-      <Input
+      <Textarea
         value={content}
         onChange={(e) => onChange(e.target.value)}
         size="xs"

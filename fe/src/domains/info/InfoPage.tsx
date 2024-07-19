@@ -4,7 +4,6 @@ import { useAuthStore } from "../login/stores/useAuthStore";
 import { useToastMessage } from "../../common/hooks/useToastMessage";
 import { FC } from "react";
 import MainContent from "./components/MainContent";
-import ProfileSidebar from "./components/ProfileSideBar";
 const InfoPage: FC = () => {
   const isMobile = useBreakpointValue({ base: true, md: false });
   const logout = useAuthStore((state) => state.logout);
@@ -29,7 +28,6 @@ const InfoPage: FC = () => {
         minH={isMobile ? "calc(100vh - 50px)" : "calc(100vh - 60px)"}
         direction={isMobile ? "column" : "row"}
       >
-        
         <MainContent />
       </Flex>
     </Flex>
