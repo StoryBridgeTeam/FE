@@ -10,12 +10,6 @@ import {
   MenuItem,
   Button,
   Input,
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
   useDisclosure,
   Tag,
   TagLabel,
@@ -29,6 +23,7 @@ import { useTranslation } from "react-i18next";
 import { renderContentWithHighlights } from "./renderContentWithHighlights";
 import { useTextSelection } from "../hook/useTextSelection";
 import { SlideUpModal } from "../../../common/components/SlideUpModal";
+import { SlideUpSmallModal } from "../../../common/components/SlideUpSmallModal";
 
 interface CommentListProps {
   content: string;
@@ -230,10 +225,10 @@ const CommentList: React.FC<CommentListProps> = ({
         <div ref={commentsEndRef} />
       </Box>
 
-      <SlideUpModal
+      <SlideUpSmallModal
         isOpen={isOpen}
         onClose={onClose}
-        title="Enter text to edit"
+        title={t(`info.editCommnet`)}
         footerContent={
           <>
             <Button variant="ghost" onClick={onClose}>
@@ -252,31 +247,8 @@ const CommentList: React.FC<CommentListProps> = ({
             onChange={(e) => setEditText(e.target.value)}
           />
         </Box>
-      </SlideUpModal>
-
-      {/* <Modal isOpen={isOpen} onClose={onClose}>
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>Edit Comment</ModalHeader>
-          <ModalBody>
-            <Box>
-              <Input
-                placeholder="Enter text to edit"
-                value={editText}
-                onChange={(e) => setEditText(e.target.value)}
-              />
-            </Box>
-          </ModalBody>
-          <ModalFooter>
-            <Button variant="ghost" onClick={onClose}>
-              Cancel
-            </Button>
-            <Button colorScheme="blue" ml={3} onClick={handleSave}>
-              Save
-            </Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal> */}
+      </SlideUpSmallModal>
+      
       <SlideUpModal
         isOpen={isConnectOpen}
         onClose={onConnectClose}
