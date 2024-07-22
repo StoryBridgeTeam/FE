@@ -9,7 +9,7 @@ import InfoPage from "./domains/info/InfoPage";
 
 const theme = extendTheme({
   fonts: {
-    body: "Inter, sans-serif", // 전역 body 요소에 적용될 글꼴
+    body: "Inter, sans-serif",
   },
 });
 
@@ -24,7 +24,7 @@ function App() {
   }, [checkAuth]);
 
   if (!initialized) {
-    return null; // You could also return a loading spinner here
+    return null;
   }
 
   return (
