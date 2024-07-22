@@ -211,7 +211,6 @@ const CommentList: React.FC<CommentListProps> = ({
                   borderRadius="full"
                   mb={2}
                   marginLeft={10}
-                  pr={5}
                   cursor="pointer"
                   onClick={() =>
                     handleTagClick(comment.startIndex, comment.endIndex)
