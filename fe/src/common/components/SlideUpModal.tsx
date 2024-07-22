@@ -52,6 +52,7 @@ export const SlideUpModal: React.FC<SlideUpModalProps> = ({
         mx={isMobile ? 0 : "auto"}
         h="80vh"
         overflow="hidden"
+        mb={0}
       >
         <ModalCloseButton _focus={{ boxShadow: "none" }} mt={2} mr={2} />
         {title && (
