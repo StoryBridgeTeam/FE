@@ -35,7 +35,17 @@
     "info": "자기소개서",
     "list": "목록보기",
     "commentPlaceHolder": "댓글을 입력하세요...",
-    "add_new": "추가하기"
+    "add_new": "추가하기",
+    "commentUpdated": "댓글 수정",
+    "commentUpdatedMessage": "댓글이 수정되었습니다.",
+    "commentRegister": "댓글 등록",
+    "commentRegisterMessage": "댓글이 등록되었습니다.",
+    "commentDelete": "댓글 삭제",
+    "commentDeleteMessage": "댓글이 삭제되었습니다.",
+    "commentConnected": "연결 완료",
+    "commentConnectedMessage": "댓글에 태그를 연결했습니다.",
+    "commentConnectedReset": "연결 초기화 완료",
+    "commentConnectedMessageReset": "댓글에 태그를 초기화했습니다."
   },
   "signup": {
     "NextStepsButton": {

@@ -14,21 +14,34 @@ interface CommentStore {
     comment: Omit<Comment, "timestamp"> & { timestamp: string }
   ) => void;
   deleteComment: (index: number) => void;
-  updateComment: (index: number, text: string) => void;
+  updateCommentText: (index: number, text: string) => void;
+  updateCommentIndexes: (
+    index: number,
+    startIndex: number,
+    endIndex: number
+  ) => void;
 }
 
 export const useCommentStore = create<CommentStore>((set) => ({
   comments: [],
   addComment: (comment) =>
-    set((state) => ({ comments: [...state.comments, comment] })),
+    set((state) => ({
+      comments: [...state.comments, comment],
+    })),
   deleteComment: (index) =>
     set((state) => ({
       comments: state.comments.filter((_, i) => i !== index),
     })),
-  updateComment: (index, text) =>
+  updateCommentText: (index, text) =>
     set((state) => ({
       comments: state.comments.map((comment, i) =>
         i === index ? { ...comment, text } : comment
+      ),
+    })),
+  updateCommentIndexes: (index, startIndex, endIndex) =>
+    set((state) => ({
+      comments: state.comments.map((comment, i) =>
+        i === index ? { ...comment, startIndex, endIndex } : comment
       ),
     })),
 }));

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   Box,
   Container,
@@ -6,32 +6,20 @@ import {
   Input,
   Button,
   Avatar,
-  Tag,
-  TagLabel,
-  TagCloseButton,
 } from "@chakra-ui/react";
 import { Send } from "tabler-icons-react";
 import { useTranslation } from "react-i18next";
 
 interface CommentInputProps {
-  selectedText: { text: string; startIndex: number; endIndex: number } | null;
   onSubmit: (text: string) => void;
-  onClearSelectedText: () => void;
 }
 
 const CommentInput: React.FC<CommentInputProps> = ({
-  selectedText,
   onSubmit,
-  onClearSelectedText,
 }) => {
   const [comment, setComment] = useState("");
   const { t } = useTranslation();
 
-  useEffect(() => {
-    if (selectedText) {
-      setComment("");
-    }
-  }, [selectedText]);
 
   const handleCommentChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setComment(e.target.value);
@@ -69,12 +57,6 @@ const CommentInput: React.FC<CommentInputProps> = ({
             mr={2}
           />
           <Box flex="1" mr={3}>
-            {selectedText && (
-              <Tag size="md" colorScheme="blue" borderRadius="full" mb={2}>
-                <TagLabel>{selectedText.text}</TagLabel>
-                <TagCloseButton onClick={onClearSelectedText} />
-              </Tag>
-            )}
             <Input
               value={comment}
               onChange={handleCommentChange}
