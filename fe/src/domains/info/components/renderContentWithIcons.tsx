@@ -1,8 +1,10 @@
 import React from "react";
+import { BiMessageDetail } from "react-icons/bi";
 
-export const renderContentWithHighlights = (
+export const renderContentWithIcons = (
   content: string,
   comments: { startIndex?: number; endIndex?: number }[],
+  scrollToHighlightedText: (startIndex?: number, endIndex?: number) => void
 ) => {
   let segments: JSX.Element[] = [];
   let lastIndex = 0;
@@ -15,7 +17,11 @@ export const renderContentWithHighlights = (
     .sort((a, b) => (a.startIndex as number) - (b.startIndex as number));
 
   sortedComments.forEach((comment, index) => {
-    if (comment.startIndex !== undefined && comment.endIndex !== undefined) {
+    if (
+      comment.startIndex !== undefined &&
+      comment.endIndex !== undefined &&
+      (comment.startIndex !== 0 || comment.endIndex !== 0)
+    ) {
       if (comment.startIndex > lastIndex) {
         segments.push(
           <React.Fragment key={`before-${index}`}>
@@ -30,12 +36,27 @@ export const renderContentWithHighlights = (
           key={`highlight-${index}`}
           className="highlight"
           style={{
-            backgroundColor: "yellow",
             cursor: "pointer",
-            userSelect: "none",
+            position: "relative",
           }}
         >
           {content.substring(comment.startIndex, comment.endIndex)}
+          <span
+            style={{
+              color: "gray",
+              position: "absolute",
+              right: "-10px",
+              top: "8%",
+              transform: "translateY(-50%)",
+              fontSize: "0.8em",
+            }}
+            onClick={(e) => {
+              e.stopPropagation();
+              scrollToHighlightedText(comment.startIndex, comment.endIndex);
+            }}
+          >
+            <BiMessageDetail />
+          </span>
         </span>
       );
 

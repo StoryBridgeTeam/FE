@@ -10,11 +10,11 @@ import {
 } from "@chakra-ui/react";
 import { Edit, Check } from "tabler-icons-react";
 import { useTranslation } from "react-i18next";
-import { renderContentWithHighlights } from "./renderContentWithHighlights";
 import { useTextSelection } from "../hook/useTextSelection";
 import CommentInput from "./CommentInput";
 import CommentList from "./CommentList";
 import { useCommentStore } from "../Store/CommentStore";
+import { renderContentWithIcons } from "./renderContentWithIcons";
 
 interface DetailPageProps {
   isEdit: boolean;
@@ -31,12 +31,7 @@ const DetailPage: React.FC<DetailPageProps> = ({
   onSave,
   onBack,
 }) => {
-  const {
-    selectedText,
-    handleMouseUp,
-    handleClearSelectedText,
-    handleCommentSubmit,
-  } = useTextSelection();
+  const { handleMouseUp, handleCommentSubmit } = useTextSelection();
   const { comments } = useCommentStore();
   const { t } = useTranslation();
   const isMobile = useBreakpointValue({ base: true, md: false });
@@ -83,7 +78,7 @@ const DetailPage: React.FC<DetailPageProps> = ({
       const element = document.getElementById(elementId);
 
       if (element) {
-        element.scrollIntoView({ behavior: "smooth", block: "start" });
+        element.scrollIntoView({ behavior: "smooth", block: "center" });
       } else {
         console.warn(`Element with id '${elementId}' not found.`);
       }
@@ -153,7 +148,7 @@ const DetailPage: React.FC<DetailPageProps> = ({
               size="lg"
             />
           ) : (
-            renderContentWithHighlights(
+            renderContentWithIcons(
               data.content,
               comments,
               scrollToHighlightedComment
@@ -167,11 +162,7 @@ const DetailPage: React.FC<DetailPageProps> = ({
           />
         </Box>
       </Flex>
-      <CommentInput
-        selectedText={selectedText}
-        onSubmit={handleCommentSubmit}
-        onClearSelectedText={handleClearSelectedText}
-      />
+      <CommentInput onSubmit={handleCommentSubmit} />
     </Box>
   );
 };

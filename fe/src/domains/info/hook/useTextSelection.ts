@@ -10,7 +10,7 @@ export const useTextSelection = () => {
 
   const comments = useCommentStore((state) => state.comments);
 
-  const handleMouseUp = () => {
+  const handleSelectionEnd = () => {
     const selection = window.getSelection();
     if (selection && selection.rangeCount > 0) {
       const range = selection.getRangeAt(0);
@@ -24,6 +24,7 @@ export const useTextSelection = () => {
           (comment) =>
             comment.startIndex !== undefined &&
             comment.endIndex !== undefined &&
+            (comment.startIndex !== 0 || comment.endIndex !== 0) &&
             startOffset < comment.startIndex &&
             endOffset > comment.startIndex
         );
@@ -78,25 +79,13 @@ export const useTextSelection = () => {
 
   const handleCommentSubmit = (text: string) => {
     const addComment = useCommentStore.getState().addComment;
-    if (selectedText) {
-      const newComment = {
-        text,
-        timestamp: new Date().toISOString(),
-        username: "User Name",
-        startIndex: selectedText.startIndex,
-        endIndex: selectedText.endIndex,
-      };
-      addComment(newComment);
-      setSelectedText(null);
-    } else {
-      const newComment = {
-        text,
-        timestamp: new Date().toISOString(),
-        username: "User Name",
-      };
-      addComment(newComment);
-      setSelectedText(null);
-    }
+
+    const newComment = {
+      text,
+      timestamp: new Date().toISOString(),
+      username: "User Name",
+    };
+    addComment(newComment);
   };
 
   const handleClearSelectedText = () => {
@@ -105,7 +94,8 @@ export const useTextSelection = () => {
 
   return {
     selectedText,
-    handleMouseUp,
+    handleMouseUp: handleSelectionEnd,
+    handleTouchEnd: handleSelectionEnd,
     handleClearSelectedText,
     handleCommentSubmit,
   };

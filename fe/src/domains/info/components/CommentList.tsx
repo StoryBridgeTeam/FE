@@ -21,11 +21,13 @@ import {
   TagLabel,
 } from "@chakra-ui/react";
 import { BiDotsVerticalRounded } from "react-icons/bi";
-import { Trash, Edit } from "tabler-icons-react";
+import { Trash, Edit, Link } from "tabler-icons-react";
 import { formatDistanceToNow } from "date-fns";
 import { useCommentStore } from "../Store/CommentStore";
 import { useToastMessage } from "../../../common/hooks/useToastMessage";
 import { useTranslation } from "react-i18next";
+import { renderContentWithHighlights } from "./renderContentWithHighlights";
+import { useTextSelection } from "../hook/useTextSelection";
 
 interface CommentListProps {
   content: string;
@@ -36,22 +38,41 @@ const CommentList: React.FC<CommentListProps> = ({
   content,
   highlightComment,
 }) => {
-  const { comments, deleteComment, updateComment } = useCommentStore();
+  const { comments, deleteComment, updateCommentText, updateCommentIndexes } =
+    useCommentStore();
   const commentsEndRef = useRef<HTMLDivElement | null>(null);
   const [editIndex, setEditIndex] = useState<number | null>(null);
   const [editText, setEditText] = useState<string>("");
+  const [connectIndex, setConnectIndex] = useState<number | null>(null);
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const {
+    isOpen: isConnectOpen,
+    onOpen: onConnectOpen,
+    onClose: onConnectClose,
+  } = useDisclosure();
   const { showToast } = useToastMessage();
   const { t } = useTranslation();
+  const {
+    selectedText,
+    handleClearSelectedText,
+    handleMouseUp,
+    handleTouchEnd,
+  } = useTextSelection();
+
   const handleEdit = (index: number, text: string) => {
     setEditIndex(index);
     setEditText(text);
     onOpen();
   };
 
+  const handleConnect = (index: number, text: string) => {
+    setConnectIndex(index);
+    onConnectOpen();
+  };
+
   const handleSave = () => {
     if (editIndex !== null) {
-      updateComment(editIndex, editText);
+      updateCommentText(editIndex, editText);
       setEditIndex(null);
       setEditText("");
       onClose();
@@ -63,11 +84,43 @@ const CommentList: React.FC<CommentListProps> = ({
     }
   };
 
+  const handleConnectReset = () => {
+    if (connectIndex !== null) {
+      updateCommentIndexes(connectIndex, 0, 0);
+      handleClearSelectedText();
+      setConnectIndex(null);
+      onConnectClose();
+      showToast(
+        t(`info.commentConnectedReset`),
+        t(`info.commentConnectedMessageReset`),
+        "success"
+      );
+    }
+  };
+
+  const handleConnectSave = () => {
+    if (connectIndex !== null && selectedText) {
+      updateCommentIndexes(
+        connectIndex,
+        selectedText.startIndex,
+        selectedText.endIndex
+      );
+      handleClearSelectedText();
+      setConnectIndex(null);
+      onConnectClose();
+      showToast(
+        t(`info.commentConnected`),
+        t(`info.commentConnectedMessage`),
+        "success"
+      );
+    }
+  };
+
   useEffect(() => {
     if (commentsEndRef.current) {
       commentsEndRef.current.scrollIntoView({ behavior: "smooth" });
     }
-  }, [comments]);
+  }, [comments.length]);
 
   const getHighlightedText = (startIndex?: number, endIndex?: number) => {
     if (startIndex !== undefined && endIndex !== undefined) {
@@ -120,6 +173,12 @@ const CommentList: React.FC<CommentListProps> = ({
                 />
                 <MenuList>
                   <MenuItem
+                    icon={<Link />}
+                    onClick={() => handleConnect(index, comment.text)}
+                  >
+                    Connect
+                  </MenuItem>
+                  <MenuItem
                     icon={<Edit />}
                     onClick={() => handleEdit(index, comment.text)}
                   >
@@ -142,7 +201,8 @@ const CommentList: React.FC<CommentListProps> = ({
               </Menu>
             </Flex>
             {comment.startIndex !== undefined &&
-              comment.endIndex !== undefined && (
+              comment.endIndex !== undefined &&
+              (comment.startIndex !== 0 || comment.endIndex !== 0) && (
                 <Tag
                   mt={1}
                   size="md"
@@ -175,16 +235,60 @@ const CommentList: React.FC<CommentListProps> = ({
         <ModalContent>
           <ModalHeader>Edit Comment</ModalHeader>
           <ModalBody>
-            <Input
-              value={editText}
-              onChange={(e) => setEditText(e.target.value)}
-            />
+            <Box>
+              <Input
+                placeholder="Enter text to edit"
+                value={editText}
+                onChange={(e) => setEditText(e.target.value)}
+              />
+            </Box>
           </ModalBody>
           <ModalFooter>
             <Button variant="ghost" onClick={onClose}>
               Cancel
             </Button>
             <Button colorScheme="blue" ml={3} onClick={handleSave}>
+              Save
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+
+      <Modal isOpen={isConnectOpen} onClose={onConnectClose}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Connect Comment</ModalHeader>
+          <ModalBody>
+            {selectedText && (
+              <Tag
+                size="md"
+                fontSize="xs"
+                colorScheme="gray"
+                borderRadius="full"
+                mb={4}
+                cursor="pointer"
+              >
+                {selectedText && selectedText.text}
+              </Tag>
+            )}
+            <Box onMouseUp={handleMouseUp} onTouchEnd={handleTouchEnd}>
+              {renderContentWithHighlights(content, comments)}
+            </Box>
+          </ModalBody>
+          <ModalFooter>
+            <Button
+              variant="ghost"
+              onClick={() => {
+                onConnectClose();
+                handleClearSelectedText();
+              }}
+            >
+              Cancel
+            </Button>
+            <Button colorScheme="yellow" ml={3} onClick={handleConnectReset}>
+              Reset
+            </Button>
+            <Button colorScheme="blue" ml={3} onClick={handleConnectSave}>
               Save
             </Button>
           </ModalFooter>
