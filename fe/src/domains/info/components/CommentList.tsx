@@ -28,6 +28,7 @@ import { useToastMessage } from "../../../common/hooks/useToastMessage";
 import { useTranslation } from "react-i18next";
 import { renderContentWithHighlights } from "./renderContentWithHighlights";
 import { useTextSelection } from "../hook/useTextSelection";
+import { SlideUpModal } from "../../../common/components/SlideUpModal";
 
 interface CommentListProps {
   content: string;
@@ -229,7 +230,31 @@ const CommentList: React.FC<CommentListProps> = ({
         <div ref={commentsEndRef} />
       </Box>
 
-      <Modal isOpen={isOpen} onClose={onClose}>
+      <SlideUpModal
+        isOpen={isOpen}
+        onClose={onClose}
+        title="Enter text to edit"
+        footerContent={
+          <>
+            <Button variant="ghost" onClick={onClose}>
+              Cancel
+            </Button>
+            <Button colorScheme="blue" ml={3} onClick={handleSave}>
+              Save
+            </Button>
+          </>
+        }
+      >
+        <Box>
+          <Input
+            placeholder="Enter text to edit"
+            value={editText}
+            onChange={(e) => setEditText(e.target.value)}
+          />
+        </Box>
+      </SlideUpModal>
+
+      {/* <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
         <ModalContent>
           <ModalHeader>Edit Comment</ModalHeader>
@@ -251,30 +276,13 @@ const CommentList: React.FC<CommentListProps> = ({
             </Button>
           </ModalFooter>
         </ModalContent>
-      </Modal>
-
-      <Modal isOpen={isConnectOpen} onClose={onConnectClose}>
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>Connect Comment</ModalHeader>
-          <ModalBody>
-            {selectedText && (
-              <Tag
-                size="md"
-                fontSize="xs"
-                colorScheme="gray"
-                borderRadius="full"
-                mb={4}
-                cursor="pointer"
-              >
-                {selectedText && selectedText.text}
-              </Tag>
-            )}
-            <Box onMouseUp={handleMouseUp} onTouchEnd={handleTouchEnd}>
-              {renderContentWithHighlights(content, comments)}
-            </Box>
-          </ModalBody>
-          <ModalFooter>
+      </Modal> */}
+      <SlideUpModal
+        isOpen={isConnectOpen}
+        onClose={onConnectClose}
+        title="Connect Comment"
+        footerContent={
+          <>
             <Button
               variant="ghost"
               onClick={() => {
@@ -290,9 +298,26 @@ const CommentList: React.FC<CommentListProps> = ({
             <Button colorScheme="blue" ml={3} onClick={handleConnectSave}>
               Save
             </Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
+          </>
+        }
+      >
+        <Box onMouseUp={handleMouseUp} onTouchEnd={handleTouchEnd}>
+          {renderContentWithHighlights(content, comments)}
+        </Box>
+        {selectedText && (
+          <Tag
+            mt={7}
+            size="lg"
+            fontSize="md"
+            colorScheme="gray"
+            borderRadius="full"
+            mb={4}
+            cursor="pointer"
+          >
+            {selectedText && selectedText.text}
+          </Tag>
+        )}
+      </SlideUpModal>
     </>
   );
 };
