@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useToastMessage } from "../../../common/hooks/useToastMessage";
 import { useHandleLogin } from "./useHandleLogin";
+import { loginUser } from "../api/LoginAPI";
 
 interface LoginFormValues {
   id: string;
@@ -101,6 +102,10 @@ export const useLoginForm = () => {
     return true;
   };
 
+  const formatPhoneNumberWithoutHyphens = (phoneNumber: string) => {
+    return phoneNumber.replace(/-/g, "");
+  };
+
   const validatePassword = () => {
     const { password } = values;
     const regex =
@@ -124,14 +129,27 @@ export const useLoginForm = () => {
 
   const onSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
+
     if (!values.id || !values.password) {
       showToast("login.loginFail", "login.description", "error");
       return;
     }
 
+    const formattedId =
+      i18n.language === "ko"
+        ? formatPhoneNumberWithoutHyphens(values.id)
+        : values.id;
+
     if (validateId() && validatePassword()) {
-      const token = "dummy-token"; //백엔드에서 받아올 예정
-      await handleLogin(token, values.id, values.rememberMe);
+      // const { accessToken, refreshToken } = await loginUser({
+      //   id: formattedId,
+      //   password: values.password,
+      //   rememberMe: values.rememberMe,
+      // });
+      // console.log(accessToken);
+      const accessToken = "asdfds"; //api 연결전
+      const refreshToken = "refresj";//api 연결전
+      await handleLogin(accessToken, refreshToken, values.rememberMe);
     }
   };
 

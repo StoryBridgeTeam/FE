@@ -248,11 +248,11 @@ const CommentList: React.FC<CommentListProps> = ({
           />
         </Box>
       </SlideUpSmallModal>
-      
+
       <SlideUpModal
         isOpen={isConnectOpen}
         onClose={onConnectClose}
-        title="Connect Comment"
+        title={t(`info.connectComment`)}
         footerContent={
           <>
             <Button

@@ -14,7 +14,7 @@ const theme = extendTheme({
 });
 
 function App() {
-  const { checkAuth, isAuthenticated, id } = useAuthStore();
+  const { checkAuth, isAuthenticated, getNickName } = useAuthStore();
   const [initialized, setInitialized] = useState(false);
 
   useEffect(() => {
@@ -34,18 +34,18 @@ function App() {
           <Route path="/signup" element={<SignupPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route
-            path="/:id"
+            path="/:nickName"
             element={<PrivateRoute element={<InfoPage />} />}
           />
           <Route
-            path="/:id/info"
+            path="/:nickName/info"
             element={<PrivateRoute element={<InfoPage />} />}
           />
           <Route
             path="*"
             element={
-              isAuthenticated ? (
-                <Navigate to={`/${id}/info`} replace />
+              isAuthenticated && getNickName ? (
+                <Navigate to={`/${getNickName}/info`} replace />
               ) : (
                 <Navigate to="/login" replace />
               )

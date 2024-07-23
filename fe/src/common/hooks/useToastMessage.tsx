@@ -10,7 +10,7 @@ export const useToastMessage = () => {
       title: t(title),
       description: t(description),
       status,
-      duration: 3000,
+      duration: 1500,
       isClosable: true,
     });
   };
