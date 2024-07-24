@@ -1,38 +1,85 @@
 import { create } from "zustand";
 import Cookies from "js-cookie";
+import { jwtDecode } from "jwt-decode";
+
+interface JwtPayload {
+  nickName?: string;
+  [key: string]: any;
+}
 
 interface AuthState {
   isAuthenticated: boolean;
-  token: string | null;
-  id: string | null;
-  login: (token: string, id: string, rememberMe: boolean) => void;
+  accessToken: string | null;
+  refreshToken: string | null;
+  login: (
+    accessToken: string,
+    refreshToken: string,
+    rememberMe: boolean
+  ) => void;
   logout: () => void;
   checkAuth: () => Promise<void>;
+  getNickName: () => string | null;
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
   isAuthenticated: false,
-  token: null,
-  id: null,
-  login: (token: string, id: string, rememberMe: boolean) => {
-    const expires = rememberMe ? 30 : 0.5; // 30 days or 30 minutes
-    Cookies.set("token", token, { expires, secure: true, sameSite: "Strict" });
-    Cookies.set("id", id, { expires, secure: true, sameSite: "Strict" });
-    set({ isAuthenticated: true, token, id });
+  accessToken: null,
+  refreshToken: null,
+  login: (accessToken: string, refreshToken: string, rememberMe: boolean) => {
+    const expires = rememberMe ? 30 : 0.5;
+    Cookies.set("accessToken", accessToken, {
+      expires,
+      secure: true,
+      sameSite: "Strict",
+    });
+    Cookies.set("refreshToken", refreshToken, {
+      expires,
+      secure: true,
+      sameSite: "Strict",
+    });
+    set({ isAuthenticated: true, accessToken, refreshToken });
   },
   logout: () => {
-    Cookies.remove("token");
-    Cookies.remove("id");
-    set({ isAuthenticated: false, token: null, id: null });
+    Cookies.remove("accessToken");
+    Cookies.remove("refreshToken");
+    set({
+      isAuthenticated: false,
+      accessToken: null,
+      refreshToken: null,
+    });
   },
   checkAuth: async () => {
-    const token = Cookies.get("token");
-    const id = Cookies.get("id");
+    const accessToken = Cookies.get("accessToken");
+    const refreshToken = Cookies.get("refreshToken");
 
-    if (token && id) {
-      set({ isAuthenticated: true, token, id });
+    if (accessToken && refreshToken) {
+      set({ isAuthenticated: true, accessToken, refreshToken });
     } else {
-      set({ isAuthenticated: false, token: null, id: null });
+      set({
+        isAuthenticated: false,
+        accessToken: null,
+        refreshToken: null,
+      });
+    }
+  },
+  getNickName: () => {
+    const accessToken = Cookies.get("accessToken");
+    if (!accessToken) {
+      console.warn("No accessToken found");
+      return null;
+    }
+
+    try {
+      const decoded = jwtDecode<JwtPayload>(accessToken);
+      if (decoded.nickName) {
+        return decoded.nickName;
+      } else {
+        console.warn("nickName not found in token");
+        return null;
+      }
+    } catch (error) {
+      console.error("Failed to decode token:", error);
+      return null;
     }
   },
 }));

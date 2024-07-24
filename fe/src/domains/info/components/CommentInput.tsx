@@ -6,6 +6,7 @@ import {
   Input,
   Button,
   Avatar,
+  useBreakpointValue,
 } from "@chakra-ui/react";
 import { Send } from "tabler-icons-react";
 import { useTranslation } from "react-i18next";
@@ -14,12 +15,10 @@ interface CommentInputProps {
   onSubmit: (text: string) => void;
 }
 
-const CommentInput: React.FC<CommentInputProps> = ({
-  onSubmit,
-}) => {
+const CommentInput: React.FC<CommentInputProps> = ({ onSubmit }) => {
   const [comment, setComment] = useState("");
   const { t } = useTranslation();
-
+  const isMobile = useBreakpointValue({ base: true, md: false });
 
   const handleCommentChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setComment(e.target.value);
@@ -46,16 +45,19 @@ const CommentInput: React.FC<CommentInputProps> = ({
       width="100%"
       bg="white"
       border="1px solid #EEEEEE"
-      p={4}
+      p={isMobile ? 2 : 4}
     >
       <Container maxW="4xl">
         <Flex alignItems="center">
-          <Avatar
-            size="md"
-            name="User Name"
-            src="https://image.idus.com/image/files/da17e0c53a4e480284c5d49932722e5a.jpg"
-            mr={2}
-          />
+          {!isMobile && (
+            <Avatar
+              size="md"
+              name="User Name"
+              src="https://image.idus.com/image/files/da17e0c53a4e480284c5d49932722e5a.jpg"
+              mr={2}
+            />
+          )}
+
           <Box flex="1" mr={3}>
             <Input
               value={comment}

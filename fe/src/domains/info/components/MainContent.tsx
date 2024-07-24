@@ -5,12 +5,13 @@ import {
   Flex,
   useBreakpointValue,
 } from "@chakra-ui/react";
-import { FC, useEffect, useState } from "react";
+import { FC, useState } from "react";
 import { Edit, Check } from "tabler-icons-react";
 import DetailPage from "./DetailPage";
 import { useTranslation } from "react-i18next";
 import TextSection from "./TextSection";
 import ProfileSidebar from "./ProfileSideBar";
+import { useProfileStore } from "../Store/useProfileStore";
 
 interface MockData {
   id: number;
@@ -45,11 +46,11 @@ const MainContent: FC = () => {
   const isMobile = useBreakpointValue({ base: true, md: false });
   const [mockData, setMockData] = useState<MockData[]>(initialMockData);
   const [selectedId, setSelectedId] = useState<number | null>(null);
-  const [isEditing, setIsEditing] = useState(false);
   const { t } = useTranslation();
+  const { isEdit, setEdit } = useProfileStore();
 
   const handleSectionClick = (id: number) => {
-    if (!isEditing) {
+    if (!isEdit) {
       setSelectedId(id);
     }
   };
@@ -59,11 +60,11 @@ const MainContent: FC = () => {
   };
 
   const handleEditClick = () => {
-    setIsEditing(!isEditing);
+    setEdit(!isEdit);
   };
 
   const handleSaveClick = () => {
-    setIsEditing(false);
+    setEdit(false);
   };
 
   const handleDelete = (id: number) => {
@@ -74,7 +75,7 @@ const MainContent: FC = () => {
     const newId = mockData.length + 1;
     const newMockData: MockData = { id: newId, title: "", content: "" };
     setMockData([...mockData, newMockData]);
-    setIsEditing(true);
+    setEdit(true);
     setSelectedId(newId);
   };
 
@@ -100,13 +101,12 @@ const MainContent: FC = () => {
               data={mockData.find((item) => item.id === selectedId)!}
               onSave={handleSaveDetail}
               onBack={handleBackClick}
-              isEdit={isEditing}
             />
           </>
         ) : (
           <>
             <Flex w="full" justifyContent="flex-end" alignItems="center">
-              {isEditing ? (
+              {isEdit ? (
                 <Button onClick={handleSaveClick}>
                   <Check size={24} color="black" />
                 </Button>
@@ -125,12 +125,12 @@ const MainContent: FC = () => {
                 id={data.id}
                 title={data.title}
                 content={data.content}
-                isEditing={isEditing}
+                isEditing={isEdit}
                 onClick={handleSectionClick}
                 onDelete={handleDelete}
               />
             ))}
-            {isEditing ? (
+            {isEdit ? (
               <Flex justifyContent="center" mt={3} mb={8}>
                 <Button onClick={handleAddNewClick}>{t(`info.add_new`)}</Button>
               </Flex>

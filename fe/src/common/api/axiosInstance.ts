@@ -1,0 +1,71 @@
+import axios from "axios";
+import Cookies from "js-cookie";
+
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
+
+const axiosInstance = axios.create({
+  baseURL: API_BASE_URL,
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
+
+axiosInstance.interceptors.request.use(
+  (config) => {
+    const accessToken = Cookies.get("accessToken");
+    const refreshToken = Cookies.get("refreshToken");
+
+    if (accessToken) {
+      config.headers["Authorization"] = `Bearer ${accessToken}`;
+    }
+    if (refreshToken) {
+      config.headers["REFRESH_TOKEN"] = refreshToken;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
+axiosInstance.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const originalRequest = error.config;
+
+    if (error.response.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
+
+      try {
+        const refreshResponse = await axiosInstance.post(
+          "/auth/token/refresh",
+          {},
+          {
+            headers: {
+              "Content-Type": "application/json",
+              REFRESH_TOKEN: Cookies.get("refreshToken"),
+            },
+          }
+        );
+
+        const { accessToken } = refreshResponse.data;
+        Cookies.set("accessToken", accessToken, {
+          expires: 30,
+          secure: true,
+          sameSite: "Strict",
+        });
+
+        axiosInstance.defaults.headers[
+          "Authorization"
+        ] = `Bearer ${accessToken}`;
+        return axiosInstance(originalRequest);
+      } catch (err) {
+        return Promise.reject(err);
+      }
+    }
+
+    return Promise.reject(error);
+  }
+);
+
+export default axiosInstance;

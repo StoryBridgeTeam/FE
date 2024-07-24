@@ -11,7 +11,7 @@ import {
   ModalFooter,
 } from "@chakra-ui/react";
 
-interface SlideUpModalProps {
+interface SlideUpSmallModalProps {
   isOpen: boolean;
   onClose: () => void;
   title?: string;
@@ -19,7 +19,7 @@ interface SlideUpModalProps {
   footerContent?: React.ReactNode; // Optional footer content
 }
 
-export const SlideUpModal: React.FC<SlideUpModalProps> = ({
+export const SlideUpSmallModal: React.FC<SlideUpSmallModalProps> = ({
   isOpen,
   onClose,
   title,
@@ -44,13 +44,13 @@ export const SlideUpModal: React.FC<SlideUpModalProps> = ({
         bottom={0}
         left={0}
         right={0}
-        mt={isMobile ? 0 : "20vh"}
+        mt={isMobile ? 0 :"50vh"}
         transform={isOpen ? "translateY(0)" : "translateY(100%)"}
         transition="transform 0.3s ease"
         p={4}
         maxW={isMobile ? "100%" : "3xl"}
         mx={isMobile ? 0 : "auto"}
-        h="80vh"
+        h="50vh"
         overflow="hidden"
         mb={0}
       >
@@ -74,19 +74,3 @@ export const SlideUpModal: React.FC<SlideUpModalProps> = ({
     </Modal>
   );
 };
-
-{
-  /* <SlideUpModal
-isOpen={isConnectOpen}
-onClose={onConnectClose}
-title="Connect Comment"
-footerContent={
-  <>
-   footer
-  </>
-}
->
-body
-</SlideUpModal> */
-}
-// 이런식으로 사용

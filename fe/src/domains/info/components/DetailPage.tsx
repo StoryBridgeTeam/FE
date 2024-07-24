@@ -15,9 +15,9 @@ import CommentInput from "./CommentInput";
 import CommentList from "./CommentList";
 import { useCommentStore } from "../Store/CommentStore";
 import { renderContentWithIcons } from "./renderContentWithIcons";
+import { useProfileStore } from "../Store/useProfileStore";
 
 interface DetailPageProps {
-  isEdit: boolean;
   id: number;
   data: { title: string; content: string };
   onSave: (id: number, updatedData: { title: string; content: string }) => void;
@@ -25,7 +25,6 @@ interface DetailPageProps {
 }
 
 const DetailPage: React.FC<DetailPageProps> = ({
-  isEdit,
   id,
   data,
   onSave,
@@ -37,15 +36,15 @@ const DetailPage: React.FC<DetailPageProps> = ({
   const isMobile = useBreakpointValue({ base: true, md: false });
   const [editedTitle, setEditedTitle] = useState(data.title);
   const [editedContent, setEditedContent] = useState(data.content);
-  const [isEditing, setIsEditing] = useState(isEdit);
+  const { isEdit, setEdit } = useProfileStore();
 
   const handleEditClick = () => {
-    setIsEditing(true);
+    setEdit(true);
   };
 
   const handleSaveClick = () => {
     onSave(id, { title: editedTitle, content: editedContent });
-    setIsEditing(false);
+    setEdit(false);
   };
 
   const scrollToHighlightedText = (startIndex?: number, endIndex?: number) => {
@@ -98,7 +97,7 @@ const DetailPage: React.FC<DetailPageProps> = ({
     >
       <Flex w="full" justifyContent="space-between" alignItems="center" mb={5}>
         <Button onClick={onBack}>{t(`info.list`)}</Button>
-        {isEditing ? (
+        {isEdit ? (
           <Button onClick={handleSaveClick}>
             <Check size={24} color="black" />
           </Button>
@@ -121,7 +120,7 @@ const DetailPage: React.FC<DetailPageProps> = ({
         direction="column"
       >
         <Flex alignItems="center" dir="row">
-          {isEditing ? (
+          {isEdit ? (
             <Input
               value={editedTitle}
               onChange={(e) => {
@@ -140,7 +139,7 @@ const DetailPage: React.FC<DetailPageProps> = ({
           <Box flex="1" borderBottom="2px" ml={2} />
         </Flex>
         <Box bg="#EEEEEE" mt={4} p={5} borderTopRadius="30" userSelect="text">
-          {isEditing ? (
+          {isEdit ? (
             <Textarea
               h={"52vh"}
               value={editedContent}
