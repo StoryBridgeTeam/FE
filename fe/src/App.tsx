@@ -36,12 +36,12 @@ function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route
             path="/:nickName"
-            // element={<PrivateRoute element={<InfoPage />} 
+            // element={<PrivateRoute element={<InfoPage />}/>}
             element={<MainPage />}
           />
           <Route
             path="/:nickName/info"
-            element={<PrivateRoute element={<InfoPage />}
+            element={<PrivateRoute element={<InfoPage />} />}
           />
           <Route
             path="*"
