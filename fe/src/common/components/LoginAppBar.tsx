@@ -10,6 +10,8 @@ import {
 } from "@chakra-ui/react";
 import { FaRegBell, FaSearch } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
+import { useAuthStore } from "../../domains/login/stores/useAuthStore";
 
 interface LoginAppBarProps {
   field1?: string;
@@ -29,6 +31,8 @@ const LoginAppBar: React.FC<LoginAppBarProps> = ({
   const { t } = useTranslation();
   const isMobile = useBreakpointValue({ base: true, md: false });
   const appBarHeight = isMobile ? "50px" : "60px";
+  const navigate = useNavigate();
+  const { getNickName } = useAuthStore();
 
   return (
     <Flex
@@ -49,6 +53,10 @@ const LoginAppBar: React.FC<LoginAppBarProps> = ({
         fontWeight="700"
         align={"center"}
         paddingLeft={isMobile ? "15px" : "20px"}
+        onClick={() => {
+          // navigate(`/${getNickName}`, { replace: true });
+          navigate(`/nickName`, { replace: true }); //api연결 전
+        }}
       >
         StoryBridge
       </Text>
