@@ -47,7 +47,7 @@ const LoginAppBar: React.FC<LoginAppBarProps> = ({
       <Text
         fontSize={isMobile ? "md" : "2xl"}
         fontWeight="700"
-        paddingTop={isMobile ? "5px" : "10px"}
+        align={"center"}
         paddingLeft={isMobile ? "15px" : "20px"}
       >
         StoryBridge
