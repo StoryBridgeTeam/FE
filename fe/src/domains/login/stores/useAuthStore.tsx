@@ -70,10 +70,7 @@ export const useAuthStore = create<AuthState>((set) => ({
     }
 
     try {
-      // JWT 디코딩
       const decoded = jwtDecode<JwtPayload>(accessToken);
-
-      // nickName 추출
       if (decoded.nickName) {
         return decoded.nickName;
       } else {

@@ -20,7 +20,7 @@ import {
   ModalFooter,
 } from "@chakra-ui/react";
 import { FC, useState } from "react";
-import { FaMinus, FaPlus } from "react-icons/fa";
+import { FiPlus, FiMinus } from "react-icons/fi";
 
 const ProfileSidebar: FC = () => {
   const isMobile = useBreakpointValue({ base: true, md: false });
@@ -37,9 +37,9 @@ const ProfileSidebar: FC = () => {
   const [education, setEducation] = useState<
     Array<{ date: string; item: string }>
   >([
-    { date: "20XX.03.01", item: "초등학교" },
-    { date: "20XX.03.01", item: "중학교" },
-    { date: "20XX.03.01", item: "고등학교" },
+    { date: "2024.03.01", item: "초등학교" },
+    { date: "2024.03.01", item: "중학교" },
+    { date: "2024.03.01", item: "고등학교" },
   ]);
 
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -70,16 +70,16 @@ const ProfileSidebar: FC = () => {
       <ProfileImage />
       <Heading size="md">{name}</Heading>
       <Divider borderColor="#C5C5C5" />
-      <InfoSection title="About Me" content={formatAboutMe(aboutMe)} />
+      <InfoSection title="인적사항" content={formatAboutMe(aboutMe)} />
       <InfoSection
-        title="학력"
+        title="학력 및 경력"
         content={formatEducation(education, removeEducation)}
-        actions={<FaPlus onClick={onOpen} />}
+        actions={<FiPlus onClick={onOpen} cursor="pointer" />}
       />
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader>새 학력 추가</ModalHeader>
+          <ModalHeader>새 학력 및 경력 추가</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
             <FormControl>
@@ -127,44 +127,53 @@ const InfoSection: FC<{
   title: string;
   content: React.ReactNode;
   actions?: React.ReactNode;
-}> = ({ title, content, actions }) => (
-  <Box w="full" justifyContent="center" p={2}>
-    <Flex align="center" justify="space-between" mb={2}>
+}> = ({ title, content, actions }) => {
+  const isMobile = useBreakpointValue({ base: true, md: false });
+
+  return (
+    <Box w="full" justifyContent="center" p={2}>
+      <Flex align="center" justify="space-between" mb={2}>
+        <Box
+          w="full"
+          h="25px"
+          lineHeight="25px"
+          bg="#dbdbdb"
+          borderRadius="full"
+          fontSize="xs"
+          fontWeight="bold"
+          textAlign="center"
+          display="flex"
+          alignItems="center"
+          justifyContent="center"
+          position="relative"
+        >
+          <Text>{title}</Text>
+          {actions && (
+            <Box position="absolute" ml={2} right={3}>
+              {actions}
+            </Box>
+          )}
+        </Box>
+      </Flex>
       <Box
         w="full"
-        h="25px"
-        lineHeight="25px"
-        bg="#dbdbdb"
-        borderRadius="full"
+        maxW="90%"
         fontSize="xs"
-        fontWeight="bold"
-        textAlign="center"
-        display="flex"
-        alignItems="center"
-        justifyContent="center"
-        position="relative"
+        textAlign="left"
+        whiteSpace="pre-wrap"
+        mt={2}
+        p={isMobile ? 5 : 3}
+        mx="auto"
+        bg="white"
+        borderRadius={"md"}
+        border={"1px"}
+        borderColor="#dbdbdb"
       >
-        <Text>{title}</Text>
-        {actions && (
-          <Box position="absolute" ml={2} right={3}>
-            {actions}
-          </Box>
-        )}
+        {content}
       </Box>
-    </Flex>
-    <Box
-      w="full"
-      maxW="200px"
-      fontSize="xs"
-      textAlign="left"
-      whiteSpace="pre-wrap"
-      mt={2}
-      mx="auto"
-    >
-      {content}
     </Box>
-  </Box>
-);
+  );
+};
 
 const formatEducation = (
   education: Array<{ date: string; item: string }>,
@@ -172,20 +181,26 @@ const formatEducation = (
 ): React.ReactNode => {
   return education.map(({ date, item }, index) => (
     <Flex key={index} justify="space-between" align="center" mb={2}>
-      <Text whiteSpace="pre-wrap">{`${date} ${item}`}</Text>
-      <FaMinus onClick={() => removeEducation(index)} fontSize="md" />
+      <Text whiteSpace="pre-wrap">{`• ${date} ${item}`}</Text>
+      <FiMinus
+        onClick={() => removeEducation(index)}
+        fontSize="md"
+        cursor="pointer"
+      />
     </Flex>
   ));
 };
 
-const formatAboutMe = (aboutMe: Array<{ [key: string]: string }>): string => {
-  return aboutMe
-    .map((item) => {
-      const key = Object.keys(item)[0];
-      const value = item[key];
-      return `• ${key}: ${value}`;
-    })
-    .join("\n");
+const formatAboutMe = (
+  aboutMe: Array<{ [key: string]: string }>
+): React.ReactNode => {
+  return aboutMe.map((item, index) => (
+    <Flex key={index} justify="space-between" align="center" mb={2}>
+      <Text whiteSpace="pre-wrap">{`• ${Object.keys(item)[0]}: ${
+        item[Object.keys(item)[0]]
+      }`}</Text>
+    </Flex>
+  ));
 };
 
 export default ProfileSidebar;

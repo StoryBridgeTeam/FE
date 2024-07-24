@@ -1,4 +1,4 @@
-import { Box, Text, Flex, Input, Textarea, IconButton } from "@chakra-ui/react";
+import { Box, Text, Flex, IconButton } from "@chakra-ui/react";
 import { FC, useRef, useEffect } from "react";
 import { Trash } from "tabler-icons-react";
 
