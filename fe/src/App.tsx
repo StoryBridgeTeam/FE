@@ -6,6 +6,7 @@ import { useAuthStore } from "./domains/login/stores/useAuthStore";
 import { useEffect, useState } from "react";
 import PrivateRoute from "./domains/login/utils/PrivateRoute";
 import InfoPage from "./domains/info/InfoPage";
+import MainPage from "./domains/main/MainPage";
 
 const theme = extendTheme({
   fonts: {
@@ -35,11 +36,12 @@ function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route
             path="/:nickName"
-            element={<PrivateRoute element={<InfoPage />} />}
+            // element={<PrivateRoute element={<InfoPage />} 
+            element={<MainPage />}
           />
           <Route
             path="/:nickName/info"
-            element={<PrivateRoute element={<InfoPage />} />}
+            element={<PrivateRoute element={<InfoPage />}
           />
           <Route
             path="*"
