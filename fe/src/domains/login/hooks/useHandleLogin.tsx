@@ -15,8 +15,8 @@ export const useHandleLogin = () => {
     try {
       login(accessToken, refreshToken, rememberMe);
       showToast("login.successTitle", "login.successDescription", "success");
-      // navigate(`/${getNickName}`, { replace: true });
-      navigate(`/nickName`, { replace: true }); //api연결 전
+      navigate(`/${getNickName}`, { replace: true });
+      console.log(getNickName);
     } catch (error) {
       console.error("Login error:", error);
       showToast("login.failTitle", "login.failDescription", "error");
