@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import PrivateRoute from "./domains/login/utils/PrivateRoute";
 import InfoPage from "./domains/info/InfoPage";
 import MainPage from "./domains/main/MainPage";
+import { getNicknameToken } from "./domains/login/api/nickname";
 
 const theme = extendTheme({
   fonts: {
@@ -15,7 +16,7 @@ const theme = extendTheme({
 });
 
 function App() {
-  const { checkAuth, isAuthenticated, getNickName } = useAuthStore();
+  const { checkAuth, isAuthenticated } = useAuthStore();
   const [initialized, setInitialized] = useState(false);
 
   useEffect(() => {
@@ -45,8 +46,8 @@ function App() {
           <Route
             path="*"
             element={
-              isAuthenticated && getNickName ? (
-                <Navigate to={`/${getNickName}/info`} replace />
+              isAuthenticated && getNicknameToken() ? (
+                <Navigate to={`/${getNicknameToken()}/info`} replace />
               ) : (
                 <Navigate to="/login" replace />
               )

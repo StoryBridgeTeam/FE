@@ -1,11 +1,5 @@
 import { create } from "zustand";
 import Cookies from "js-cookie";
-import { jwtDecode } from "jwt-decode";
-
-interface JwtPayload {
-  nickName?: string;
-  [key: string]: any;
-}
 
 interface AuthState {
   isAuthenticated: boolean;
@@ -18,7 +12,6 @@ interface AuthState {
   ) => void;
   logout: () => void;
   checkAuth: () => Promise<void>;
-  getNickName: () => string | null;
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
@@ -62,24 +55,5 @@ export const useAuthStore = create<AuthState>((set) => ({
       });
     }
   },
-  getNickName: () => {
-    const accessToken = Cookies.get("accessToken");
-    if (!accessToken) {
-      console.warn("No accessToken found");
-      return null;
-    }
-
-    try {
-      const decoded = jwtDecode<JwtPayload>(accessToken);
-      if (decoded.nickName) {
-        return decoded.nickName;
-      } else {
-        console.warn("nickName not found in token");
-        return null;
-      }
-    } catch (error) {
-      console.error("Failed to decode token:", error);
-      return null;
-    }
-  },
+  
 }));

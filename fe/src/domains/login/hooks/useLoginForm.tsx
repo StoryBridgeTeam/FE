@@ -2,8 +2,7 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useToastMessage } from "../../../common/hooks/useToastMessage";
 import { useHandleLogin } from "./useHandleLogin";
-import { loginUser } from "../api/LoginAPI";
-
+import { useLoginUser } from "../api/LoginAPI";
 interface LoginFormValues {
   id: string;
   password: string;
@@ -19,6 +18,7 @@ export const useLoginForm = () => {
   const { t, i18n } = useTranslation();
   const handleLogin = useHandleLogin();
   const { showToast } = useToastMessage();
+  const { loginUser } = useLoginUser();
 
   const [values, setValues] = useState<LoginFormValues>({
     id: "",
@@ -32,7 +32,7 @@ export const useLoginForm = () => {
   });
 
   const handleIdChange = (value: string) => {
-    if (i18n.language === "ko") {
+    if (i18n.language === "ko-KR") {
       let formattedNumber = value.replace(/[^0-9]/g, "");
       if (formattedNumber.length > 3) {
         formattedNumber = `${formattedNumber.slice(
@@ -74,7 +74,7 @@ export const useLoginForm = () => {
 
   const validateId = () => {
     const { id } = values;
-    if (i18n.language === "ko") {
+    if (i18n.language === "ko-KR") {
       const phoneRegex = /^010-[0-9]{4}-[0-9]{4}$/;
       if (!phoneRegex.test(id)) {
         setErrors((prev) => ({
@@ -136,20 +136,25 @@ export const useLoginForm = () => {
     }
 
     const formattedId =
-      i18n.language === "ko"
+      i18n.language === "ko-KR"
         ? formatPhoneNumberWithoutHyphens(values.id)
         : values.id;
 
     if (validateId() && validatePassword()) {
-      // const { accessToken, refreshToken } = await loginUser({
-      //   id: formattedId,
-      //   password: values.password,
-      //   rememberMe: values.rememberMe,
-      // });
-      // console.log(accessToken);
-      const accessToken = "asdfds"; //api 연결전
-      const refreshToken = "refresj";//api 연결전
-      await handleLogin(accessToken, refreshToken, values.rememberMe);
+      const response = await loginUser({
+        id: formattedId,
+        password: values.password,
+        rememberMe: values.rememberMe,
+      });
+
+      try {
+        if (response && response.accessToken && response.refreshToken) {
+          const { accessToken, refreshToken } = response;
+          await handleLogin(accessToken, refreshToken, values.rememberMe);
+        }
+      } catch {
+        showToast("login.failTitle", "login.loginError", "error");
+      }
     }
   };
 
