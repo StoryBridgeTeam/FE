@@ -8,7 +8,6 @@ export const useToastMessage = () => {
   const showToast = (title: string, description: string, status: "success" | "error" | "warning" | "info") => {
     toast({
       title: t(title),
-      description: t(description),
       status,
       duration: 1500,
       isClosable: true,

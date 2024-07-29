@@ -25,7 +25,9 @@
     "successTitle": "로그인 성공",
     "successDescription": "성공적으로 로그인되었습니다",
     "failTitle": "로그인 실패",
-    "failDescription": "유효하지 않은 비밀번호입니다"
+    "failDescription": "유효하지 않은 비밀번호입니다",
+    "error": "오류가 발생하였습니다.",
+    "loginError": "아이디와 비밀번호가 일치하지 않습니다"
   },
   "logout": {
     "successTitle": "로그아웃 성공",
