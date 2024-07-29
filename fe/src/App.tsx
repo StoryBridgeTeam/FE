@@ -36,8 +36,7 @@ function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route
             path="/:nickName"
-            // element={<PrivateRoute element={<InfoPage />}/>}
-            element={<MainPage />}
+            element={<PrivateRoute element={<MainPage />} />}
           />
           <Route
             path="/:nickName/info"
