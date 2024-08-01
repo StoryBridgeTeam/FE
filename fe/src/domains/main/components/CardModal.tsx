@@ -85,7 +85,13 @@ const CardModal: React.FC<CardModalProps> = ({ isOpen, onClose, name }) => {
               체크박스를 통해 메인페이지에 표시여부를 설정할 수 있습니다.
             </Text>
           )}
-          <Box borderRadius="xl" mx={4} mb={12} border="1px dashed black">
+
+          <Box
+            borderRadius="xl"
+            mx={{ base: 0, md: 4 }}
+            mb={12}
+            border={{ base: 0, md: "1px dashed black" }}
+          >
             <ModalActionButtons
               isEditing={isEditing}
               onEdit={handleEditMode}

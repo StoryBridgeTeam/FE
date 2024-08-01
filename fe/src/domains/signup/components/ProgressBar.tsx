@@ -1,5 +1,5 @@
 import { extendTheme, Progress } from "@chakra-ui/react";
-import { useStepsStore } from "../stores/useStepsStore";
+import { useStepsStore } from "../stores/StepsStore";
 
 const ProgressBar = () => {
   const { step } = useStepsStore();

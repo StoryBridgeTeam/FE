@@ -1,35 +1,28 @@
 import { Button } from "@chakra-ui/react";
-import { useStepsStore } from "../stores/useStepsStore";
-import { useUserTypeStore } from "../stores/useUserTypeStore";
+import { useStepsStore } from "../stores/StepsStore";
+import { useSignUpStore } from "../stores/SignUpStore";
 import { usePhoneVerification } from "../hooks/usePhoneVerification";
 import { useVerificationCode } from "../hooks/useVerificationCode";
 import { useEmailVerification } from "../hooks/useEmailVerification";
 import { useTranslation } from "react-i18next";
-import { useNicknameForm } from "../hooks/useNicknameFormt";
+import { useNicknameForm } from "../hooks/useNicknameForm";
+import { useSignUpComplete } from "../hooks/useSignUpComplete";
 
 interface Step {
   currentStep: number;
 }
 
-interface ButtonProps {
-  text: string;
-  onClick: () => void;
-}
 const NextStepButton = ({ currentStep }: Step) => {
   const { t } = useTranslation();
-  const { nextStep, conditions } = useStepsStore((state) => ({
-    conditions: state.conditions,
-    nextStep: state.nextStep,
-  }));
-  const { userType } = useUserTypeStore((state) => ({
-    userType: state.userType,
-  }));
+  const { nextStep, conditions } = useStepsStore();
+  const userType = useSignUpStore((state) => state.userType);
   const { handleSendRequestPhone } = usePhoneVerification();
   const { handleSendRequestEmail } = useEmailVerification();
   const { checkVerificationCode } = useVerificationCode();
   const { checkNickname } = useNicknameForm();
+  const { handleSignUpComplete } = useSignUpComplete();
 
-  const buttonProps = (): ButtonProps => {
+  const getButtonProps = () => {
     switch (currentStep) {
       case 2:
         return { text: t("signup.NextStepsButton.agree"), onClick: nextStep };
@@ -58,25 +51,25 @@ const NextStepButton = ({ currentStep }: Step) => {
       case 7:
         return {
           text: t("signup.NextStepsButton.Complete"),
-          onClick: () => {
-            console.log("complete");
-          },
+          onClick: handleSignUpComplete,
         };
       default:
         return { text: t("signup.NextStepsButton.Next"), onClick: nextStep };
     }
   };
 
+  const buttonProps = getButtonProps();
+
   return (
     <Button
-      onClick={buttonProps().onClick}
+      onClick={buttonProps.onClick}
       isDisabled={!conditions[currentStep]}
       w="full"
       bg="black"
       color="white"
       colorScheme="blackAlpha"
     >
-      {buttonProps().text}
+      {buttonProps.text}
     </Button>
   );
 };

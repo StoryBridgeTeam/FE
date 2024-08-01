@@ -11,7 +11,7 @@ import { useTranslation } from "react-i18next";
 import POIList from "./POIList";
 import NetworkStatus from "./NetwortStatus";
 import Advertisement from "./Advertisement";
-import BusinessCard from "./BusinessCard";
+import CardComponent from "./CardComponent";
 
 interface SectionHeaderProps {
   title: string;
@@ -72,7 +72,7 @@ const MainContent: React.FC = () => {
 
   const sections: SectionData[] = [
     { area: "poi", title: "POI List", Component: POIList },
-    { area: "card", title: "명함카드", Component: BusinessCard },
+    { area: "card", title: "명함카드", Component: CardComponent },
     { area: "network", title: "네트워크 현황", Component: NetworkStatus },
     { area: "ad", title: "광고", Component: Advertisement },
   ];

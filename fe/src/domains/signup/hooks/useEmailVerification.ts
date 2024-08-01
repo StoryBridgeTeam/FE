@@ -1,32 +1,32 @@
 import { useEffect } from "react";
-import { useStepsStore } from "../stores/useStepsStore";
-import { useEmailVerificationStore } from "../stores/useEmailVerificationStore";
-import { useVerificationCodeStore } from "../stores/useVerificationCodeStore";
+import { useSignUpStore } from "../stores/SignUpStore";
+import { useVerificationStore } from "../stores/VerificationStore";
+import { useStepsStore } from "../stores/StepsStore";
+import { requestEmailVerification } from "../api/auth";
 
 export const useEmailVerification = () => {
+  const { email, setEmail } = useSignUpStore();
+  const { setVerificationCode } = useVerificationStore();
   const { nextStep, setCondition } = useStepsStore();
-  const { email, setEmail } = useEmailVerificationStore();
-  const { setVerficationCode } = useVerificationCodeStore();
 
   const handleEmailChange = (value: string) => {
     setEmail(value);
   };
 
-  const handleSendRequestEmail = () => {
-    // 인증코드 발송 API 호출, d이후 setVerficationCode에 저장
-    setVerficationCode("123456");
-    console.log("Email: " + email);
-    nextStep();
+  const handleSendRequestEmail = async () => {
+    try {
+      const response = await requestEmailVerification(email);
+      setVerificationCode(response.data.identityVerificationId);
+      nextStep();
+    } catch (error) {
+      //에러 처리 따로 추가하기
+    }
   };
 
   useEffect(() => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (emailRegex.test(email)) {
-      setCondition(3, true);
-    } else {
-      setCondition(3, false);
-    }
-  }, [email]);
+    setCondition(3, emailRegex.test(email));
+  }, [email, setCondition]);
 
   return {
     email,

@@ -6,9 +6,9 @@ import InputMask from "react-input-mask";
 const PhoneVerificationForm = () => {
   const { t } = useTranslation();
   const {
-    username,
+    name,
     gender,
-    birthDate,
+    birth,
     phoneNumber,
     telecom,
     handleNameChange,
@@ -29,11 +29,11 @@ const PhoneVerificationForm = () => {
       <Stack spacing={10} mt={4} mb={6}>
         <Input
           ml="2"
-          isInvalid={username !== "" && !isInputNameValid()}
+          isInvalid={name !== "" && !isInputNameValid()}
           variant="flushed"
           borderColor="gray.300"
           placeholder="성명"
-          value={username}
+          value={name}
           onChange={(e) => handleNameChange(e.target.value)}
         />
 
@@ -49,18 +49,18 @@ const PhoneVerificationForm = () => {
               성별
             </option>
             <option value="male">남성</option>
-            <option value="felmale">여성</option>
+            <option value="female">여성</option>
           </Select>
           <Input
             ml="2"
-            isInvalid={birthDate !== "" && !isInputDateValid()}
+            isInvalid={birth !== "" && !isInputDateValid()}
             variant="flushed"
             borderColor="gray.300"
             placeholder="생년월일 8자리"
             as={InputMask}
             mask="99999999"
             maskChar={null}
-            value={birthDate}
+            value={birth}
             onChange={(e) => handleBirthDateChange(e.target.value)}
           />
         </InputGroup>

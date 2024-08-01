@@ -1,11 +1,4 @@
-import {
-  Box,
-  Input,
-  InputGroup,
-  InputRightElement,
-  Stack,
-  Text,
-} from "@chakra-ui/react";
+import { Box, Stack, Text } from "@chakra-ui/react";
 import { useTranslation } from "react-i18next";
 
 const SignupComplete = () => {

@@ -1,6 +1,7 @@
-import { Box, Flex, Text, Stack, useBreakpointValue } from "@chakra-ui/react";
-import { useStepsStore } from "./stores/useStepsStore";
-import { useUserTypeStore } from "./stores/useUserTypeStore";
+import React from "react";
+import { Box, Flex, Stack, useBreakpointValue } from "@chakra-ui/react";
+import { useStepsStore } from "./stores/StepsStore";
+import { useSignUpStore } from "./stores/SignUpStore";
 import NextStepsButton from "./components/NextStepsButton";
 import ProgressBar from "./components/ProgressBar";
 import TypeSelector from "./components/TypeSelector";
@@ -12,10 +13,10 @@ import PasswordForm from "./components/PasswordForm";
 import NicknameForm from "./components/NicknameForm";
 import SignupComplete from "./components/SignupComplete";
 
-const SignupPage = () => {
+const SignupPage: React.FC = () => {
   const isMobile = useBreakpointValue({ base: true, md: false });
   const currentStep = useStepsStore((state) => state.step);
-  const userType = useUserTypeStore((state) => state.userType);
+  const userType = useSignUpStore((state) => state.userType);
 
   const renderStep = () => {
     switch (currentStep) {
@@ -24,9 +25,11 @@ const SignupPage = () => {
       case 2:
         return <TermsAgreement />;
       case 3:
-        if (userType === "korea") {
-          return <PhoneVerificationForm />;
-        } else return <EmailVerificationForm />;
+        return userType === "korea" ? (
+          <PhoneVerificationForm />
+        ) : (
+          <EmailVerificationForm />
+        );
       case 4:
         return <VerificationCodeForm />;
       case 5:
@@ -46,7 +49,7 @@ const SignupPage = () => {
         shadow={isMobile ? undefined : "xl"}
         border={isMobile ? undefined : "1px"}
         borderColor={isMobile ? undefined : "#CDCDCD"}
-        maxW="lg" //lg
+        maxW="lg"
         w="full"
         borderRadius="3xl"
       >
@@ -54,7 +57,7 @@ const SignupPage = () => {
         <Stack spacing={1} mb={24}>
           {renderStep()}
         </Stack>
-        {currentStep === 1 ? null : (
+        {currentStep !== 1 && (
           <Box mt="auto">
             <NextStepsButton currentStep={currentStep} />
           </Box>

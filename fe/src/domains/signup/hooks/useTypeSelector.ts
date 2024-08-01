@@ -1,9 +1,9 @@
-import { useStepsStore } from "../stores/useStepsStore";
-import { useUserTypeStore } from "../stores/useUserTypeStore";
+import { useSignUpStore } from "../stores/SignUpStore";
+import { useStepsStore } from "../stores/StepsStore";
 
 export const useTypeSelector = () => {
+  const { setUserType } = useSignUpStore();
   const { nextStep } = useStepsStore();
-  const { setUserType } = useUserTypeStore();
 
   const handleSelectType = (type: "korea" | "non-korea") => {
     setUserType(type);

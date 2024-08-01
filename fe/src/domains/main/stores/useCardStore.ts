@@ -25,7 +25,7 @@ export const useCardStore = create<CardStore>((set, get) => ({
   cards: [],
   setName: (name) => set({ name }),
   setNickName: (nickName) => set({ nickName }),
-  addCard: (card) =>
+  addCard: (card) => 
     set((state) => {
       const newId =
         state.cards.length > 0

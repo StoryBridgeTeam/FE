@@ -27,7 +27,12 @@ const CardList: React.FC<CardListProps> = ({
 }) => {
   if (!isEditing) {
     return (
-      <UnorderedList styleType="none" px={8} pb={10} spacing={2}>
+      <UnorderedList
+        styleType="none"
+        px={{ base: 0, md: 8 }}
+        pb={{ base: 0, md: 10 }}
+        spacing={2}
+      >
         {cards.map((card) => (
           <CardModalItem
             key={card.id}
@@ -48,8 +53,8 @@ const CardList: React.FC<CardListProps> = ({
               {...provided.droppableProps}
               ref={provided.innerRef}
               styleType="none"
-              px={8}
-              pb={10}
+              px={{ base: 0, md: 8 }}
+              pb={{ base: 0, md: 10 }}
               spacing={4}
             >
               {cards.map((card, index) => (

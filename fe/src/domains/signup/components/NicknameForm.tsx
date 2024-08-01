@@ -1,6 +1,6 @@
 import { Box, Input, InputGroup, Stack, Text } from "@chakra-ui/react";
 import { useTranslation } from "react-i18next";
-import { useNicknameForm } from "../hooks/useNicknameFormt";
+import { useNicknameForm } from "../hooks/useNicknameForm";
 
 const NicknameForm = () => {
   const { t } = useTranslation();
