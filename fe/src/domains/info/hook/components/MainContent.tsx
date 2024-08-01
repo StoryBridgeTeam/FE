@@ -11,8 +11,8 @@ import DetailPage from "./DetailPage";
 import { useTranslation } from "react-i18next";
 import TextSection from "./TextSection";
 import ProfileSidebar from "./ProfileSideBar";
-import { useProfileStore } from "../Store/useProfileStore";
-import { getCoverLetters, putCoverLetters } from "../api/InfoAPI";
+import { useProfileStore } from "../../Store/useProfileStore";
+import { getCoverLetters, putCoverLetters } from "../../api/InfoAPI";
 
 interface MockData {
   id: number;
@@ -87,14 +87,7 @@ const MainContent: FC = () => {
       mockData.length > 0
         ? Math.max(...mockData.map((item) => item.id)) + 1
         : 1;
-    const newMockData: MockData = { id: newId, title: "", content: "" };
-    const updatedMockData = [...mockData, newMockData];
-    setMockData(updatedMockData);
-
-    await updateServerData(updatedMockData);
-
-    setSelectedId(newId);
-    setEdit(true);
+    console.log(newId);
   };
 
   const handleSaveDetail = (
@@ -105,8 +98,6 @@ const MainContent: FC = () => {
     const updatedMockData = mockData.map((item) =>
       item.id === id ? { ...item, ...updatedData } : item
     );
-    console.log(updatedMockData);
-
     setMockData(updatedMockData);
     updateServerData(updatedMockData);
   };

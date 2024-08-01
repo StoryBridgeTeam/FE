@@ -12,11 +12,11 @@ const IdInput: React.FC<IdInputProps> = ({ id, idError, handleIdChange }) => {
   const { t, i18n } = useTranslation();
 
   const determineInputType = () => {
-    return i18n.language === "ko-KR" ? "tel" : "email";
+    return i18n.language === "ko" ? "tel" : "email";
   };
 
   const determineAutocomplete = () => {
-    return i18n.language === "ko-KR" ? "tel" : "username";
+    return i18n.language === "ko" ? "tel" : "username";
   };
 
   return (

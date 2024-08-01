@@ -1,4 +1,5 @@
-import create from "zustand";
+import { create } from 'zustand';
+
 
 type UserType = "korea" | "non-korea";
 

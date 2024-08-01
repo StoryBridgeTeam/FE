@@ -1,4 +1,4 @@
-import create from "zustand";
+import { create } from "zustand";
 
 interface CodeState {
   //입력받은 코드

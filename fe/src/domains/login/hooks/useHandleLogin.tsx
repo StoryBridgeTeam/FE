@@ -1,7 +1,6 @@
 import { useAuthStore } from "../stores/useAuthStore";
 import { useNavigate } from "react-router-dom";
 import { useToastMessage } from "../../../common/hooks/useToastMessage";
-import base64 from "base-64";
 import { getNicknameToken } from "../api/nickname";
 
 export const useHandleLogin = () => {

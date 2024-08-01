@@ -21,8 +21,8 @@ import {
 } from "@chakra-ui/react";
 import { FC, useEffect, useState } from "react";
 import { FiPlus, FiMinus } from "react-icons/fi";
-import { getCard } from "../api/SideBarAPI";
-import { getNicknameToken } from "../../login/api/nickname";
+import { getNicknameToken } from "../../../login/api/nickname";
+import { getCard } from "../../api/SideBarAPI";
 
 const ProfileSidebar: FC = () => {
   const isMobile = useBreakpointValue({ base: true, md: false });
