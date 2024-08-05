@@ -1,0 +1,361 @@
+import React, { useEffect, useRef } from "react";
+import {
+  Box,
+  Flex,
+  Avatar,
+  Text,
+  Menu,
+  MenuButton,
+  MenuList,
+  MenuItem,
+  Button,
+  Input,
+  useDisclosure,
+  Tag,
+  TagLabel,
+} from "@chakra-ui/react";
+import { BiDotsVerticalRounded } from "react-icons/bi";
+import { Trash, Edit, Link } from "tabler-icons-react";
+import { formatDistanceToNow } from "date-fns";
+import { useCommentStore } from "../Store/CommentStore";
+import { useToastMessage } from "../../../common/hooks/useToastMessage";
+import { useTranslation } from "react-i18next";
+import { renderContentWithHighlights } from "./renderContentWithHighlights";
+import { useTextSelection } from "../hook/useTextSelection";
+import { SlideUpModal } from "../../../common/components/SlideUpModal";
+import { SlideUpSmallModal } from "../../../common/components/SlideUpSmallModal";
+import {
+  getComments,
+  deleteCommentServer,
+  updateComment,
+  tagComment,
+} from "../api/CommentAPI";
+
+interface CommentListProps {
+  id: number;
+  content: string;
+  highlightComment: (startIndex: number, endIndex: number) => void;
+}
+
+const CommentList: React.FC<CommentListProps> = ({
+  id,
+  content,
+  highlightComment,
+}) => {
+  const {
+    comments,
+    setComments,
+    deleteComment,
+    updateCommentText,
+    updateCommentIndexes,
+  } = useCommentStore();
+
+  const commentsEndRef = useRef<HTMLDivElement | null>(null);
+  const [editIndex, setEditIndex] = React.useState<number | null>(null);
+  const [editText, setEditText] = React.useState<string>("");
+  const [connectIndex, setConnectIndex] = React.useState<number | null>(null);
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const {
+    isOpen: isConnectOpen,
+    onOpen: onConnectOpen,
+    onClose: onConnectClose,
+  } = useDisclosure();
+  const { showToast } = useToastMessage();
+  const { t } = useTranslation();
+  const {
+    selectedText,
+    handleClearSelectedText,
+    handleMouseUp,
+    handleTouchEnd,
+  } = useTextSelection();
+
+  useEffect(() => {
+    fetchCommentData();
+  }, [id]);
+
+  const fetchCommentData = async () => {
+    try {
+      const response = await getComments(id);
+      if (response) {
+        setComments(response);
+      } else {
+        setComments([]);
+      }
+    } catch (error) {
+      console.error("comment error:", error);
+    }
+  };
+
+  const handleEdit = (index: number, text: string) => {
+    setEditIndex(index);
+    setEditText(text);
+    onOpen();
+  };
+
+  const handleConnect = (index: number, text: string) => {
+    setConnectIndex(index);
+    onConnectOpen();
+  };
+
+  const handleSave = async () => {
+    if (editIndex !== null) {
+      await updateComment(editIndex, editText);
+      updateCommentText(editIndex, editText);
+      setEditIndex(null);
+      setEditText("");
+      onClose();
+      showToast(
+        t(`info.commentUpdated`),
+        t(`info.commentUpdatedMessage`),
+        "success"
+      );
+    }
+  };
+
+  const handleConnectReset = async () => {
+    if (connectIndex !== null) {
+      await tagComment(id, connectIndex, { startIndex: 0, lastIndex: 0 });
+      updateCommentIndexes(connectIndex, 0, 0);
+      handleClearSelectedText();
+      setConnectIndex(null);
+      onConnectClose();
+      showToast(
+        t(`info.commentConnectedReset`),
+        t(`info.commentConnectedMessageReset`),
+        "success"
+      );
+    }
+  };
+
+  const handleConnectSave = async () => {
+    if (connectIndex !== null && selectedText) {
+      await tagComment(id, connectIndex, {
+        startIndex: selectedText.startIndex,
+        lastIndex: selectedText.endIndex,
+      });
+      updateCommentIndexes(
+        connectIndex,
+        selectedText.startIndex,
+        selectedText.endIndex
+      );
+      handleClearSelectedText();
+      setConnectIndex(null);
+      onConnectClose();
+      showToast(
+        t(`info.commentConnected`),
+        t(`info.commentConnectedMessage`),
+        "success"
+      );
+    }
+  };
+
+  useEffect(() => {
+    if (commentsEndRef.current) {
+      commentsEndRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [comments.length]);
+
+  const getHighlightedText = (startIndex?: number, endIndex?: number) => {
+    if (startIndex !== undefined && endIndex !== undefined) {
+      return content.substring(startIndex, endIndex);
+    }
+    return "";
+  };
+
+  const handleTagClick = (
+    startIndex: number | undefined,
+    endIndex: number | undefined
+  ) => {
+    if (startIndex !== undefined && endIndex !== undefined) {
+      highlightComment(startIndex, endIndex);
+    }
+  };
+
+  const processedComments = comments.map((comment) => ({
+    content: comment.content,
+    startIndex: comment.tagInfo?.startIndex || 0,
+    endIndex: comment.tagInfo?.lastIndex || 0,
+  }));
+
+  return (
+    <>
+      <Box border="1px" borderColor="#EEEEEE" p={4} mb={"82px"} h={"100%"}>
+        {comments.map((comment) => (
+          <Box marginBottom={5} key={comment.id} id={`comment-${comment.id}`}>
+            <Flex align="center">
+              <Avatar
+                size="sm"
+                name={comment.author.nickName}
+                src="https://image.idus.com/image/files/da17e0c53a4e480284c5d49932722e5a.jpg"
+                mr={3}
+              />
+              <Text fontWeight="bold">{comment.author.nickName}</Text>
+              <Text
+                fontSize="xs"
+                color="gray.500"
+                mr={2}
+                lineHeight={"xl"}
+                ml={3}
+              >
+                {formatDistanceToNow(new Date(comment.createdTime))} ago
+              </Text>
+              <Menu>
+                <MenuButton
+                  as={Button}
+                  variant="ghost"
+                  size="xs"
+                  aria-label="More options"
+                  rightIcon={<BiDotsVerticalRounded />}
+                  p={0}
+                  m={0}
+                  minW={0}
+                />
+                <MenuList>
+                  <MenuItem
+                    icon={<Link />}
+                    onClick={() => handleConnect(comment.id, comment.content)}
+                  >
+                    Connect
+                  </MenuItem>
+                  <MenuItem
+                    icon={<Edit />}
+                    onClick={() => handleEdit(comment.id, comment.content)}
+                  >
+                    Edit
+                  </MenuItem>
+                  <MenuItem
+                    icon={<Trash />}
+                    onClick={async () => {
+                      await deleteCommentServer(comment.id);
+                      deleteComment(comment.id);
+                      showToast(
+                        t(`info.commentDelete`),
+                        t(`info.commentDeleteMessage`),
+                        "success"
+                      );
+                    }}
+                  >
+                    Delete
+                  </MenuItem>
+                </MenuList>
+              </Menu>
+            </Flex>
+            {comment.tagInfo &&
+              (comment.tagInfo.startIndex !== 0 ||
+                comment.tagInfo.lastIndex !== 0) && (
+                <Tag
+                  mt={1}
+                  size="md"
+                  fontSize="xs"
+                  colorScheme="gray"
+                  borderRadius="full"
+                  mb={2}
+                  marginLeft={10}
+                  cursor="pointer"
+                  onClick={() =>
+                    handleTagClick(
+                      comment.tagInfo!.startIndex,
+                      comment.tagInfo!.lastIndex
+                    )
+                  }
+                >
+                  <TagLabel color={"gray"}>
+                    {getHighlightedText(
+                      comment.tagInfo.startIndex,
+                      comment.tagInfo.lastIndex
+                    )}
+                  </TagLabel>
+                </Tag>
+              )}
+            <Text marginLeft={10} pr={5}>
+              {comment.content}
+            </Text>
+          </Box>
+        ))}
+        <div ref={commentsEndRef} />
+      </Box>
+
+      <SlideUpSmallModal
+        isOpen={isOpen}
+        onClose={onClose}
+        title={t(`info.editCommnet`)}
+        footerContent={
+          <>
+            <Button variant="ghost" onClick={onClose}>
+              Cancel
+            </Button>
+            <Button colorScheme="blue" ml={3} onClick={handleSave}>
+              Save
+            </Button>
+          </>
+        }
+      >
+        <Box>
+          <Input
+            placeholder="Enter text to edit"
+            value={editText}
+            onChange={(e) => setEditText(e.target.value)}
+          />
+        </Box>
+      </SlideUpSmallModal>
+
+      <SlideUpModal
+        isOpen={isConnectOpen}
+        onClose={onConnectClose}
+        title={t(`info.connectComment`)}
+        footerContent={
+          <>
+            <Button
+              variant="ghost"
+              onClick={() => {
+                onConnectClose();
+                handleClearSelectedText();
+              }}
+            >
+              Cancel
+            </Button>
+            <Button
+              colorScheme="yellow"
+              ml={3}
+              onClick={() => {
+                handleConnectReset();
+                handleClearSelectedText();
+              }}
+            >
+              Reset
+            </Button>
+            <Button
+              colorScheme="blue"
+              ml={3}
+              onClick={() => {
+                handleConnectSave();
+                handleClearSelectedText();
+              }}
+            >
+              Save
+            </Button>
+          </>
+        }
+      >
+        <Box onMouseUp={handleMouseUp} onTouchEnd={handleTouchEnd}>
+          {renderContentWithHighlights(content, processedComments)}
+        </Box>
+        {selectedText && (
+          <Tag
+            mt={7}
+            size="lg"
+            fontSize="md"
+            colorScheme="gray"
+            borderRadius="full"
+            mb={4}
+            cursor="pointer"
+          >
+            {selectedText && selectedText.text}
+          </Tag>
+        )}
+      </SlideUpModal>
+    </>
+  );
+};
+
+export default CommentList;

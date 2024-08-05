@@ -10,5 +10,56 @@
   "nav": {
     "Feed": "Feed",
     "Chatting": "Chat"
+  },
+  "login": {},
+  "signup": {
+    "NextStepsButton": {
+      "agree": "Agree",
+      "VerificationRequest": "Request Verification",
+      "Verification": "Verify",
+      "Next": "Next",
+      "Complete": "Complete"
+    },
+    "TermsAgreement": {
+      "title": "Please agree to the terms",
+      "agreeAll": "Agree to all.",
+      "agreeRequired1": "[Required] Required service terms of use",
+      "agreeRequired2": "[Required] Consent to collection and use of personal information",
+      "agreeOptional1": "[Optional] Consent to additional collection of profile information",
+      "agreeOptional2": "[Optional] Consent to receive advertising messages"
+    },
+    "VerificationCode": {
+      "title": "Please enter the verification code",
+      "placeholder": "Please enter the 6-digit verification code",
+      "toast": {
+        "error": "Verification failed",
+        "description": "Please enter a valid verification code"
+      }
+    },
+    "PasswordForm": {
+      "title": "Please enter your password",
+      "subtitle": "Combine letters + numbers + special characters, 8-15 characters",
+      "passwordPlaceholder": "Please enter the password you will use",
+      "confirmPasswordPlaceholder": "Please enter the password again",
+      "engLetter": "Letter",
+      "number": "Number",
+      "specialChar": "Special character",
+      "length": "8-16 characters",
+      "same": "Password match"
+    },
+    "NicknameForm": {
+      "title": "Please enter your nickname",
+      "subtitle": "Combination of conditions, 3-10 characters",
+      "placeholder": "Please enter the nickname you will use",
+      "toast": {
+        "error": "Duplicate nickname",
+        "description": "This nickname is already in use."
+      }
+    },
+    "SignupComplete": {
+      "title": "You have successfully signed up!",
+      "description": "The verified email will be used as your ID.",
+      "description2": "Get to know various people here and engage with them."
+    }
   }
 }
