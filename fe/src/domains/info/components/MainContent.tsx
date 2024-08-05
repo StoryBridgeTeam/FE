@@ -4,6 +4,7 @@ import {
   Heading,
   Flex,
   useBreakpointValue,
+  Text,
 } from "@chakra-ui/react";
 import { FC, useEffect, useState } from "react";
 import { Edit, Check } from "tabler-icons-react";
@@ -13,6 +14,8 @@ import TextSection from "./TextSection";
 import ProfileSidebar from "./ProfileSideBar";
 import { useProfileStore } from "../Store/useProfileStore";
 import { getCoverLetters, putCoverLetters } from "../api/InfoAPI";
+import { useCommentStore } from "../Store/CommentStore";
+import { getComments } from "../api/CommentAPI";
 
 interface MockData {
   id: number;
@@ -26,18 +29,23 @@ const MainContent: FC = () => {
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const { t } = useTranslation();
   const { isEdit, setEdit } = useProfileStore();
+  const [isLoading, setLoading] = useState<boolean>(false);
+  const { setComments } = useCommentStore();
 
   useEffect(() => {
     const fetchCoverData = async () => {
       try {
-        const cover = await getCoverLetters();
-        if (cover === null) {
+        setLoading(true);
+        const { entries } = await getCoverLetters();
+        if (entries === null) {
           setMockData([]);
         } else {
-          setMockData(cover);
+          setMockData(entries);
         }
+        setLoading(false);
       } catch (error) {
         console.error("cover error:", error);
+        setLoading(false);
       }
     };
 
@@ -57,13 +65,23 @@ const MainContent: FC = () => {
     }
   };
 
-  const handleSectionClick = (id: number) => {
-    if (!isEdit) {
-      setSelectedId(id);
+  const handleSectionClick = async (id: number) => {
+    try {
+      const response = await getComments(id);
+      if (response) {
+        setComments(response);
+      } else {
+        setComments([]);
+      }
+    } catch (error) {
+      console.error("comment error:", error);
     }
+
+    setSelectedId(id);
   };
 
   const handleBackClick = () => {
+    setComments([]);
     setSelectedId(null);
   };
 
@@ -87,21 +105,21 @@ const MainContent: FC = () => {
       mockData.length > 0
         ? Math.max(...mockData.map((item) => item.id)) + 1
         : 1;
-    const newMockData: MockData = { id: newId, title: "", content: "" };
+    const newMockData: MockData = {
+      id: newId,
+      title: "새로운 제목",
+      content: "새로운 내용",
+    };
     const updatedMockData = [...mockData, newMockData];
-    setMockData(updatedMockData);
 
     await updateServerData(updatedMockData);
-
-    setSelectedId(newId);
-    setEdit(true);
+    setMockData(updatedMockData);
   };
 
   const handleSaveDetail = (
     id: number,
     updatedData: { title: string; content: string }
   ) => {
-    console.log(id);
     const updatedMockData = mockData.map((item) =>
       item.id === id ? { ...item, ...updatedData } : item
     );
@@ -138,6 +156,12 @@ const MainContent: FC = () => {
             <Flex justifyContent="center" mb={5}>
               <Heading size="lg">{t(`info.info`)}</Heading>
             </Flex>
+            <Flex justifyContent="center">
+              {mockData.length === 0 && !isLoading && (
+                <Text>등록된 자기소개서가 없습니다.</Text>
+              )}
+            </Flex>
+
             {mockData.map((data) => (
               <TextSection
                 key={data.id}

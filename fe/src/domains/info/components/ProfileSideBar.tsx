@@ -19,56 +19,168 @@ import {
   ModalBody,
   ModalFooter,
 } from "@chakra-ui/react";
-import { FC, useEffect, useState } from "react";
+import { FC, useEffect, useState, useCallback } from "react";
 import { FiPlus, FiMinus } from "react-icons/fi";
-import { getCard } from "../api/SideBarAPI";
+import {
+  getCard,
+  getAdditionalInfo,
+  createAdditionalInfo,
+  deleteAdditionalInfo,
+} from "../api/SideBarAPI";
 import { getNicknameToken } from "../../login/api/nickname";
+import { useParams } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+
+type AboutMeItem = { [key: string]: string };
+
+type EducationItem = {
+  id: number;
+  startDate: string;
+  endDate: string;
+  content: string;
+};
 
 const ProfileSidebar: FC = () => {
+  const { nickName } = useParams<{ nickName: string }>();
   const isMobile = useBreakpointValue({ base: true, md: false });
   const name = getNicknameToken();
-  const [aboutMe, setAboutMe] = useState<Array<{ [key: string]: string }>>([]);
-  const [education, setEducation] = useState<
-    Array<{ date: string; item: string }>
-  >([
-    { date: "2024.03.01", item: "초등학교" },
-    { date: "2024.03.01", item: "중학교" },
-    { date: "2024.03.01", item: "고등학교" },
-  ]);
+  const { t } = useTranslation();
+  const [aboutMe, setAboutMe] = useState<AboutMeItem[]>([]);
+  const [education, setEducation] = useState<EducationItem[]>([]);
+  const ishost = nickName === name;
 
-  const { isOpen, onOpen, onClose } = useDisclosure();
-  const [newDate, setNewDate] = useState("");
+  const {
+    isOpen: isAddEducationOpen,
+    onOpen: onAddEducationOpen,
+    onClose: onAddEducationClose,
+  } = useDisclosure();
+
+  const {
+    isOpen: isDeleteEducationOpen,
+    onOpen: onDeleteEducationOpen,
+    onClose: onDeleteEducationClose,
+  } = useDisclosure();
+
+  const [newStartDate, setNewStartDate] = useState("");
+  const [newEndDate, setNewEndDate] = useState("");
   const [newItem, setNewItem] = useState("");
+  const [selectedEducationId, setSelectedEducationId] = useState<number | null>(
+    null
+  );
 
-  useEffect(() => {
-    const fetchCardData = async () => {
-      try {
-        const card = await getCard();
-        if (card === null) {
-          setAboutMe([]);
-        } else {
-          setAboutMe(card);
-          console.log(card);
-        }
-      } catch (error) {
-        console.error("Card error:", error);
+  const [selectedEducation, setSelectedEducation] =
+    useState<EducationItem | null>(null);
+
+  const fetchAdditionalInfo = useCallback(async () => {
+    try {
+      const additionalInfo = await getAdditionalInfo(nickName!);
+      if (Array.isArray(additionalInfo)) {
+        setEducation(additionalInfo);
+      } else {
+        console.error("Unexpected format for additionalInfo:", additionalInfo);
+        setEducation([]);
       }
-    };
-
-    fetchCardData();
+    } catch (error) {
+      console.error("Error fetching additional info:", error);
+      setEducation([]);
+    }
   }, []);
 
-  const addEducation = () => {
-    if (newDate && newItem) {
-      setEducation([...education, { date: newDate, item: newItem }]);
-      setNewDate("");
+  const fetchCardData = useCallback(async () => {
+    try {
+      const card = await getCard(nickName!);
+      if (Array.isArray(card)) {
+        setAboutMe(card);
+      } else {
+        console.error("Unexpected format for card:", card);
+        setAboutMe([]);
+      }
+    } catch (error) {
+      console.error("Card error:", error);
+    }
+  }, [nickName]);
+
+  useEffect(() => {
+    fetchCardData();
+    fetchAdditionalInfo();
+  }, [fetchCardData, fetchAdditionalInfo]);
+
+  const addEducation = async () => {
+    if (newStartDate && newEndDate && newItem) {
+      await createAdditionalInfo(nickName!, newStartDate, newEndDate, newItem);
+      await fetchAdditionalInfo();
+      setNewStartDate("");
+      setNewEndDate("");
       setNewItem("");
-      onClose();
+      onAddEducationClose();
     }
   };
 
-  const removeEducation = (index: number) => {
-    setEducation(education.filter((_, i) => i !== index));
+  const handleEducationDelete = async () => {
+    if (selectedEducationId !== null) {
+      await deleteAdditionalInfo(nickName!, selectedEducationId);
+      await fetchAdditionalInfo();
+      setSelectedEducationId(null);
+      setSelectedEducation(null);
+      onDeleteEducationClose();
+    }
+  };
+
+  const confirmDeleteEducation = (id: number) => {
+    const educationItem = education.find((item) => item.id === id) || null;
+    setSelectedEducation(educationItem);
+    setSelectedEducationId(id);
+    onAddEducationClose();
+    onDeleteEducationOpen();
+  };
+
+  const formatDate = (dateString: string): string => {
+    const date = new Date(dateString);
+    const year = date.getFullYear().toString().slice(-2);
+    const month = (date.getMonth() + 1).toString().padStart(2, "0");
+    const day = date.getDate().toString().padStart(2, "0");
+    return `${year}.${month}.${day}`;
+  };
+
+  const formatEducation = (
+    education: EducationItem[],
+    t: (key: string) => string
+  ): React.ReactNode => {
+    if (!Array.isArray(education) || education.length === 0) {
+      return <Text>{t(`info.noEducation`)}</Text>;
+    }
+
+    return education.map(({ id, startDate, endDate, content }) => (
+      <Flex key={id} justify="space-between" align="center" mb={2}>
+        <Text fontSize="10px" whiteSpace="pre-wrap">{`• ${formatDate(
+          startDate
+        )} ~ ${formatDate(endDate)} ${content}`}</Text>
+        {ishost && (
+          <FiMinus
+            onClick={() => confirmDeleteEducation(id)}
+            fontSize="xs"
+            cursor="pointer"
+          />
+        )}
+      </Flex>
+    ));
+  };
+
+  const formatAboutMe = (
+    aboutMe: AboutMeItem[],
+    t: (key: string) => string
+  ): React.ReactNode => {
+    if (!Array.isArray(aboutMe) || aboutMe.length === 0) {
+      return <Text>{t(`info.noPersonal`)}</Text>;
+    }
+
+    return aboutMe.map((item, index) => (
+      <Flex key={index} justify="space-between" align="center" mb={2}>
+        <Text whiteSpace="pre-wrap">{`• ${Object.keys(item)[0]}: ${
+          item[Object.keys(item)[0]]
+        }`}</Text>
+      </Flex>
+    ));
   };
 
   return (
@@ -80,30 +192,43 @@ const ProfileSidebar: FC = () => {
       spacing={4}
     >
       <ProfileImage />
-      <Heading size="md">{name}</Heading>
+      <Heading size="md">{nickName}</Heading>
       <Divider borderColor="#C5C5C5" />
-      <InfoSection title="인적사항" content={formatAboutMe(aboutMe)} />
       <InfoSection
-        title="학력 및 경력"
-        content={formatEducation(education, removeEducation)}
-        actions={<FiPlus onClick={onOpen} cursor="pointer" />}
+        title={t(`info.personal`)}
+        content={formatAboutMe(aboutMe, t)}
       />
-      <Modal isOpen={isOpen} onClose={onClose}>
+      <InfoSection
+        title={t(`info.education`)}
+        content={formatEducation(education, t)}
+        actions={
+          ishost && <FiPlus onClick={onAddEducationOpen} cursor="pointer" />
+        }
+      />
+      <Modal isOpen={isAddEducationOpen} onClose={onAddEducationClose}>
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader>새 학력 및 경력 추가</ModalHeader>
+          <ModalHeader>{t(`info.addEducation`)}</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
             <FormControl>
-              <FormLabel>날짜</FormLabel>
+              <FormLabel>{t(`info.startDate`)}</FormLabel>
               <Input
                 type="date"
-                value={newDate}
-                onChange={(e) => setNewDate(e.target.value)}
+                value={newStartDate}
+                onChange={(e) => setNewStartDate(e.target.value)}
               />
             </FormControl>
             <FormControl mt={4}>
-              <FormLabel>항목</FormLabel>
+              <FormLabel>{t(`info.endDate`)}</FormLabel>
+              <Input
+                type="date"
+                value={newEndDate}
+                onChange={(e) => setNewEndDate(e.target.value)}
+              />
+            </FormControl>
+            <FormControl mt={4}>
+              <FormLabel>{t(`info.item`)}</FormLabel>
               <Input
                 value={newItem}
                 onChange={(e) => setNewItem(e.target.value)}
@@ -112,10 +237,43 @@ const ProfileSidebar: FC = () => {
           </ModalBody>
           <ModalFooter>
             <Button colorScheme="blue" mr={3} onClick={addEducation}>
-              추가
+              {t(`info.plus`)}
             </Button>
-            <Button variant="ghost" onClick={onClose}>
-              닫기
+            <Button variant="ghost" onClick={onAddEducationClose}>
+              {t(`info.close`)}
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+      <Modal isOpen={isDeleteEducationOpen} onClose={onDeleteEducationClose}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>{t(`info.confirmDelete`)}</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            {selectedEducation && (
+              <Box>
+                <Text mt={2}>
+                  <strong>{t(`info.startDate`)}:</strong>{" "}
+                  {formatDate(selectedEducation.startDate)}
+                </Text>
+                <Text mt={1}>
+                  <strong>{t(`info.endDate`)}:</strong>{" "}
+                  {formatDate(selectedEducation.endDate)}
+                </Text>
+                <Text mt={1}>
+                  <strong>{t(`info.content`)}:</strong>{" "}
+                  {selectedEducation.content}
+                </Text>
+              </Box>
+            )}
+          </ModalBody>
+          <ModalFooter>
+            <Button variant="ghost" onClick={onDeleteEducationClose}>
+              {t(`info.cancel`)}
+            </Button>
+            <Button colorScheme="red" mr={3} onClick={handleEducationDelete}>
+              {t(`info.delete`)}
             </Button>
           </ModalFooter>
         </ModalContent>
@@ -128,7 +286,7 @@ const ProfileImage: FC = () => (
   <Box
     w="150px"
     h="150px"
-    borderRadius="50"
+    borderRadius="full"
     backgroundImage="url(https://image.idus.com/image/files/da17e0c53a4e480284c5d49932722e5a.jpg)"
     backgroundSize="cover"
     backgroundPosition="center"
@@ -185,42 +343,6 @@ const InfoSection: FC<{
       </Box>
     </Box>
   );
-};
-
-const formatEducation = (
-  education: Array<{ date: string; item: string }>,
-  removeEducation: (index: number) => void
-): React.ReactNode => {
-  if (education.length === 0) {
-    return <Text>학력 및 경력이 없습니다.</Text>;
-  }
-
-  return education.map(({ date, item }, index) => (
-    <Flex key={index} justify="space-between" align="center" mb={2}>
-      <Text whiteSpace="pre-wrap">{`• ${date} ${item}`}</Text>
-      <FiMinus
-        onClick={() => removeEducation(index)}
-        fontSize="md"
-        cursor="pointer"
-      />
-    </Flex>
-  ));
-};
-
-const formatAboutMe = (
-  aboutMe: Array<{ [key: string]: string }>
-): React.ReactNode => {
-  if (aboutMe.length === 0) {
-    return <Text>인적사항이 없습니다.</Text>;
-  }
-
-  return aboutMe.map((item, index) => (
-    <Flex key={index} justify="space-between" align="center" mb={2}>
-      <Text whiteSpace="pre-wrap">{`• ${Object.keys(item)[0]}: ${
-        item[Object.keys(item)[0]]
-      }`}</Text>
-    </Flex>
-  ));
 };
 
 export default ProfileSidebar;

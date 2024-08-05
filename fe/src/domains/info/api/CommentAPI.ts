@@ -1,11 +1,10 @@
 import axiosInstance from "../../../common/api/axiosInstance";
+import { getNicknameToken } from "../../login/api/nickname";
 
-export const getComments = async (coverLetterId: number) => {
+export const getComments = async (id: number) => {
   try {
-    const response = await axiosInstance.get(
-      `/cover-letter/${coverLetterId}/comments`
-    );
-    return response.data;
+    const response = await axiosInstance.get(`/cover-letter/${id}/comments`);
+    return response.data.data.comments;
   } catch (error) {
     console.error("Failed to fetch comments:", error);
     throw error;
@@ -13,16 +12,16 @@ export const getComments = async (coverLetterId: number) => {
 };
 
 export const postComment = async (
-  coverLetterId: number,
-  token: string,
-  comment: { nickName: string; content: string }
+  id: number,
+  comment: { nickName: string; content: string },
+  token?: string
 ) => {
   try {
     const response = await axiosInstance.post(
-      `/cover-letter/${coverLetterId}/comments?token=${token}`,
+      `/cover-letter/${id}/comments`,
       comment
     );
-    return response.data;
+    return response.data.data;
   } catch (error) {
     console.error("Failed to post comment:", error);
     throw error;
@@ -30,20 +29,16 @@ export const postComment = async (
 };
 
 export const updateComment = async (
-  coverLetterId: number,
   commentId: number,
-  token: string,
-  updatedComment: { nickName: string; content: string }
+  editText: string,
+  token?: string
 ) => {
   try {
-    const response = await axiosInstance.put(
-      `/cover-letter/${coverLetterId}/comments/${commentId}/normal?token=${token}`,
-      {
-        nickName: updatedComment.nickName,
-        commentId,
-        content: updatedComment.content,
-      }
-    );
+    const response = await axiosInstance.put(`/comments/${commentId}`, {
+      nickName: getNicknameToken(),
+      commentId,
+      content: editText,
+    });
     return response.data;
   } catch (error) {
     console.error("Failed to update comment:", error);
@@ -51,14 +46,9 @@ export const updateComment = async (
   }
 };
 
-export const deleteComment = async (
-  commentId: number,
-  coverLetterId: number
-) => {
+export const deleteCommentServer = async (commentId: number) => {
   try {
-    const response = await axiosInstance.delete(
-      `/cover-letter/${coverLetterId}/comments/${commentId}`
-    );
+    const response = await axiosInstance.delete(`/comments/${commentId}`);
     return response.data;
   } catch (error) {
     console.error("Failed to delete comment:", error);
@@ -67,13 +57,13 @@ export const deleteComment = async (
 };
 
 export const tagComment = async (
-  coverLetterId: number,
+  id: number,
   commentId: number,
   tagDetails: { startIndex: number; lastIndex: number }
 ) => {
   try {
     const response = await axiosInstance.post(
-      `/cover-letter/${coverLetterId}/comments/${commentId}/tag-link`,
+      `/cover-letter/${id}/comments/${commentId}/tag-link`,
       tagDetails
     );
     return response.data;

@@ -47,7 +47,7 @@ function App() {
             path="*"
             element={
               isAuthenticated && getNicknameToken() ? (
-                <Navigate to={`/${getNicknameToken()}/info`} replace />
+                <Navigate to={`/${getNicknameToken()}`} replace />
               ) : (
                 <Navigate to="/login" replace />
               )

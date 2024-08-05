@@ -14,20 +14,22 @@ export const useTextSelection = () => {
     const selection = window.getSelection();
     if (selection && selection.rangeCount > 0) {
       const range = selection.getRangeAt(0);
-
       const startOffset = getOffset(range.startContainer, range.startOffset);
       const endOffset = getOffset(range.endContainer, range.endOffset);
 
       const text = selection.toString();
       if (text.trim().length > 0) {
-        const intersects = comments.some(
-          (comment) =>
-            comment.startIndex !== undefined &&
-            comment.endIndex !== undefined &&
-            (comment.startIndex !== 0 || comment.endIndex !== 0) &&
-            startOffset < comment.startIndex &&
-            endOffset > comment.startIndex
-        );
+        const intersects = comments.some((comment) => {
+          const tagInfo = comment.tagInfo;
+          return (
+            tagInfo &&
+            tagInfo.startIndex !== undefined &&
+            tagInfo.lastIndex !== undefined &&
+            (tagInfo.startIndex !== 0 || tagInfo.lastIndex !== 0) &&
+            startOffset < tagInfo.lastIndex &&
+            endOffset > tagInfo.startIndex
+          );
+        });
 
         if (!intersects && startOffset < endOffset) {
           setSelectedText({
@@ -77,17 +79,6 @@ export const useTextSelection = () => {
     return totalOffset;
   };
 
-  const handleCommentSubmit = (text: string) => {
-    const addComment = useCommentStore.getState().addComment;
-
-    const newComment = {
-      text,
-      timestamp: new Date().toISOString(),
-      username: "User Name",
-    };
-    addComment(newComment);
-  };
-
   const handleClearSelectedText = () => {
     setSelectedText(null);
   };
@@ -97,6 +88,5 @@ export const useTextSelection = () => {
     handleMouseUp: handleSelectionEnd,
     handleTouchEnd: handleSelectionEnd,
     handleClearSelectedText,
-    handleCommentSubmit,
   };
 };

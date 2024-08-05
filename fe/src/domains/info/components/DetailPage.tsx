@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Flex,
@@ -26,16 +26,16 @@ interface DetailPageProps {
 
 const DetailPage: React.FC<DetailPageProps> = ({
   id,
-  data,
+  data = { title: "", content: "" },
   onSave,
   onBack,
 }) => {
-  const { handleMouseUp, handleCommentSubmit } = useTextSelection();
+  const { handleMouseUp } = useTextSelection();
   const { comments } = useCommentStore();
   const { t } = useTranslation();
   const isMobile = useBreakpointValue({ base: true, md: false });
-  const [editedTitle, setEditedTitle] = useState(data.title);
-  const [editedContent, setEditedContent] = useState(data.content);
+  const [editedTitle, setEditedTitle] = useState<string>(data.title);
+  const [editedContent, setEditedContent] = useState<string>(data.content);
   const { isEdit, setEdit } = useProfileStore();
 
   const handleEditClick = () => {
@@ -48,14 +48,16 @@ const DetailPage: React.FC<DetailPageProps> = ({
   };
 
   const scrollToHighlightedText = (startIndex?: number, endIndex?: number) => {
+    if (startIndex === undefined || endIndex === undefined) return;
+
     const highlightElements = document.querySelectorAll(`[id^='highlight-']`);
     highlightElements.forEach((element) => {
       const id = element.id.replace("highlight-", "");
-      const filteredComments = comments.filter(
-        (comment) => comment.startIndex !== undefined
-      );
-      const comment = filteredComments[parseInt(id)];
-      if (comment.startIndex === startIndex && comment.endIndex === endIndex) {
+      const comment = comments.find((c) => c.id.toString() === id);
+      if (
+        comment?.tagInfo?.startIndex === startIndex &&
+        comment?.tagInfo?.lastIndex === endIndex
+      ) {
         (element as HTMLElement).scrollIntoView({
           behavior: "smooth",
           block: "center",
@@ -68,12 +70,15 @@ const DetailPage: React.FC<DetailPageProps> = ({
     startIndex?: number,
     endIndex?: number
   ) => {
-    const index = comments.findIndex(
-      (comment) =>
-        comment.startIndex === startIndex && comment.endIndex === endIndex
+    if (startIndex === undefined || endIndex === undefined) return;
+
+    const comment = comments.find(
+      (c) =>
+        c.tagInfo?.startIndex === startIndex &&
+        c.tagInfo?.lastIndex === endIndex
     );
-    if (index !== -1) {
-      const elementId = `comment-${index}`;
+    if (comment) {
+      const elementId = `comment-${comment.id}`;
       const element = document.getElementById(elementId);
 
       if (element) {
@@ -86,6 +91,13 @@ const DetailPage: React.FC<DetailPageProps> = ({
     }
   };
 
+  const processedComments = comments.map((comment) => ({
+    id: comment.id,
+    content: comment.content,
+    startIndex: comment.tagInfo?.startIndex || 0,
+    endIndex: comment.tagInfo?.lastIndex || 0,
+  }));
+
   return (
     <Box
       mt={6}
@@ -96,7 +108,7 @@ const DetailPage: React.FC<DetailPageProps> = ({
       dir="col"
     >
       <Flex w="full" justifyContent="space-between" alignItems="center" mb={5}>
-        <Button onClick={onBack}>{t(`info.list`)}</Button>
+        <Button onClick={onBack}>{t("info.list")}</Button>
         {isEdit ? (
           <Button onClick={handleSaveClick}>
             <Check size={24} color="black" />
@@ -132,8 +144,8 @@ const DetailPage: React.FC<DetailPageProps> = ({
               fontWeight="bold"
             />
           ) : (
-            <Text fontWeight="bold" fontSize={"lg"}>
-              {data.title}
+            <Text fontWeight="bold" fontSize="lg">
+              {data.title || editedTitle}
             </Text>
           )}
           <Box flex="1" borderBottom="2px" ml={2} />
@@ -141,27 +153,28 @@ const DetailPage: React.FC<DetailPageProps> = ({
         <Box bg="#EEEEEE" mt={4} p={5} borderTopRadius="30" userSelect="text">
           {isEdit ? (
             <Textarea
-              h={"52vh"}
+              h="52vh"
               value={editedContent}
               onChange={(e) => setEditedContent(e.target.value)}
               size="lg"
             />
           ) : (
             renderContentWithIcons(
-              data.content,
-              comments,
+              data.content || editedContent,
+              processedComments,
               scrollToHighlightedComment
             )
           )}
         </Box>
         <Box flex="1">
           <CommentList
+            id={id}
             content={data.content}
             highlightComment={scrollToHighlightedText}
           />
         </Box>
       </Flex>
-      <CommentInput onSubmit={handleCommentSubmit} />
+      <CommentInput id={id} />
     </Box>
   );
 };
