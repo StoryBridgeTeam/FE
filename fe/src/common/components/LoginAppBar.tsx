@@ -12,7 +12,7 @@ import { FaRegBell, FaSearch } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../../domains/login/stores/useAuthStore";
-import { getNicknameToken } from "../../domains/login/api/nickname";
+import { getNicknameToken } from "../utils/nickname";
 
 interface LoginAppBarProps {
   field1?: string;

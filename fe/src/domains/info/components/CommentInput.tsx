@@ -11,7 +11,7 @@ import {
 import { Send } from "tabler-icons-react";
 import { useTranslation } from "react-i18next";
 import { postComment } from "../api/CommentAPI";
-import { getNicknameToken } from "../../login/api/nickname";
+import { getNicknameToken } from "../../../common/utils/nickname";
 import { useCommentStore } from "../Store/CommentStore";
 
 interface CommentInputProps {

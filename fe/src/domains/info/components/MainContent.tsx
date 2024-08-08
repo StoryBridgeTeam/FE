@@ -16,6 +16,8 @@ import { useProfileStore } from "../Store/useProfileStore";
 import { getCoverLetters, putCoverLetters } from "../api/InfoAPI";
 import { useCommentStore } from "../Store/CommentStore";
 import { getComments } from "../api/CommentAPI";
+import { useParams } from "react-router-dom";
+import { getNicknameToken } from "../../../common/utils/nickname";
 
 interface MockData {
   id: number;
@@ -24,6 +26,7 @@ interface MockData {
 }
 
 const MainContent: FC = () => {
+  const { nickName } = useParams<{ nickName: string }>();
   const isMobile = useBreakpointValue({ base: true, md: false });
   const [mockData, setMockData] = useState<MockData[]>([]);
   const [selectedId, setSelectedId] = useState<number | null>(null);
@@ -31,12 +34,14 @@ const MainContent: FC = () => {
   const { isEdit, setEdit } = useProfileStore();
   const [isLoading, setLoading] = useState<boolean>(false);
   const { setComments } = useCommentStore();
+  const name = getNicknameToken();
+  const ishost = nickName === name;
 
   useEffect(() => {
     const fetchCoverData = async () => {
       try {
         setLoading(true);
-        const { entries } = await getCoverLetters();
+        const { entries } = await getCoverLetters(nickName!);
         if (entries === null) {
           setMockData([]);
         } else {
@@ -54,7 +59,7 @@ const MainContent: FC = () => {
 
   const updateServerData = async (updatedMockData: MockData[]) => {
     try {
-      const newCover = await putCoverLetters(updatedMockData);
+      const newCover = await putCoverLetters(nickName!, updatedMockData);
       if (newCover === null) {
         setMockData([]);
       } else {
@@ -107,8 +112,8 @@ const MainContent: FC = () => {
         : 1;
     const newMockData: MockData = {
       id: newId,
-      title: "새로운 제목",
-      content: "새로운 내용",
+      title: t(`info.newItem`),
+      content: t(`info.newContent`),
     };
     const updatedMockData = [...mockData, newMockData];
 
@@ -142,23 +147,25 @@ const MainContent: FC = () => {
           />
         ) : (
           <>
-            <Flex w="full" justifyContent="flex-end" alignItems="center">
-              {isEdit ? (
-                <Button onClick={handleSaveClick}>
-                  <Check size={24} color="black" />
-                </Button>
-              ) : (
-                <Button onClick={handleEditClick}>
-                  <Edit size={24} color="black" />
-                </Button>
-              )}
-            </Flex>
-            <Flex justifyContent="center" mb={5}>
+            {!ishost && (
+              <Flex w="full" justifyContent="flex-end" alignItems="center">
+                {isEdit ? (
+                  <Button onClick={handleSaveClick}>
+                    <Check size={24} color="black" />
+                  </Button>
+                ) : (
+                  <Button onClick={handleEditClick}>
+                    <Edit size={24} color="black" />
+                  </Button>
+                )}
+              </Flex>
+            )}
+            <Flex justifyContent="center" mb={5} mt={ishost ? 12 : undefined}>
               <Heading size="lg">{t(`info.info`)}</Heading>
             </Flex>
             <Flex justifyContent="center">
               {mockData.length === 0 && !isLoading && (
-                <Text>등록된 자기소개서가 없습니다.</Text>
+                <Text>{t(`info.noInfo`)}</Text>
               )}
             </Flex>
 

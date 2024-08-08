@@ -27,7 +27,7 @@ import {
   createAdditionalInfo,
   deleteAdditionalInfo,
 } from "../api/SideBarAPI";
-import { getNicknameToken } from "../../login/api/nickname";
+import { getNicknameToken } from "../../../common/utils/nickname";
 import { useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 

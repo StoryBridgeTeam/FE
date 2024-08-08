@@ -1,8 +1,6 @@
 import axiosInstance from "../../../common/api/axiosInstance";
-import { getNicknameToken } from "../../login/api/nickname";
-const nickname = getNicknameToken();
 
-export const getCoverLetters = async (token?: string) => {
+export const getCoverLetters = async (nickname: string, token?: string) => {
   try {
     const response = await axiosInstance.get(
       `/members/${nickname}/cover-letter`,
@@ -20,14 +18,15 @@ export const getCoverLetters = async (token?: string) => {
 };
 
 export const putCoverLetters = async (
+  nickname: string,
   entries: { id: number | null; title: string; content: string }[]
 ) => {
   try {
     const response = await axiosInstance.put(
-      `/members/${nickname}/cover-letter`, 
+      `/members/${nickname}/cover-letter`,
       {
-        entries: entries.map(({ id, title, content }) => ({
-          id,
+        entries: entries.map(({ title, content }) => ({
+          id: null,
           title,
           content,
           createdAt: null,

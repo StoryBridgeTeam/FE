@@ -174,7 +174,7 @@ const DetailPage: React.FC<DetailPageProps> = ({
           />
         </Box>
       </Flex>
-      <CommentInput id={id} />
+      {!isEdit && <CommentInput id={id} />}
     </Box>
   );
 };
