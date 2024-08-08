@@ -55,7 +55,7 @@ const MainContent: FC = () => {
     };
 
     fetchCoverData();
-  }, []);
+  }, [nickName]);
 
   const updateServerData = async (updatedMockData: MockData[]) => {
     try {
@@ -128,7 +128,6 @@ const MainContent: FC = () => {
     const updatedMockData = mockData.map((item) =>
       item.id === id ? { ...item, ...updatedData } : item
     );
-    console.log(updatedMockData);
 
     setMockData(updatedMockData);
     updateServerData(updatedMockData);
@@ -147,7 +146,7 @@ const MainContent: FC = () => {
           />
         ) : (
           <>
-            {!ishost && (
+            {ishost && (
               <Flex w="full" justifyContent="flex-end" alignItems="center">
                 {isEdit ? (
                   <Button onClick={handleSaveClick}>

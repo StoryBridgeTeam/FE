@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   Box,
   Flex,
@@ -6,7 +6,6 @@ import {
   useBreakpointValue,
   Button,
   Input,
-  Textarea,
 } from "@chakra-ui/react";
 import { Edit, Check } from "tabler-icons-react";
 import { useTranslation } from "react-i18next";
@@ -16,6 +15,10 @@ import CommentList from "./CommentList";
 import { useCommentStore } from "../Store/CommentStore";
 import { renderContentWithIcons } from "./renderContentWithIcons";
 import { useProfileStore } from "../Store/useProfileStore";
+import { CKEditor } from "@ckeditor/ckeditor5-react";
+import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
+import { getNicknameToken } from "../../../common/utils/nickname";
+import { useParams } from "react-router-dom";
 
 interface DetailPageProps {
   id: number;
@@ -30,6 +33,8 @@ const DetailPage: React.FC<DetailPageProps> = ({
   onSave,
   onBack,
 }) => {
+  const { nickName } = useParams<{ nickName: string }>();
+
   const { handleMouseUp } = useTextSelection();
   const { comments } = useCommentStore();
   const { t } = useTranslation();
@@ -37,6 +42,8 @@ const DetailPage: React.FC<DetailPageProps> = ({
   const [editedTitle, setEditedTitle] = useState<string>(data.title);
   const [editedContent, setEditedContent] = useState<string>(data.content);
   const { isEdit, setEdit } = useProfileStore();
+  const name = getNicknameToken();
+  const ishost = nickName === name;
 
   const handleEditClick = () => {
     setEdit(true);
@@ -45,6 +52,11 @@ const DetailPage: React.FC<DetailPageProps> = ({
   const handleSaveClick = () => {
     onSave(id, { title: editedTitle, content: editedContent });
     setEdit(false);
+  };
+
+  const handleEditorChange = (event: any, editor: any) => {
+    const data = editor.getData();
+    setEditedContent(data);
   };
 
   const scrollToHighlightedText = (startIndex?: number, endIndex?: number) => {
@@ -152,18 +164,17 @@ const DetailPage: React.FC<DetailPageProps> = ({
         </Flex>
         <Box bg="#EEEEEE" mt={4} p={5} borderTopRadius="30" userSelect="text">
           {isEdit ? (
-            <Textarea
-              h="52vh"
-              value={editedContent}
-              onChange={(e) => setEditedContent(e.target.value)}
-              size="lg"
+            <CKEditor
+              editor={ClassicEditor}
+              data={editedContent}
+              onChange={handleEditorChange}
             />
           ) : (
-            renderContentWithIcons(
-              data.content || editedContent,
-              processedComments,
-              scrollToHighlightedComment
-            )
+            <div
+              dangerouslySetInnerHTML={{
+                __html: data.content || editedContent,
+              }}
+            />
           )}
         </Box>
         <Box flex="1">
