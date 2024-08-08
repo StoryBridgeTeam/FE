@@ -116,7 +116,6 @@ const DetailPage: React.FC<DetailPageProps> = ({
       w="full"
       cursor="pointer"
       position="relative"
-      onMouseUp={handleMouseUp}
       dir="col"
     >
       <Flex w="full" justifyContent="space-between" alignItems="center" mb={5}>
