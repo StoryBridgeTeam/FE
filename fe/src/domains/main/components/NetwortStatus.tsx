@@ -9,6 +9,7 @@ import {
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useParams } from "react-router-dom";
+import { getNicknameToken } from "../../../common/utils/nickname";
 
 const NetworkStatus: React.FC = () => {
   const isMobile = useBreakpointValue({ base: true, md: false });
@@ -28,6 +29,9 @@ const NetworkStatus: React.FC = () => {
       overflow="hidden"
       display="flex"
       flexDirection="column"
+      onClick={() => {
+        navigate(`/${getNicknameToken()}/amt`);
+      }}
     >
       <VStack
         align="flex-start"
