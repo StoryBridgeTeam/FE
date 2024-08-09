@@ -25,8 +25,8 @@ export const putCoverLetters = async (
     const response = await axiosInstance.put(
       `/members/${nickname}/cover-letter`,
       {
-        entries: entries.map(({ title, content }) => ({
-          id: null,
+        entries: entries.map(({ id, title, content }) => ({
+          id,
           title,
           content,
           createdAt: null,
