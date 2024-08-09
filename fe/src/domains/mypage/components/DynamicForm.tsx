@@ -56,7 +56,7 @@ const DynamicForm: React.FC = () => {
                 key={item}
                 variant="ghost"
                 w="full"
-                mb="2"
+                mb="1"
                 onClick={() => setSelectedItem(item)}
               >
                 {item}
