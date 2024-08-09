@@ -6,11 +6,11 @@ export const getCoverLetters = async (nickname: string, token?: string) => {
       `/members/${nickname}/cover-letter`,
       {
         params: {
-          token: token || "",
+          token,
         },
       }
     );
-    return response.data;
+    return response.data.data;
   } catch (error) {
     console.error("Failed to fetch cover letters:", error);
     throw error;
@@ -25,10 +25,16 @@ export const putCoverLetters = async (
     const response = await axiosInstance.put(
       `/members/${nickname}/cover-letter`,
       {
-        entries,
+        entries: entries.map(({ title, content }) => ({
+          id: null,
+          title,
+          content,
+          createdAt: null,
+          modifiedAt: null,
+        })),
       }
     );
-    return response.data;
+    return response.data.data.entries;
   } catch (error) {
     console.error("Failed to update cover letters:", error);
     throw error;

@@ -4,14 +4,20 @@ import {
   Heading,
   Flex,
   useBreakpointValue,
+  Text,
 } from "@chakra-ui/react";
-import { FC, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import { Edit, Check } from "tabler-icons-react";
 import DetailPage from "./DetailPage";
 import { useTranslation } from "react-i18next";
 import TextSection from "./TextSection";
 import ProfileSidebar from "./ProfileSideBar";
 import { useProfileStore } from "../Store/useProfileStore";
+import { getCoverLetters, putCoverLetters } from "../api/InfoAPI";
+import { useCommentStore } from "../Store/CommentStore";
+import { getComments } from "../api/CommentAPI";
+import { useParams } from "react-router-dom";
+import { getNicknameToken } from "../../../common/utils/nickname";
 
 interface MockData {
   id: number;
@@ -19,43 +25,68 @@ interface MockData {
   content: string;
 }
 
-const initialMockData: MockData[] = [
-  {
-    id: 1,
-    title: "000 항목",
-    content: `[대회 이름]에 참가하게 된 동기는 [대회 참여 동기] 때문입니다. 이 대회는 [대회에 대한 설명 및 목표]라는 점에서 저의 관심을 끌었습니다. 특히, [특정 요소]가 저에게 매우 매력적으로 다가왔습니다. 대회를 준비하면서, 저는 [준비 과정]에 주력했습니다. 처음에는 [어려움]에 부딪혔지만, [문제 해결 방법]을 통해 극복할 수 있었습니다. 팀원들과의 협업도 중요한 부분이었는데, 우리는 [팀워크 경험]을 통해 서로의 강점을 최대한 활용했습니다. 대회 기간 동안, 저는 [구체적인 활동]을 통해 많은 것을 배웠습니다.이 대회를 통해 저는 [개인적인 성장 또는 배운 점]을 느꼈고, 앞으로의 목표를 더욱 명확히 할 수 있었습니다.`,
-  },
-  {
-    id: 2,
-    title: "000 항목",
-    content: "리더십 경험에 대해 설명해 주세요.",
-  },
-  {
-    id: 3,
-    title: "000 항목",
-    content: "팀 프로젝트 경험에 대해 설명해 주세요.",
-  },
-  {
-    id: 4,
-    title: "000 항목",
-    content: "리더십 경험에 대해 설명해 주세요.",
-  },
-];
-
 const MainContent: FC = () => {
+  const { nickName } = useParams<{ nickName: string }>();
   const isMobile = useBreakpointValue({ base: true, md: false });
-  const [mockData, setMockData] = useState<MockData[]>(initialMockData);
+  const [mockData, setMockData] = useState<MockData[]>([]);
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const { t } = useTranslation();
   const { isEdit, setEdit } = useProfileStore();
+  const [isLoading, setLoading] = useState<boolean>(false);
+  const { setComments } = useCommentStore();
+  const name = getNicknameToken();
+  const ishost = nickName === name;
 
-  const handleSectionClick = (id: number) => {
-    if (!isEdit) {
-      setSelectedId(id);
+  useEffect(() => {
+    const fetchCoverData = async () => {
+      try {
+        setLoading(true);
+        const { entries } = await getCoverLetters(nickName!);
+        if (entries === null) {
+          setMockData([]);
+        } else {
+          setMockData(entries);
+        }
+        setLoading(false);
+      } catch (error) {
+        console.error("cover error:", error);
+        setLoading(false);
+      }
+    };
+
+    fetchCoverData();
+  }, [nickName]);
+
+  const updateServerData = async (updatedMockData: MockData[]) => {
+    try {
+      const newCover = await putCoverLetters(nickName!, updatedMockData);
+      if (newCover === null) {
+        setMockData([]);
+      } else {
+        setMockData(newCover);
+      }
+    } catch (error) {
+      console.error("cover error:", error);
     }
   };
 
+  const handleSectionClick = async (id: number) => {
+    try {
+      const response = await getComments(id);
+      if (response) {
+        setComments(response);
+      } else {
+        setComments([]);
+      }
+    } catch (error) {
+      console.error("comment error:", error);
+    }
+
+    setSelectedId(id);
+  };
+
   const handleBackClick = () => {
+    setComments([]);
     setSelectedId(null);
   };
 
@@ -64,30 +95,42 @@ const MainContent: FC = () => {
   };
 
   const handleSaveClick = () => {
+    updateServerData(mockData);
     setEdit(false);
   };
 
   const handleDelete = (id: number) => {
-    setMockData((prevData) => prevData.filter((item) => item.id !== id));
+    const updatedMockData = mockData.filter((item) => item.id !== id);
+    setMockData(updatedMockData);
+    updateServerData(updatedMockData);
   };
 
-  const handleAddNewClick = () => {
-    const newId = mockData.length + 1;
-    const newMockData: MockData = { id: newId, title: "", content: "" };
-    setMockData([...mockData, newMockData]);
-    setEdit(true);
-    setSelectedId(newId);
+  const handleAddNewClick = async () => {
+    const newId =
+      mockData.length > 0
+        ? Math.max(...mockData.map((item) => item.id)) + 1
+        : 1;
+    const newMockData: MockData = {
+      id: newId,
+      title: t(`info.newItem`),
+      content: t(`info.newContent`),
+    };
+    const updatedMockData = [...mockData, newMockData];
+
+    await updateServerData(updatedMockData);
+    setMockData(updatedMockData);
   };
 
   const handleSaveDetail = (
     id: number,
     updatedData: { title: string; content: string }
   ) => {
-    setMockData((prevData) =>
-      prevData.map((item) =>
-        item.id === id ? { ...item, ...updatedData } : item
-      )
+    const updatedMockData = mockData.map((item) =>
+      item.id === id ? { ...item, ...updatedData } : item
     );
+
+    setMockData(updatedMockData);
+    updateServerData(updatedMockData);
   };
 
   return (
@@ -95,30 +138,36 @@ const MainContent: FC = () => {
       {isMobile && selectedId ? undefined : <ProfileSidebar />}
       <Container maxW="4xl" mt={5}>
         {selectedId ? (
-          <>
-            <DetailPage
-              id={selectedId}
-              data={mockData.find((item) => item.id === selectedId)!}
-              onSave={handleSaveDetail}
-              onBack={handleBackClick}
-            />
-          </>
+          <DetailPage
+            id={selectedId}
+            data={mockData.find((item) => item.id === selectedId)!}
+            onSave={handleSaveDetail}
+            onBack={handleBackClick}
+          />
         ) : (
           <>
-            <Flex w="full" justifyContent="flex-end" alignItems="center">
-              {isEdit ? (
-                <Button onClick={handleSaveClick}>
-                  <Check size={24} color="black" />
-                </Button>
-              ) : (
-                <Button onClick={handleEditClick}>
-                  <Edit size={24} color="black" />
-                </Button>
-              )}
-            </Flex>
-            <Flex justifyContent="center" mb={5}>
+            {ishost && (
+              <Flex w="full" justifyContent="flex-end" alignItems="center">
+                {isEdit ? (
+                  <Button onClick={handleSaveClick}>
+                    <Check size={24} color="black" />
+                  </Button>
+                ) : (
+                  <Button onClick={handleEditClick}>
+                    <Edit size={24} color="black" />
+                  </Button>
+                )}
+              </Flex>
+            )}
+            <Flex justifyContent="center" mb={5} mt={ishost ? 12 : undefined}>
               <Heading size="lg">{t(`info.info`)}</Heading>
             </Flex>
+            <Flex justifyContent="center">
+              {mockData.length === 0 && !isLoading && (
+                <Text>{t(`info.noInfo`)}</Text>
+              )}
+            </Flex>
+
             {mockData.map((data) => (
               <TextSection
                 key={data.id}

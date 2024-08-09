@@ -12,7 +12,7 @@ import { mockData2 } from "../mainData";
 import CardModal from "./CardModal";
 import CardInfoItem from "./CardInfoItem";
 import { useNavigate, useParams } from "react-router-dom";
-import { getNicknameToken } from "../../login/api/nickname";
+import { getNicknameToken } from "../../../common/utils/nickname";
 
 const CardInfoBox: React.FC<{ cards: CardState[]; onClick: () => void }> = ({
   cards,

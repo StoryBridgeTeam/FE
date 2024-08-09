@@ -58,7 +58,16 @@ const TextSection: FC<TextSectionProps> = ({
         overflow="hidden"
         textOverflow="ellipsis"
       >
-        <Text noOfLines={6}>{content}</Text>
+        <Box
+          dangerouslySetInnerHTML={{ __html: content }}
+          sx={{
+            display: "-webkit-box",
+            overflow: "hidden",
+            WebkitLineClamp: "6",
+            WebkitBoxOrient: "vertical",
+          }}
+        />
+        {/* <Text noOfLines={6}>{content}</Text> */}
       </Box>
     </Box>
   );

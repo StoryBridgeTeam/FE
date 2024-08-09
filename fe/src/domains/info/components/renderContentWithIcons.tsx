@@ -3,7 +3,12 @@ import { BiMessageDetail } from "react-icons/bi";
 
 export const renderContentWithIcons = (
   content: string,
-  comments: { startIndex?: number; endIndex?: number }[],
+  comments: {
+    id: number;
+    content: string;
+    startIndex?: number;
+    endIndex?: number;
+  }[],
   scrollToHighlightedText: (startIndex?: number, endIndex?: number) => void
 ) => {
   let segments: JSX.Element[] = [];
@@ -24,7 +29,7 @@ export const renderContentWithIcons = (
     ) {
       if (comment.startIndex > lastIndex) {
         segments.push(
-          <React.Fragment key={`before-${index}`}>
+          <React.Fragment key={`before-${comment.id}`}>
             {content.substring(lastIndex, comment.startIndex)}
           </React.Fragment>
         );
@@ -32,8 +37,8 @@ export const renderContentWithIcons = (
 
       segments.push(
         <span
-          id={`highlight-${index}`}
-          key={`highlight-${index}`}
+          id={`highlight-${comment.id}`}
+          key={`highlight-${comment.id}`}
           className="highlight"
           style={{
             cursor: "pointer",
@@ -45,7 +50,7 @@ export const renderContentWithIcons = (
             style={{
               color: "gray",
               position: "absolute",
-              right: "-10px",
+              right: "-5px",
               top: "8%",
               transform: "translateY(-50%)",
               fontSize: "0.8em",

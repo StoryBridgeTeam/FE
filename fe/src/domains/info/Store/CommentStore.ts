@@ -1,47 +1,69 @@
 import create from "zustand";
 
 interface Comment {
-  text: string;
-  timestamp: string;
-  username: string;
-  startIndex?: number;
-  endIndex?: number;
+  id: number;
+  author: Author;
+  content: string;
+  createdTime: string;
+  modifiedTime: string | null;
+  tagInfo: TagInfo | null;
 }
 
-interface CommentStore {
+interface Author {
+  name: string;
+  nickName: string;
+  role: string;
+}
+
+interface TagInfo {
+  startIndex: number;
+  lastIndex: number;
+}
+
+interface CommentState {
   comments: Comment[];
-  addComment: (
-    comment: Omit<Comment, "timestamp"> & { timestamp: string }
-  ) => void;
-  deleteComment: (index: number) => void;
-  updateCommentText: (index: number, text: string) => void;
+  setComments: (comments: Comment[]) => void;
+  addComments: (newComment: Comment) => void;
+  deleteComment: (id: number) => void;
+  updateCommentText: (id: number, newText: string) => void;
   updateCommentIndexes: (
-    index: number,
+    id: number,
     startIndex: number,
     endIndex: number
   ) => void;
 }
 
-export const useCommentStore = create<CommentStore>((set) => ({
+export const useCommentStore = create<CommentState>((set) => ({
   comments: [],
-  addComment: (comment) =>
+  setComments: (comments) => set({ comments }),
+  addComments: (newComment) => {
     set((state) => ({
-      comments: [...state.comments, comment],
+      comments: [...state.comments, newComment],
+    }));
+  },
+  deleteComment: (id) =>
+    set((state) => ({
+      comments: state.comments.filter((comment) => comment.id !== id),
     })),
-  deleteComment: (index) =>
+  updateCommentText: (id, newText) =>
     set((state) => ({
-      comments: state.comments.filter((_, i) => i !== index),
-    })),
-  updateCommentText: (index, text) =>
-    set((state) => ({
-      comments: state.comments.map((comment, i) =>
-        i === index ? { ...comment, text } : comment
+      comments: state.comments.map((comment) =>
+        comment.id === id ? { ...comment, content: newText } : comment
       ),
     })),
-  updateCommentIndexes: (index, startIndex, endIndex) =>
+  updateCommentIndexes: (id, startIndex, endIndex) =>
     set((state) => ({
-      comments: state.comments.map((comment, i) =>
-        i === index ? { ...comment, startIndex, endIndex } : comment
+      comments: state.comments.map((comment) =>
+        comment.id === id
+          ? {
+              ...comment,
+              tagInfo: {
+                ...(comment.tagInfo || {}),
+                startIndex,
+                lastIndex: endIndex,
+              },
+            }
+          : comment
       ),
     })),
 }));

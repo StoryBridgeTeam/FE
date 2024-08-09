@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import {
   Box,
   Flex,
@@ -24,22 +24,36 @@ import { renderContentWithHighlights } from "./renderContentWithHighlights";
 import { useTextSelection } from "../hook/useTextSelection";
 import { SlideUpModal } from "../../../common/components/SlideUpModal";
 import { SlideUpSmallModal } from "../../../common/components/SlideUpSmallModal";
+import {
+  getComments,
+  deleteCommentServer,
+  updateComment,
+  tagComment,
+} from "../api/CommentAPI";
 
 interface CommentListProps {
+  id: number;
   content: string;
   highlightComment: (startIndex: number, endIndex: number) => void;
 }
 
 const CommentList: React.FC<CommentListProps> = ({
+  id,
   content,
   highlightComment,
 }) => {
-  const { comments, deleteComment, updateCommentText, updateCommentIndexes } =
-    useCommentStore();
+  const {
+    comments,
+    setComments,
+    deleteComment,
+    updateCommentText,
+    updateCommentIndexes,
+  } = useCommentStore();
+
   const commentsEndRef = useRef<HTMLDivElement | null>(null);
-  const [editIndex, setEditIndex] = useState<number | null>(null);
-  const [editText, setEditText] = useState<string>("");
-  const [connectIndex, setConnectIndex] = useState<number | null>(null);
+  const [editIndex, setEditIndex] = React.useState<number | null>(null);
+  const [editText, setEditText] = React.useState<string>("");
+  const [connectIndex, setConnectIndex] = React.useState<number | null>(null);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const {
     isOpen: isConnectOpen,
@@ -55,6 +69,23 @@ const CommentList: React.FC<CommentListProps> = ({
     handleTouchEnd,
   } = useTextSelection();
 
+  useEffect(() => {
+    fetchCommentData();
+  }, [id]);
+
+  const fetchCommentData = async () => {
+    try {
+      const response = await getComments(id);
+      if (response) {
+        setComments(response);
+      } else {
+        setComments([]);
+      }
+    } catch (error) {
+      console.error("comment error:", error);
+    }
+  };
+
   const handleEdit = (index: number, text: string) => {
     setEditIndex(index);
     setEditText(text);
@@ -66,8 +97,9 @@ const CommentList: React.FC<CommentListProps> = ({
     onConnectOpen();
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (editIndex !== null) {
+      await updateComment(editIndex, editText);
       updateCommentText(editIndex, editText);
       setEditIndex(null);
       setEditText("");
@@ -80,8 +112,9 @@ const CommentList: React.FC<CommentListProps> = ({
     }
   };
 
-  const handleConnectReset = () => {
+  const handleConnectReset = async () => {
     if (connectIndex !== null) {
+      await tagComment(id, connectIndex, { startIndex: 0, lastIndex: 0 });
       updateCommentIndexes(connectIndex, 0, 0);
       handleClearSelectedText();
       setConnectIndex(null);
@@ -94,8 +127,12 @@ const CommentList: React.FC<CommentListProps> = ({
     }
   };
 
-  const handleConnectSave = () => {
+  const handleConnectSave = async () => {
     if (connectIndex !== null && selectedText) {
+      await tagComment(id, connectIndex, {
+        startIndex: selectedText.startIndex,
+        lastIndex: selectedText.endIndex,
+      });
       updateCommentIndexes(
         connectIndex,
         selectedText.startIndex,
@@ -134,19 +171,25 @@ const CommentList: React.FC<CommentListProps> = ({
     }
   };
 
+  const processedComments = comments.map((comment) => ({
+    content: comment.content,
+    startIndex: comment.tagInfo?.startIndex || 0,
+    endIndex: comment.tagInfo?.lastIndex || 0,
+  }));
+
   return (
     <>
       <Box border="1px" borderColor="#EEEEEE" p={4} mb={"82px"} h={"100%"}>
-        {comments.map((comment, index) => (
-          <Box marginBottom={5} key={index} id={`comment-${index}`}>
+        {comments.map((comment) => (
+          <Box marginBottom={5} key={comment.id} id={`comment-${comment.id}`}>
             <Flex align="center">
               <Avatar
                 size="sm"
-                name={comment.username}
+                name={comment.author.nickName}
                 src="https://image.idus.com/image/files/da17e0c53a4e480284c5d49932722e5a.jpg"
                 mr={3}
               />
-              <Text fontWeight="bold">{comment.username}</Text>
+              <Text fontWeight="bold">{comment.author.nickName}</Text>
               <Text
                 fontSize="xs"
                 color="gray.500"
@@ -154,7 +197,7 @@ const CommentList: React.FC<CommentListProps> = ({
                 lineHeight={"xl"}
                 ml={3}
               >
-                {formatDistanceToNow(new Date(comment.timestamp))} ago
+                {formatDistanceToNow(new Date(comment.createdTime))} ago
               </Text>
               <Menu>
                 <MenuButton
@@ -170,20 +213,21 @@ const CommentList: React.FC<CommentListProps> = ({
                 <MenuList>
                   <MenuItem
                     icon={<Link />}
-                    onClick={() => handleConnect(index, comment.text)}
+                    onClick={() => handleConnect(comment.id, comment.content)}
                   >
                     Connect
                   </MenuItem>
                   <MenuItem
                     icon={<Edit />}
-                    onClick={() => handleEdit(index, comment.text)}
+                    onClick={() => handleEdit(comment.id, comment.content)}
                   >
                     Edit
                   </MenuItem>
                   <MenuItem
                     icon={<Trash />}
-                    onClick={() => {
-                      deleteComment(index);
+                    onClick={async () => {
+                      await deleteCommentServer(comment.id);
+                      deleteComment(comment.id);
                       showToast(
                         t(`info.commentDelete`),
                         t(`info.commentDeleteMessage`),
@@ -196,9 +240,9 @@ const CommentList: React.FC<CommentListProps> = ({
                 </MenuList>
               </Menu>
             </Flex>
-            {comment.startIndex !== undefined &&
-              comment.endIndex !== undefined &&
-              (comment.startIndex !== 0 || comment.endIndex !== 0) && (
+            {comment.tagInfo &&
+              (comment.tagInfo.startIndex !== 0 ||
+                comment.tagInfo.lastIndex !== 0) && (
                 <Tag
                   mt={1}
                   size="md"
@@ -209,16 +253,22 @@ const CommentList: React.FC<CommentListProps> = ({
                   marginLeft={10}
                   cursor="pointer"
                   onClick={() =>
-                    handleTagClick(comment.startIndex, comment.endIndex)
+                    handleTagClick(
+                      comment.tagInfo!.startIndex,
+                      comment.tagInfo!.lastIndex
+                    )
                   }
                 >
                   <TagLabel color={"gray"}>
-                    {getHighlightedText(comment.startIndex, comment.endIndex)}
+                    {getHighlightedText(
+                      comment.tagInfo.startIndex,
+                      comment.tagInfo.lastIndex
+                    )}
                   </TagLabel>
                 </Tag>
               )}
             <Text marginLeft={10} pr={5}>
-              {comment.text}
+              {comment.content}
             </Text>
           </Box>
         ))}
@@ -264,17 +314,31 @@ const CommentList: React.FC<CommentListProps> = ({
             >
               Cancel
             </Button>
-            <Button colorScheme="yellow" ml={3} onClick={handleConnectReset}>
+            <Button
+              colorScheme="yellow"
+              ml={3}
+              onClick={() => {
+                handleConnectReset();
+                handleClearSelectedText();
+              }}
+            >
               Reset
             </Button>
-            <Button colorScheme="blue" ml={3} onClick={handleConnectSave}>
+            <Button
+              colorScheme="blue"
+              ml={3}
+              onClick={() => {
+                handleConnectSave();
+                handleClearSelectedText();
+              }}
+            >
               Save
             </Button>
           </>
         }
       >
         <Box onMouseUp={handleMouseUp} onTouchEnd={handleTouchEnd}>
-          {renderContentWithHighlights(content, comments)}
+          {renderContentWithHighlights(content, processedComments)}
         </Box>
         {selectedText && (
           <Tag

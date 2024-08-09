@@ -32,7 +32,7 @@ export const useLoginForm = () => {
   });
 
   const handleIdChange = (value: string) => {
-    if (i18n.language === "ko-KR") {
+    if (i18n.language === "ko") {
       let formattedNumber = value.replace(/[^0-9]/g, "");
       if (formattedNumber.length > 3) {
         formattedNumber = `${formattedNumber.slice(
@@ -74,7 +74,7 @@ export const useLoginForm = () => {
 
   const validateId = () => {
     const { id } = values;
-    if (i18n.language === "ko-KR") {
+    if (i18n.language === "ko") {
       const phoneRegex = /^010-[0-9]{4}-[0-9]{4}$/;
       if (!phoneRegex.test(id)) {
         setErrors((prev) => ({
@@ -136,7 +136,7 @@ export const useLoginForm = () => {
     }
 
     const formattedId =
-      i18n.language === "ko-KR"
+      i18n.language === "ko"
         ? formatPhoneNumberWithoutHyphens(values.id)
         : values.id;
 

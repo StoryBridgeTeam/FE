@@ -6,7 +6,6 @@ import {
   useBreakpointValue,
   Button,
   Input,
-  Textarea,
 } from "@chakra-ui/react";
 import { Edit, Check } from "tabler-icons-react";
 import { useTranslation } from "react-i18next";
@@ -16,6 +15,10 @@ import CommentList from "./CommentList";
 import { useCommentStore } from "../Store/CommentStore";
 import { renderContentWithIcons } from "./renderContentWithIcons";
 import { useProfileStore } from "../Store/useProfileStore";
+import { CKEditor } from "@ckeditor/ckeditor5-react";
+import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
+import { getNicknameToken } from "../../../common/utils/nickname";
+import { useParams } from "react-router-dom";
 
 interface DetailPageProps {
   id: number;
@@ -26,17 +29,21 @@ interface DetailPageProps {
 
 const DetailPage: React.FC<DetailPageProps> = ({
   id,
-  data,
+  data = { title: "", content: "" },
   onSave,
   onBack,
 }) => {
-  const { handleMouseUp, handleCommentSubmit } = useTextSelection();
+  const { nickName } = useParams<{ nickName: string }>();
+
+  const { handleMouseUp } = useTextSelection();
   const { comments } = useCommentStore();
   const { t } = useTranslation();
   const isMobile = useBreakpointValue({ base: true, md: false });
-  const [editedTitle, setEditedTitle] = useState(data.title);
-  const [editedContent, setEditedContent] = useState(data.content);
+  const [editedTitle, setEditedTitle] = useState<string>(data.title);
+  const [editedContent, setEditedContent] = useState<string>(data.content);
   const { isEdit, setEdit } = useProfileStore();
+  const name = getNicknameToken();
+  const ishost = nickName === name;
 
   const handleEditClick = () => {
     setEdit(true);
@@ -47,15 +54,22 @@ const DetailPage: React.FC<DetailPageProps> = ({
     setEdit(false);
   };
 
+  const handleEditorChange = (event: any, editor: any) => {
+    const data = editor.getData();
+    setEditedContent(data);
+  };
+
   const scrollToHighlightedText = (startIndex?: number, endIndex?: number) => {
+    if (startIndex === undefined || endIndex === undefined) return;
+
     const highlightElements = document.querySelectorAll(`[id^='highlight-']`);
     highlightElements.forEach((element) => {
       const id = element.id.replace("highlight-", "");
-      const filteredComments = comments.filter(
-        (comment) => comment.startIndex !== undefined
-      );
-      const comment = filteredComments[parseInt(id)];
-      if (comment.startIndex === startIndex && comment.endIndex === endIndex) {
+      const comment = comments.find((c) => c.id.toString() === id);
+      if (
+        comment?.tagInfo?.startIndex === startIndex &&
+        comment?.tagInfo?.lastIndex === endIndex
+      ) {
         (element as HTMLElement).scrollIntoView({
           behavior: "smooth",
           block: "center",
@@ -68,12 +82,15 @@ const DetailPage: React.FC<DetailPageProps> = ({
     startIndex?: number,
     endIndex?: number
   ) => {
-    const index = comments.findIndex(
-      (comment) =>
-        comment.startIndex === startIndex && comment.endIndex === endIndex
+    if (startIndex === undefined || endIndex === undefined) return;
+
+    const comment = comments.find(
+      (c) =>
+        c.tagInfo?.startIndex === startIndex &&
+        c.tagInfo?.lastIndex === endIndex
     );
-    if (index !== -1) {
-      const elementId = `comment-${index}`;
+    if (comment) {
+      const elementId = `comment-${comment.id}`;
       const element = document.getElementById(elementId);
 
       if (element) {
@@ -86,17 +103,23 @@ const DetailPage: React.FC<DetailPageProps> = ({
     }
   };
 
+  const processedComments = comments.map((comment) => ({
+    id: comment.id,
+    content: comment.content,
+    startIndex: comment.tagInfo?.startIndex || 0,
+    endIndex: comment.tagInfo?.lastIndex || 0,
+  }));
+
   return (
     <Box
       mt={6}
       w="full"
       cursor="pointer"
       position="relative"
-      onMouseUp={handleMouseUp}
       dir="col"
     >
       <Flex w="full" justifyContent="space-between" alignItems="center" mb={5}>
-        <Button onClick={onBack}>{t(`info.list`)}</Button>
+        <Button onClick={onBack}>{t("info.list")}</Button>
         {isEdit ? (
           <Button onClick={handleSaveClick}>
             <Check size={24} color="black" />
@@ -132,36 +155,36 @@ const DetailPage: React.FC<DetailPageProps> = ({
               fontWeight="bold"
             />
           ) : (
-            <Text fontWeight="bold" fontSize={"lg"}>
-              {data.title}
+            <Text fontWeight="bold" fontSize="lg">
+              {data.title || editedTitle}
             </Text>
           )}
           <Box flex="1" borderBottom="2px" ml={2} />
         </Flex>
         <Box bg="#EEEEEE" mt={4} p={5} borderTopRadius="30" userSelect="text">
           {isEdit ? (
-            <Textarea
-              h={"52vh"}
-              value={editedContent}
-              onChange={(e) => setEditedContent(e.target.value)}
-              size="lg"
+            <CKEditor
+              editor={ClassicEditor}
+              data={editedContent}
+              onChange={handleEditorChange}
             />
           ) : (
-            renderContentWithIcons(
-              data.content,
-              comments,
-              scrollToHighlightedComment
-            )
+            <div
+              dangerouslySetInnerHTML={{
+                __html: data.content || editedContent,
+              }}
+            />
           )}
         </Box>
         <Box flex="1">
           <CommentList
+            id={id}
             content={data.content}
             highlightComment={scrollToHighlightedText}
           />
         </Box>
       </Flex>
-      <CommentInput onSubmit={handleCommentSubmit} />
+      {!isEdit && <CommentInput id={id} />}
     </Box>
   );
 };

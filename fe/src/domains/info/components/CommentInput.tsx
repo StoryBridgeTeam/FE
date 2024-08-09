@@ -10,12 +10,16 @@ import {
 } from "@chakra-ui/react";
 import { Send } from "tabler-icons-react";
 import { useTranslation } from "react-i18next";
+import { postComment } from "../api/CommentAPI";
+import { getNicknameToken } from "../../../common/utils/nickname";
+import { useCommentStore } from "../Store/CommentStore";
 
 interface CommentInputProps {
-  onSubmit: (text: string) => void;
+  id: number;
 }
 
-const CommentInput: React.FC<CommentInputProps> = ({ onSubmit }) => {
+const CommentInput: React.FC<CommentInputProps> = ({ id }) => {
+  const { addComments } = useCommentStore();
   const [comment, setComment] = useState("");
   const { t } = useTranslation();
   const isMobile = useBreakpointValue({ base: true, md: false });
@@ -24,9 +28,19 @@ const CommentInput: React.FC<CommentInputProps> = ({ onSubmit }) => {
     setComment(e.target.value);
   };
 
-  const handleCommentSubmit = () => {
+  const handleCommentSubmit = async () => {
     if (comment.trim()) {
-      onSubmit(comment);
+      try {
+        const response = await postComment(id, {
+          nickName: getNicknameToken(),
+          content: comment,
+        });
+        if (response) {
+          addComments(response);
+        }
+      } catch (error) {
+        console.error("Failed to post comment:", error);
+      }
       setComment("");
     }
   };
