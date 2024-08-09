@@ -8,6 +8,7 @@ import PrivateRoute from "./domains/login/utils/PrivateRoute";
 import InfoPage from "./domains/info/InfoPage";
 import MainPage from "./domains/main/MainPage";
 import { getNicknameToken } from "./common/utils/nickname";
+import MyPage from "./domains/mypage/MyPage";
 
 const theme = extendTheme({
   fonts: {
@@ -42,6 +43,10 @@ function App() {
           <Route
             path="/:nickName/info"
             element={<PrivateRoute element={<InfoPage />} />}
+          />
+          <Route
+            path="/mypage"
+            element={<PrivateRoute element={<MyPage />} />}
           />
           <Route
             path="*"
