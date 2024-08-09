@@ -28,38 +28,37 @@ axiosInstance.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
-
     if (error.response.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
-
+      const refreshToken = Cookies.get("refreshToken");
       try {
-        const refreshResponse = await axiosInstance.post(
-          "/auth/token/refresh",
-          {},
+        const refreshResponse = await axios.post(
+          `http://13.239.139.51:9090/auth/token/refresh`,
+          { refreshToken },
           {
             headers: {
               "Content-Type": "application/json",
-              REFRESH_TOKEN: Cookies.get("refreshToken"),
             },
           }
         );
-
-        const { accessToken } = refreshResponse.data;
+        const { accessToken } = refreshResponse.data.data;
+        console.log("refrsh", accessToken);
         Cookies.set("accessToken", accessToken, {
           expires: 30,
           secure: true,
           sameSite: "Strict",
         });
-
+        console.log(accessToken);
         axiosInstance.defaults.headers[
           "Authorization"
         ] = `Bearer ${accessToken}`;
         return axiosInstance(originalRequest);
       } catch (err) {
+        // localStorage.removeItem("accessToken");
+        // localStorage.removeItem("refreshToken");
         return Promise.reject(err);
       }
     }
-
     return Promise.reject(error);
   }
 );

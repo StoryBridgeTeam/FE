@@ -7,7 +7,6 @@ import {
   FormControl,
   Image,
   Flex,
-  Spacer,
   useToast,
   Text,
   useBreakpointValue,
@@ -62,7 +61,7 @@ const ProfileForm: React.FC = () => {
       borderRadius={"30px"}
       w={isMobile ? "full" : "800px"}
       height={"585px"}
-      ml={"30px"}
+      ml={"10px"}
     >
       <VStack align="stretch" spacing={4} w="full">
         <FormControl>

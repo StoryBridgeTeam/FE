@@ -106,10 +106,7 @@ const MainContent: FC = () => {
   };
 
   const handleAddNewClick = async () => {
-    const newId =
-      mockData.length > 0
-        ? Math.max(...mockData.map((item) => item.id)) + 1
-        : 1;
+    const newId = 1000;
     const newMockData: MockData = {
       id: newId,
       title: t(`info.newItem`),
@@ -118,7 +115,6 @@ const MainContent: FC = () => {
     const updatedMockData = [...mockData, newMockData];
 
     await updateServerData(updatedMockData);
-    setMockData(updatedMockData);
   };
 
   const handleSaveDetail = (
@@ -136,7 +132,7 @@ const MainContent: FC = () => {
   return (
     <>
       {isMobile && selectedId ? undefined : <ProfileSidebar />}
-      <Container maxW="4xl" mt={5}>
+      <Container maxW="4xl">
         {selectedId ? (
           <DetailPage
             id={selectedId}

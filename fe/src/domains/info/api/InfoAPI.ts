@@ -26,7 +26,7 @@ export const putCoverLetters = async (
       `/members/${nickname}/cover-letter`,
       {
         entries: entries.map(({ id, title, content }) => ({
-          id,
+          id: id === 1000 ? null : id,
           title,
           content,
           createdAt: null,
