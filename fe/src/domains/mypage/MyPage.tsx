@@ -1,23 +1,18 @@
 import { Flex, useBreakpointValue } from "@chakra-ui/react";
-import LoginAppBar from "../../common/components/LoginAppBar";
-import { useAuthStore } from "../login/stores/useAuthStore";
-import { useToastMessage } from "../../common/hooks/useToastMessage";
 import { FC } from "react";
-import MainContent from "./components/MainContent";
-import { useNavigate } from "react-router-dom";
+import LoginAppBar from "../../common/components/LoginAppBar";
+import { useToastMessage } from "../../common/hooks/useToastMessage";
+import { useAuthStore } from "../login/stores/useAuthStore";
+import DynamicForm from "./components/DynamicForm";
 
-const InfoPage: FC = () => {
+const MyPage: FC = () => {
   const isMobile = useBreakpointValue({ base: true, md: false });
-  const logout = useAuthStore((state) => state.logout);
   const { showToast } = useToastMessage();
-  const navigate = useNavigate();
+  const logout = useAuthStore((state) => state.logout);
+
   return (
     <Flex minH="100vh" direction="column">
       <LoginAppBar
-        field1="header.mypage"
-        field1OnClick={() => {
-          navigate("/mypage");
-        }}
         field2="header.logout"
         field2OnClick={() => {
           logout();
@@ -33,10 +28,10 @@ const InfoPage: FC = () => {
         minH={isMobile ? "calc(100vh - 50px)" : "calc(100vh - 60px)"}
         direction={isMobile ? "column" : "row"}
       >
-        <MainContent />
+        <DynamicForm />
       </Flex>
     </Flex>
   );
 };
 
-export default InfoPage;
+export default MyPage;
