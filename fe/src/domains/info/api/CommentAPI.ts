@@ -1,5 +1,5 @@
 import axiosInstance from "../../../common/api/axiosInstance";
-import { getNicknameToken } from "../../login/api/nickname";
+import { getNicknameToken } from "../../../common/utils/nickname";
 
 export const getComments = async (id: number) => {
   try {

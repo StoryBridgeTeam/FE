@@ -1,5 +1,4 @@
 import axiosInstance from "../../../common/api/axiosInstance";
-import { getNicknameToken } from "../../login/api/nickname";
 import axios from "axios";
 
 export const getCard = async (nickname: string, token?: string) => {

@@ -63,7 +63,10 @@
     "confirmDelete": "기존 학력 및 경력 삭제",
     "content": "내용",
     "cancel": "취소",
-    "delete": "삭제"
+    "delete": "삭제",
+    "newItem": "새로운 내용",
+    "newContent": "새로운 항목",
+    "noInfo": "등록된 자기소서가 없습니다."
   },
   "signup": {
     "NextStepsButton": {
