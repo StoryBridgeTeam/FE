@@ -143,7 +143,12 @@ const MainContent: FC = () => {
         ) : (
           <>
             {ishost && (
-              <Flex w="full" justifyContent="flex-end" alignItems="center">
+              <Flex
+                w="full"
+                justifyContent="flex-end"
+                alignItems="center"
+                mt={5}
+              >
                 {isEdit ? (
                   <Button onClick={handleSaveClick}>
                     <Check size={24} color="black" />

@@ -42,20 +42,16 @@ axiosInstance.interceptors.response.use(
           }
         );
         const { accessToken } = refreshResponse.data.data;
-        console.log("refrsh", accessToken);
         Cookies.set("accessToken", accessToken, {
           expires: 30,
           secure: true,
           sameSite: "Strict",
         });
-        console.log(accessToken);
         axiosInstance.defaults.headers[
           "Authorization"
         ] = `Bearer ${accessToken}`;
         return axiosInstance(originalRequest);
       } catch (err) {
-        // localStorage.removeItem("accessToken");
-        // localStorage.removeItem("refreshToken");
         return Promise.reject(err);
       }
     }

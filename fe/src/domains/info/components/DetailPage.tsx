@@ -100,7 +100,7 @@ const DetailPage: React.FC<DetailPageProps> = ({
 
   return (
     <Box
-      minH={isMobile ? "calc(100vh - 100px)" : "calc(100vh - 110px)"}
+      minH={isMobile ? "calc(100vh - 80px)" : "calc(100vh - 85px)"}
       mt={6}
       w="full"
       cursor="pointer"
