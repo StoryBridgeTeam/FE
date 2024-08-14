@@ -4,6 +4,7 @@ import { useAuthStore } from "../login/stores/useAuthStore";
 import { useToastMessage } from "../../common/hooks/useToastMessage";
 import { FC } from "react";
 import { useNavigate } from "react-router-dom";
+import AmtTree from "./components/AmtTree";
 
 const AmtPage: FC = () => {
   const isMobile = useBreakpointValue({ base: true, md: false });
@@ -32,7 +33,7 @@ const AmtPage: FC = () => {
         minH={isMobile ? "calc(100vh - 50px)" : "calc(100vh - 60px)"}
         direction={isMobile ? "column" : "row"}
       >
-        Amt
+        <AmtTree />
       </Flex>
     </Flex>
   );

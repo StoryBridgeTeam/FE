@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   Box,
   Flex,
@@ -13,6 +13,7 @@ import {
   useDisclosure,
   Tag,
   TagLabel,
+  Spinner,
 } from "@chakra-ui/react";
 import { BiDotsVerticalRounded } from "react-icons/bi";
 import { Trash, Edit, Link } from "tabler-icons-react";
@@ -50,10 +51,9 @@ const CommentList: React.FC<CommentListProps> = ({
     updateCommentIndexes,
   } = useCommentStore();
 
-  const commentsEndRef = useRef<HTMLDivElement | null>(null);
-  const [editIndex, setEditIndex] = React.useState<number | null>(null);
-  const [editText, setEditText] = React.useState<string>("");
-  const [connectIndex, setConnectIndex] = React.useState<number | null>(null);
+  const [editIndex, setEditIndex] = useState<number | null>(null);
+  const [editText, setEditText] = useState<string>("");
+  const [connectIndex, setConnectIndex] = useState<number | null>(null);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const {
     isOpen: isConnectOpen,
@@ -69,20 +69,31 @@ const CommentList: React.FC<CommentListProps> = ({
     handleTouchEnd,
   } = useTextSelection();
 
-  useEffect(() => {
-    fetchCommentData();
-  }, [id]);
+  const [page, setPage] = useState<number>(0);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [hasMore, setHasMore] = useState<boolean>(true);
 
-  const fetchCommentData = async () => {
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    fetchCommentData(page);
+  }, [id, page]);
+
+  const fetchCommentData = async (page: number) => {
     try {
-      const response = await getComments(id);
-      if (response) {
+      setLoading(true);
+      const response = await getComments(id, page);
+      if (page > 0 && response && response.length > 0) {
+        setComments([...comments, ...response]);
+      } else if (response && response.length > 0) {
         setComments(response);
       } else {
-        setComments([]);
+        setHasMore(false);
       }
     } catch (error) {
       console.error("comment error:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -149,12 +160,6 @@ const CommentList: React.FC<CommentListProps> = ({
     }
   };
 
-  useEffect(() => {
-    if (commentsEndRef.current) {
-      commentsEndRef.current.scrollIntoView({ behavior: "smooth" });
-    }
-  }, [comments.length]);
-
   const getHighlightedText = (startIndex?: number, endIndex?: number) => {
     if (startIndex !== undefined && endIndex !== undefined) {
       return content.substring(startIndex, endIndex);
@@ -171,6 +176,19 @@ const CommentList: React.FC<CommentListProps> = ({
     }
   };
 
+  const handleScroll = () => {
+    if (scrollRef.current) {
+      const { scrollTop, scrollHeight, clientHeight } = scrollRef.current;
+      if (
+        scrollTop + clientHeight >= scrollHeight - 100 &&
+        hasMore &&
+        !loading
+      ) {
+        setPage((prevPage) => prevPage + 1);
+      }
+    }
+  };
+
   const processedComments = comments.map((comment) => ({
     content: comment.content,
     startIndex: comment.tagInfo?.startIndex || 0,
@@ -179,7 +197,16 @@ const CommentList: React.FC<CommentListProps> = ({
 
   return (
     <>
-      <Box border="1px" borderColor="#EEEEEE" p={4} mb={"82px"} h={"100%"}>
+      <Box
+        ref={scrollRef}
+        border="1px"
+        borderColor="#EEEEEE"
+        p={4}
+        mb={"82px"}
+        h={"100%"}
+        overflowY="auto"
+        onScroll={handleScroll} // Add scroll event listener
+      >
         {comments.map((comment) => (
           <Box marginBottom={5} key={comment.id} id={`comment-${comment.id}`}>
             <Flex align="center">
@@ -228,6 +255,7 @@ const CommentList: React.FC<CommentListProps> = ({
                     onClick={async () => {
                       await deleteCommentServer(comment.id);
                       deleteComment(comment.id);
+                      await fetchCommentData(0);
                       showToast(
                         t(`info.commentDelete`),
                         t(`info.commentDeleteMessage`),
@@ -272,7 +300,11 @@ const CommentList: React.FC<CommentListProps> = ({
             </Text>
           </Box>
         ))}
-        <div ref={commentsEndRef} />
+        {loading && (
+          <Flex justifyContent="center" mt={4}>
+            <Spinner />
+          </Flex>
+        )}
       </Box>
 
       <SlideUpSmallModal
