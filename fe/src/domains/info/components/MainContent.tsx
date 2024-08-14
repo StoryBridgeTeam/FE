@@ -53,7 +53,6 @@ const MainContent: FC = () => {
         setLoading(false);
       }
     };
-
     fetchCoverData();
   }, [nickName]);
 
@@ -72,7 +71,7 @@ const MainContent: FC = () => {
 
   const handleSectionClick = async (id: number) => {
     try {
-      const response = await getComments(id);
+      const response = await getComments(id, 0);
       if (response) {
         setComments(response);
       } else {
