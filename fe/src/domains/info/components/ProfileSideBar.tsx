@@ -136,7 +136,7 @@ const ProfileSidebar: FC = () => {
 
   const formatDate = (dateString: string): string => {
     const date = new Date(dateString);
-    const year = date.getFullYear().toString();
+    const year = date.getFullYear().toString().slice(-2);
     const month = (date.getMonth() + 1).toString().padStart(2, "0");
     const day = date.getDate().toString().padStart(2, "0");
     return `${year}.${month}.${day}`;
@@ -151,21 +151,18 @@ const ProfileSidebar: FC = () => {
     }
 
     return education.map(({ id, startDate, endDate, content }) => (
-      <>
-        <Flex key={id} justify="space-between" align="center">
-          <Text whiteSpace="pre-wrap">{`• ${formatDate(startDate)}~${formatDate(
-            endDate
-          )}`}</Text>
-          {ishost && (
-            <FiMinus
-              onClick={() => confirmDeleteEducation(id)}
-              fontSize="xs"
-              cursor="pointer"
-            />
-          )}
-        </Flex>
-        <Text whiteSpace="pre-wrap" mb={2} ml={2}>{`${content}`}</Text>
-      </>
+      <Flex key={id} justify="space-between" align="center" mb={2}>
+        <Text fontSize="10px" whiteSpace="pre-wrap">{`• ${formatDate(
+          startDate
+        )} ~ ${formatDate(endDate)} ${content}`}</Text>
+        {ishost && (
+          <FiMinus
+            onClick={() => confirmDeleteEducation(id)}
+            fontSize="xs"
+            cursor="pointer"
+          />
+        )}
+      </Flex>
     ));
   };
 

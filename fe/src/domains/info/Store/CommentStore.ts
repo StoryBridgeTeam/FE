@@ -23,7 +23,6 @@ interface TagInfo {
 interface CommentState {
   comments: Comment[];
   setComments: (comments: Comment[]) => void;
-  setMoreComments: (comments: Comment[]) => void;
   addComments: (newComment: Comment) => void;
   deleteComment: (id: number) => void;
   updateCommentText: (id: number, newText: string) => void;
@@ -37,13 +36,12 @@ interface CommentState {
 export const useCommentStore = create<CommentState>((set) => ({
   comments: [],
   setComments: (comments) => set({ comments }),
-  setMoreComments: (comments) => set({ comments }),
   addComments: (newComment) => {
     set((state) => ({
-      comments: [newComment, ...state.comments],
+      comments: [...state.comments, newComment],
     }));
   },
-  deleteComment: async (id) =>
+  deleteComment: (id) =>
     set((state) => ({
       comments: state.comments.filter((comment) => comment.id !== id),
     })),

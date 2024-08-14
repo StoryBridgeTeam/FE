@@ -1,12 +1,10 @@
 import axiosInstance from "../../../common/api/axiosInstance";
 import { getNicknameToken } from "../../../common/utils/nickname";
 
-export const getComments = async (id: number, page: number) => {
+export const getComments = async (id: number) => {
   try {
-    const response = await axiosInstance.get(
-      `/cover-letter/${id}/comments?page=${page}`
-    );
-    return response.data.data.comments.content;
+    const response = await axiosInstance.get(`/cover-letter/${id}/comments`);
+    return response.data.data.comments;
   } catch (error) {
     console.error("Failed to fetch comments:", error);
     throw error;
