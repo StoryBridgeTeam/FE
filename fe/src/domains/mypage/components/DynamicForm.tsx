@@ -6,14 +6,12 @@ import {
   VStack,
   useBreakpointValue,
 } from "@chakra-ui/react";
-import ProfileForm from "./ProfileForm"; // Assuming ProfileForm is correctly exported as default
+import ProfileForm from "./ProfileForm";
 
-// ComponentMapping defines a map where each key returns a React component function.
 type ComponentMapping = {
   [key: string]: () => JSX.Element;
 };
 
-// Map different functionalities to the ProfileForm. You can replace these with different forms as needed.
 const menuItems: ComponentMapping = {
   "회원정보 수정": () => <ProfileForm />,
   "언어 설정": () => <ProfileForm />,
@@ -56,7 +54,7 @@ const DynamicForm: React.FC = () => {
                 key={item}
                 variant="ghost"
                 w="full"
-                mb="2"
+                mb="1"
                 onClick={() => setSelectedItem(item)}
               >
                 {item}

@@ -53,7 +53,6 @@ const MainContent: FC = () => {
         setLoading(false);
       }
     };
-
     fetchCoverData();
   }, [nickName]);
 
@@ -72,7 +71,7 @@ const MainContent: FC = () => {
 
   const handleSectionClick = async (id: number) => {
     try {
-      const response = await getComments(id);
+      const response = await getComments(id, 0);
       if (response) {
         setComments(response);
       } else {
@@ -106,10 +105,7 @@ const MainContent: FC = () => {
   };
 
   const handleAddNewClick = async () => {
-    const newId =
-      mockData.length > 0
-        ? Math.max(...mockData.map((item) => item.id)) + 1
-        : 1;
+    const newId = 1000;
     const newMockData: MockData = {
       id: newId,
       title: t(`info.newItem`),
@@ -118,7 +114,6 @@ const MainContent: FC = () => {
     const updatedMockData = [...mockData, newMockData];
 
     await updateServerData(updatedMockData);
-    setMockData(updatedMockData);
   };
 
   const handleSaveDetail = (
@@ -136,7 +131,7 @@ const MainContent: FC = () => {
   return (
     <>
       {isMobile && selectedId ? undefined : <ProfileSidebar />}
-      <Container maxW="4xl" mt={5}>
+      <Container maxW="4xl">
         {selectedId ? (
           <DetailPage
             id={selectedId}
@@ -147,7 +142,12 @@ const MainContent: FC = () => {
         ) : (
           <>
             {ishost && (
-              <Flex w="full" justifyContent="flex-end" alignItems="center">
+              <Flex
+                w="full"
+                justifyContent="flex-end"
+                alignItems="center"
+                mt={5}
+              >
                 {isEdit ? (
                   <Button onClick={handleSaveClick}>
                     <Check size={24} color="black" />
