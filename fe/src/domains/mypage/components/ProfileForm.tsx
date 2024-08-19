@@ -7,7 +7,6 @@ import {
   FormControl,
   Image,
   Flex,
-  Spacer,
   useToast,
   Text,
   useBreakpointValue,
@@ -21,6 +20,9 @@ const ProfileForm: React.FC = () => {
   const [image, setImage] = useState<string>("");
   const [profile, setProfile] = useState({
     nickname: "",
+    existPassword: "",
+    newPassword: "",
+    correctPassword: "",
   });
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -62,7 +64,7 @@ const ProfileForm: React.FC = () => {
       borderRadius={"30px"}
       w={isMobile ? "full" : "800px"}
       height={"585px"}
-      ml={"30px"}
+      ml={"10px"}
     >
       <VStack align="stretch" spacing={4} w="full">
         <FormControl>
@@ -121,22 +123,25 @@ const ProfileForm: React.FC = () => {
           <Flex w={"50%"} direction={"column"}>
             <Input
               placeholder={"기존 비밀번호"}
-              name="기존 비밀번호"
-              value={profile.nickname}
+              type="password"
+              name="existPassword"
+              value={profile.existPassword}
+              onChange={handleInputChange}
+              mb={3}
+            />
+            <Input
+              placeholder={"새 비밀번호"}
+              type="password"
+              name="newPassword"
+              value={profile.newPassword}
               onChange={handleInputChange}
               mb={3}
             />
             <Input
               placeholder={"새 비밀번호 확인"}
-              name="새 비밀번호 확인"
-              value={profile.nickname}
-              onChange={handleInputChange}
-              mb={3}
-            />
-            <Input
-              placeholder={"새 비밀번호 확인"}
-              name="새 비밀번호 확인"
-              value={profile.nickname}
+              type="password"
+              name="correctPassword"
+              value={profile.correctPassword}
               onChange={handleInputChange}
             />
           </Flex>
