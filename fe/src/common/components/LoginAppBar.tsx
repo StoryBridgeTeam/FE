@@ -11,8 +11,6 @@ import {
 import { FaRegBell, FaSearch } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
-import { useAuthStore } from "../../domains/login/stores/useAuthStore";
-import { getNicknameToken } from "../utils/nickname";
 
 interface LoginAppBarProps {
   field1?: string;
@@ -33,6 +31,7 @@ const LoginAppBar: React.FC<LoginAppBarProps> = ({
   const isMobile = useBreakpointValue({ base: true, md: false });
   const appBarHeight = isMobile ? "50px" : "60px";
   const navigate = useNavigate();
+  const nickName = localStorage.getItem("nickName");
 
   return (
     <Flex
@@ -54,7 +53,7 @@ const LoginAppBar: React.FC<LoginAppBarProps> = ({
         align={"center"}
         paddingLeft={isMobile ? "15px" : "20px"}
         onClick={() => {
-          navigate(`/${getNicknameToken()}`, { replace: true });
+          navigate(`/${nickName}`, { replace: true });
         }}
       >
         StoryBridge

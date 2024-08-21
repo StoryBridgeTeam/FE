@@ -1,7 +1,6 @@
 import { useAuthStore } from "../stores/useAuthStore";
 import { useNavigate } from "react-router-dom";
 import { useToastMessage } from "../../../common/hooks/useToastMessage";
-import { getNicknameToken } from "../../../common/utils/nickname";
 
 export const useHandleLogin = () => {
   const navigate = useNavigate();
@@ -14,9 +13,10 @@ export const useHandleLogin = () => {
     rememberMe: boolean
   ) => {
     try {
+      const nickName = localStorage.getItem("nickName");
       login(accessToken, refreshToken, rememberMe);
       showToast("login.successTitle", "login.successDescription", "success");
-      navigate(`/${getNicknameToken()}`, { replace: true });
+      navigate(`/${nickName}`, { replace: true });
     } catch (error) {
       console.error("Login error:", error);
       showToast("login.failTitle", "login.failDescription", "error");

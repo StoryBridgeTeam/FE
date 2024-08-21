@@ -11,7 +11,6 @@ import {
 import { Send } from "tabler-icons-react";
 import { useTranslation } from "react-i18next";
 import { postComment } from "../api/CommentAPI";
-import { getNicknameToken } from "../../../common/utils/nickname";
 import { useCommentStore } from "../Store/CommentStore";
 
 interface CommentInputProps {
@@ -23,6 +22,7 @@ const CommentInput: React.FC<CommentInputProps> = ({ id }) => {
   const [comment, setComment] = useState("");
   const { t } = useTranslation();
   const isMobile = useBreakpointValue({ base: true, md: false });
+  const nickname = localStorage.getItem("nickName");
 
   const handleCommentChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setComment(e.target.value);
@@ -32,7 +32,7 @@ const CommentInput: React.FC<CommentInputProps> = ({ id }) => {
     if (comment.trim()) {
       try {
         const response = await postComment(id, {
-          nickName: getNicknameToken(),
+          nickName: nickname!,
           content: comment,
         });
         if (response) {

@@ -1,5 +1,4 @@
 import axios from "axios";
-import Cookies from "js-cookie";
 
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
@@ -12,7 +11,7 @@ const axiosInstance = axios.create({
 
 axiosInstance.interceptors.request.use(
   (config) => {
-    const accessToken = Cookies.get("accessToken");
+    const accessToken = localStorage.getItem("accessToken");
 
     if (accessToken) {
       config.headers["Authorization"] = `Bearer ${accessToken}`;
@@ -30,10 +29,10 @@ axiosInstance.interceptors.response.use(
     const originalRequest = error.config;
     if (error.response.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
-      const refreshToken = Cookies.get("refreshToken");
+      const refreshToken = localStorage.getItem("refreshToken");
       try {
         const refreshResponse = await axios.post(
-          `http://13.239.139.51:9090/auth/token/refresh`,
+          `${API_BASE_URL}/auth/token/refresh`,
           { refreshToken },
           {
             headers: {
@@ -42,11 +41,7 @@ axiosInstance.interceptors.response.use(
           }
         );
         const { accessToken } = refreshResponse.data.data;
-        Cookies.set("accessToken", accessToken, {
-          expires: 30,
-          secure: true,
-          sameSite: "Strict",
-        });
+        localStorage.setItem("accessToken", accessToken);
         axiosInstance.defaults.headers[
           "Authorization"
         ] = `Bearer ${accessToken}`;

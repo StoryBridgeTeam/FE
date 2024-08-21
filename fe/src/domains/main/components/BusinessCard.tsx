@@ -12,7 +12,6 @@ import { mockData2 } from "../mainData";
 import CardModal from "./CardModal";
 import CardInfoItem from "./CardInfoItem";
 import { useNavigate, useParams } from "react-router-dom";
-import { getNicknameToken } from "../../../common/utils/nickname";
 
 const CardInfoBox: React.FC<{ cards: CardState[]; onClick: () => void }> = ({
   cards,
@@ -42,10 +41,12 @@ const CardInfoBox: React.FC<{ cards: CardState[]; onClick: () => void }> = ({
 );
 
 const IntroductionBox: React.FC = () => {
+  const { nickName } = useParams<{ nickName: string }>();
+
   const navigate = useNavigate();
 
   const handleClick = () => {
-    navigate(`/${getNicknameToken()}/info`);
+    navigate(`/${nickName}/info`);
   };
 
   return (

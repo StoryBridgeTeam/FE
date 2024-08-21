@@ -27,7 +27,6 @@ import {
   createAdditionalInfo,
   deleteAdditionalInfo,
 } from "../api/SideBarAPI";
-import { getNicknameToken } from "../../../common/utils/nickname";
 import { useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
@@ -43,7 +42,7 @@ type EducationItem = {
 const ProfileSidebar: FC = () => {
   const { nickName } = useParams<{ nickName: string }>();
   const isMobile = useBreakpointValue({ base: true, md: false });
-  const name = getNicknameToken();
+  const name = localStorage.getItem("nickName");
   const { t } = useTranslation();
   const [aboutMe, setAboutMe] = useState<AboutMeItem[]>([]);
   const [education, setEducation] = useState<EducationItem[]>([]);

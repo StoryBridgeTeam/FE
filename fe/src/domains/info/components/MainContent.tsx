@@ -5,6 +5,7 @@ import {
   Flex,
   useBreakpointValue,
   Text,
+  Spinner,
 } from "@chakra-ui/react";
 import { FC, useEffect, useState } from "react";
 import { Edit, Check } from "tabler-icons-react";
@@ -13,11 +14,15 @@ import { useTranslation } from "react-i18next";
 import TextSection from "./TextSection";
 import ProfileSidebar from "./ProfileSideBar";
 import { useProfileStore } from "../Store/useProfileStore";
-import { getCoverLetters, putCoverLetters } from "../api/InfoAPI";
+import {
+  deleteCoverLetters,
+  getCoverLetters,
+  postCoverLetters,
+  putCoverLetters,
+} from "../api/InfoAPI";
 import { useCommentStore } from "../Store/CommentStore";
 import { getComments } from "../api/CommentAPI";
 import { useParams } from "react-router-dom";
-import { getNicknameToken } from "../../../common/utils/nickname";
 
 interface MockData {
   id: number;
@@ -34,40 +39,29 @@ const MainContent: FC = () => {
   const { isEdit, setEdit } = useProfileStore();
   const [isLoading, setLoading] = useState<boolean>(false);
   const { setComments } = useCommentStore();
-  const name = getNicknameToken();
+  const name = localStorage.getItem("nickName");
   const ishost = nickName === name;
 
-  useEffect(() => {
-    const fetchCoverData = async () => {
-      try {
-        setLoading(true);
-        const { entries } = await getCoverLetters(nickName!);
-        if (entries === null) {
-          setMockData([]);
-        } else {
-          setMockData(entries);
-        }
-        setLoading(false);
-      } catch (error) {
-        console.error("cover error:", error);
-        setLoading(false);
-      }
-    };
-    fetchCoverData();
-  }, [nickName]);
-
-  const updateServerData = async (updatedMockData: MockData[]) => {
+  const fetchCoverData = async () => {
     try {
-      const newCover = await putCoverLetters(nickName!, updatedMockData);
-      if (newCover === null) {
+      setLoading(true);
+      const { entries } = await getCoverLetters(nickName!);
+      if (entries.content === null) {
         setMockData([]);
       } else {
-        setMockData(newCover);
+        setMockData(entries.content);
       }
     } catch (error) {
       console.error("cover error:", error);
+      setMockData([]);
+    } finally {
+      setLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchCoverData();
+  }, [nickName]);
 
   const handleSectionClick = async (id: number) => {
     try {
@@ -94,45 +88,40 @@ const MainContent: FC = () => {
   };
 
   const handleSaveClick = () => {
-    updateServerData(mockData);
     setEdit(false);
   };
 
-  const handleDelete = (id: number) => {
-    const updatedMockData = mockData.filter((item) => item.id !== id);
-    setMockData(updatedMockData);
-    updateServerData(updatedMockData);
+  const handleDelete = async (id: number) => {
+    await deleteCoverLetters(nickName!, id);
+    await fetchCoverData();
   };
 
   const handleAddNewClick = async () => {
-    const newId = 1000;
-    const newMockData: MockData = {
-      id: newId,
+    const newMockData = {
       title: t(`info.newItem`),
       content: t(`info.newContent`),
     };
-    const updatedMockData = [...mockData, newMockData];
-
-    await updateServerData(updatedMockData);
+    await postCoverLetters(nickName!, newMockData);
+    await fetchCoverData();
   };
 
-  const handleSaveDetail = (
+  const handleSaveDetail = async (
     id: number,
     updatedData: { title: string; content: string }
   ) => {
-    const updatedMockData = mockData.map((item) =>
-      item.id === id ? { ...item, ...updatedData } : item
-    );
-
-    setMockData(updatedMockData);
-    updateServerData(updatedMockData);
+    await putCoverLetters(nickName!, { ...updatedData, id });
+    await fetchCoverData();
   };
 
   return (
     <>
       {isMobile && selectedId ? undefined : <ProfileSidebar />}
       <Container maxW="4xl">
-        {selectedId ? (
+        {isLoading ? (
+          <Flex justifyContent="center" alignItems="center" h="100vh">
+            <Spinner />
+          </Flex>
+        ) : selectedId ? (
           <DetailPage
             id={selectedId}
             data={mockData.find((item) => item.id === selectedId)!}
@@ -159,7 +148,7 @@ const MainContent: FC = () => {
                 )}
               </Flex>
             )}
-            <Flex justifyContent="center" mb={5} mt={ishost ? 12 : undefined}>
+            <Flex justifyContent="center" mb={5} mt={12}>
               <Heading size="lg">{t(`info.info`)}</Heading>
             </Flex>
             <Flex justifyContent="center">

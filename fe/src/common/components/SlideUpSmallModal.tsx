@@ -16,7 +16,7 @@ interface SlideUpSmallModalProps {
   onClose: () => void;
   title?: string;
   children?: React.ReactNode;
-  footerContent?: React.ReactNode; // Optional footer content
+  footerContent?: React.ReactNode;
 }
 
 export const SlideUpSmallModal: React.FC<SlideUpSmallModalProps> = ({
@@ -34,7 +34,7 @@ export const SlideUpSmallModal: React.FC<SlideUpSmallModalProps> = ({
       onClose={onClose}
       closeOnOverlayClick={false}
       motionPreset="slideInBottom"
-      size={isMobile ? "full" : "md"}
+      size={isMobile ? "md" : "md"}
     >
       <ModalOverlay bg="blackAlpha.600" />
       <ModalContent
@@ -44,13 +44,13 @@ export const SlideUpSmallModal: React.FC<SlideUpSmallModalProps> = ({
         bottom={0}
         left={0}
         right={0}
-        mt={isMobile ? 0 :"50vh"}
+        mt={isMobile ? "auto" : "50vh"} // Place at the bottom on mobile, middle on larger screens
         transform={isOpen ? "translateY(0)" : "translateY(100%)"}
         transition="transform 0.3s ease"
-        p={4}
+        p={isMobile ? 0 : 4}
         maxW={isMobile ? "100%" : "3xl"}
         mx={isMobile ? 0 : "auto"}
-        h="50vh"
+        h={isMobile ? "40vh" : "50vh"} // Adjust the height to 50% of the screen
         overflow="hidden"
         mb={0}
       >

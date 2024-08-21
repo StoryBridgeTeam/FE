@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import Cookies from "js-cookie";
+import { getNicknameToken } from "../../../common/utils/nickname";
 
 interface AuthState {
   isAuthenticated: boolean;
@@ -19,22 +19,15 @@ export const useAuthStore = create<AuthState>((set) => ({
   accessToken: null,
   refreshToken: null,
   login: (accessToken: string, refreshToken: string, rememberMe: boolean) => {
-    const expires = rememberMe ? 30 : 0.5;
-    Cookies.set("accessToken", accessToken, {
-      expires,
-      secure: true,
-      sameSite: "Strict",
-    });
-    Cookies.set("refreshToken", refreshToken, {
-      expires,
-      secure: true,
-      sameSite: "Strict",
-    });
+    localStorage.setItem("accessToken", accessToken);
+    localStorage.setItem("refreshToken", refreshToken);
+    localStorage.setItem("nickName", getNicknameToken());
     set({ isAuthenticated: true, accessToken, refreshToken });
   },
   logout: () => {
-    Cookies.remove("accessToken");
-    Cookies.remove("refreshToken");
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("refreshToken");
+    localStorage.removeItem("nickName");
     set({
       isAuthenticated: false,
       accessToken: null,
@@ -42,10 +35,11 @@ export const useAuthStore = create<AuthState>((set) => ({
     });
   },
   checkAuth: async () => {
-    const accessToken = Cookies.get("accessToken");
-    const refreshToken = Cookies.get("refreshToken");
+    const accessToken = localStorage.getItem("accessToken");
+    const refreshToken = localStorage.getItem("refreshToken");
+    const nickName = localStorage.getItem("nickName");
 
-    if (accessToken && refreshToken) {
+    if (accessToken && refreshToken && nickName) {
       set({ isAuthenticated: true, accessToken, refreshToken });
     } else {
       set({
@@ -55,5 +49,4 @@ export const useAuthStore = create<AuthState>((set) => ({
       });
     }
   },
-  
 }));

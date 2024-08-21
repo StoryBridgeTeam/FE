@@ -5,32 +5,16 @@ import {
   VStack,
   Text,
   HStack,
-  Grid,
-  GridItem,
 } from "@chakra-ui/react";
 import React from "react";
-import { useTranslation } from "react-i18next";
 import { useNavigate, useParams } from "react-router-dom";
-import { getNicknameToken } from "../../../common/utils/nickname";
 
 const NetworkStatus: React.FC = () => {
   const isMobile = useBreakpointValue({ base: true, md: false });
-  const { t } = useTranslation();
   const navigate = useNavigate();
-  const { id } = useParams();
-  const ancestors = [
-    { name: "Ancestor 1", img: "/path/to/image1.jpg" },
-    { name: "Ancestor 2", img: "/path/to/image2.jpg" },
-    { name: "Ancestor 3", img: "/path/to/image3.jpg" },
-    { name: "Ancestor 4", img: "/path/to/image4.jpg" },
-    { name: "Ancestor 5", img: "/path/to/image5.jpg" },
-    { name: "Ancestor 6", img: "/path/to/image1.jpg" },
-    { name: "Ancestor 7", img: "/path/to/image2.jpg" },
-    { name: "Ancestor 8", img: "/path/to/image3.jpg" },
-    { name: "Ancestor 9", img: "/path/to/image4.jpg" },
-  ];
-
+  const ancestors = { name: "Ancestor 1", img: "/path/to/image1.jpg" };
   const descendants = [{ count: 17 }, { count: 31 }, { count: 76 }];
+  const { nickName } = useParams<{ nickName: string }>();
 
   const maxCount = Math.max(...descendants.map((d) => d.count));
 
@@ -47,7 +31,7 @@ const NetworkStatus: React.FC = () => {
       display="flex"
       flexDirection="column"
       onClick={() => {
-        navigate(`/${getNicknameToken()}/amt`);
+        navigate(`/${nickName}/amt`);
       }}
     >
       <VStack
@@ -57,15 +41,9 @@ const NetworkStatus: React.FC = () => {
         flex="1"
         overflow="auto"
       >
-        <Grid templateColumns="repeat(10, 1fr)">
-          {ancestors.map((ancestor, index) => (
-            <GridItem key={index} mr={2}>
-              <HStack spacing={1}>
-                <Avatar name={ancestor.name} src={ancestor.img} size="sm" />
-              </HStack>
-            </GridItem>
-          ))}
-        </Grid>
+        <HStack spacing={1}>
+          <Avatar name={ancestors.name} src={ancestors.img} size="sm" />
+        </HStack>
         <HStack spacing={1}>
           <Avatar
             name={"나"}

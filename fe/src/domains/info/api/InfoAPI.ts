@@ -19,22 +19,47 @@ export const getCoverLetters = async (nickname: string, token?: string) => {
 
 export const putCoverLetters = async (
   nickname: string,
-  entries: { id: number | null; title: string; content: string }[]
+  entries: { id: number; title: string; content: string }
 ) => {
   try {
     const response = await axiosInstance.put(
-      `/members/${nickname}/cover-letter`,
+      `/members/${nickname}/cover-letter/${entries.id}`,
       {
-        entries: entries.map(({ id, title, content }) => ({
-          id: id === 1000 ? null : id,
-          title,
-          content,
-          createdAt: null,
-          modifiedAt: null,
-        })),
+        title: entries.title,
+        content: entries.content,
       }
     );
-    return response.data.data.entries;
+    return response.data.data;
+  } catch (error) {
+    console.error("Failed to update cover letters:", error);
+    throw error;
+  }
+};
+
+export const postCoverLetters = async (
+  nickname: string,
+  entries: { title: string; content: string }
+) => {
+  try {
+    const response = await axiosInstance.post(
+      `/members/${nickname}/cover-letter`,
+      {
+        title: entries.title,
+        content: entries.content,
+      }
+    );
+    return response.data.data;
+  } catch (error) {
+    console.error("Failed to update cover letters:", error);
+    throw error;
+  }
+};
+export const deleteCoverLetters = async (nickname: string, id: number) => {
+  try {
+    const response = await axiosInstance.delete(
+      `/members/${nickname}/cover-letter/${id}`
+    );
+    return response.data.data;
   } catch (error) {
     console.error("Failed to update cover letters:", error);
     throw error;
