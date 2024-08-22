@@ -1,6 +1,6 @@
 import { Flex, useBreakpointValue } from "@chakra-ui/react";
 import LoginAppBar from "../../common/components/LoginAppBar";
-import { useAuthStore } from "../login/stores/useAuthStore";
+import { useAuthStore } from "../../common/stores/AuthStore";
 import { useToastMessage } from "../../common/hooks/useToastMessage";
 import { FC } from "react";
 import MainContent from "./components/MainContent";

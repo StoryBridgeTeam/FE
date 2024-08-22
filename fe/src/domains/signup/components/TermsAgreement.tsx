@@ -1,13 +1,13 @@
 import { Box, Stack, Text } from "@chakra-ui/react";
 import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { useTermsStore } from "../stores/useTermsStore";
+import { useSignUpStore } from "../stores/SignUpStore";
 import TermItem from "./TermItem";
-import { useStepsStore } from "../stores/useStepsStore";
+import { useStepsStore } from "../stores/StepsStore";
 
 const TermsAgreement = () => {
   const { t } = useTranslation();
-  const { agreements, handleAgreeAll, handleAgreeChange } = useTermsStore();
+  const { agreements, setAgreement, setAllAgreements } = useSignUpStore();
   const { setCondition } = useStepsStore();
 
   interface Term {
@@ -18,34 +18,43 @@ const TermsAgreement = () => {
 
   const terms: Term[] = [
     {
-      name: "agreeRequired1",
+      name: "required1",
       label: t("signup.TermsAgreement.agreeRequired1"),
       required: true,
     },
     {
-      name: "agreeRequired2",
+      name: "required2",
       label: t("signup.TermsAgreement.agreeRequired2"),
       required: true,
     },
     {
-      name: "agreeOptional1",
+      name: "optional1",
       label: t("signup.TermsAgreement.agreeOptional1"),
       required: false,
     },
     {
-      name: "agreeOptional2",
+      name: "optional2",
       label: t("signup.TermsAgreement.agreeOptional2"),
       required: false,
     },
   ];
 
+  const handleAgreeAll = () => {
+    const allChecked = Object.values(agreements).every(Boolean);
+    setAllAgreements(!allChecked);
+  };
+
+  const handleAgreeChange = (name: keyof typeof agreements) => {
+    setAgreement(name, !agreements[name]);
+  };
+
   useEffect(() => {
-    if (agreements["agreeRequired1"] && agreements["agreeRequired2"]) {
+    if (agreements.required1 && agreements.required2) {
       setCondition(2, true);
     } else {
       setCondition(2, false);
     }
-  }, [agreements]);
+  }, [agreements, setCondition]);
 
   return (
     <Box>

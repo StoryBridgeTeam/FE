@@ -48,7 +48,7 @@ export const renderContentWithIcons = (
           {content.substring(comment.startIndex, comment.endIndex)}
           <span
             style={{
-              color: "gray",
+              color: "#e6b800",
               position: "absolute",
               right: "-5px",
               top: "8%",

@@ -87,9 +87,24 @@
     "VerificationCode": {
       "title": "인증코드를 입력해주세요",
       "placeholder": "인증코드 6자리를 입력해주세요",
+      "retry": "재전송",
       "toast": {
-        "error": "인증 실패",
-        "description": "올바른 인증 코드를 입력해주세요"
+        "invalidCode": {
+          "title": "유효하지 않는 코드",
+          "description": "올바른 인증 코드를 입력해주세요"
+        },
+        "expiredCode": {
+          "title": "인증코드 만료",
+          "description": "다시 인증 코드를 요청해주세요"
+        },
+        "tooManyAttempts": {
+          "title": "인증시도 횟수 초과",
+          "description": "다시 인증 코드를 요청해주세요"
+        },
+        "error": {
+          "title": "인증 실패",
+          "description": "올바른 인증 코드를 입력해주세요"
+        }
       }
     },
     "PasswordForm": {
@@ -99,7 +114,7 @@
       "confirmPasswordPlaceholder": "비밀번호를 한번 더 입력해주세요",
       "engLetter": "영문",
       "number": "숫자",
-      "specialChar": "특수문자",
+      "specialChar": "특수문자(~!@#$%^&*()+|=)",
       "length": "8~16자",
       "same": "비밀번호 일치"
     },
@@ -116,6 +131,16 @@
       "title": "회원가입을 성공적으로 마쳤어요!",
       "description": "인증한 전화번호는 아이디로 사용돼요.",
       "description2": "이곳에서 다양한 사람에 대해 알아가고, 사람들과 함께 해보세요."
+    }
+  },
+  "main": {
+    "MainContent": {
+      "businessCard": "명함카드",
+      "networkStatus": "네트워크 현황",
+      "advertisement": "광고"
+    },
+    "CardComponent": {
+      "self-introduction": "자기소개서"
     }
   }
 }

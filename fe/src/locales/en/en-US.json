@@ -29,11 +29,22 @@
       "agreeOptional2": "[Optional] Consent to receive advertising messages"
     },
     "VerificationCode": {
-      "title": "Please enter the verification code",
-      "placeholder": "Please enter the 6-digit verification code",
+      "title": "Enter Verification Code",
+      "placeholder": "Enter 6-digit verification code",
+      "retry": "Retry",
       "toast": {
-        "error": "Verification failed",
-        "description": "Please enter a valid verification code"
+        "invalidCode": {
+          "title": "Invalid Code",
+          "description": "Please enter a valid verification code"
+        },
+        "expiredCode": {
+          "title": "Code Expired",
+          "description": "Please request a new verification code"
+        },
+        "tooManyAttempts": {
+          "title": "Too Many Attempts",
+          "description": "Please request a new verification code"
+        }
       }
     },
     "PasswordForm": {
@@ -43,7 +54,7 @@
       "confirmPasswordPlaceholder": "Please enter the password again",
       "engLetter": "Letter",
       "number": "Number",
-      "specialChar": "Special character",
+      "specialChar": "Special character(~!@#$%^&*()+|=)",
       "length": "8-16 characters",
       "same": "Password match"
     },
@@ -60,6 +71,16 @@
       "title": "You have successfully signed up!",
       "description": "The verified email will be used as your ID.",
       "description2": "Get to know various people here and engage with them."
+    }
+  },
+  "main": {
+    "MainContent": {
+      "businessCard": "BusinessCard",
+      "networkStatus": "NetworkStatus",
+      "advertisement": "Advertisement"
+    },
+    "CardComponent": {
+      "self-introduction": "self-introduction"
     }
   }
 }

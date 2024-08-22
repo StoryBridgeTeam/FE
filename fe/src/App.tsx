@@ -2,14 +2,14 @@ import { ChakraProvider, extendTheme } from "@chakra-ui/react";
 import LoginPage from "./domains/login/LoginPage";
 import SignupPage from "./domains/signup/SignupPage";
 import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
-import { useAuthStore } from "./domains/login/stores/useAuthStore";
+import { useAuthStore } from "./common/stores/AuthStore";
 import { useEffect, useState } from "react";
 import PrivateRoute from "./domains/login/utils/PrivateRoute";
 import InfoPage from "./domains/info/InfoPage";
 import MainPage from "./domains/main/MainPage";
-import { getNicknameToken } from "./common/utils/nickname";
 import MyPage from "./domains/mypage/MyPage";
 import AmtPage from "./domains/amt/AmtPage";
+import POIPage from "./domains/poi/POIPage";
 
 const theme = extendTheme({
   fonts: {
@@ -20,6 +20,7 @@ const theme = extendTheme({
 function App() {
   const { checkAuth, isAuthenticated } = useAuthStore();
   const [initialized, setInitialized] = useState(false);
+  const nickName = localStorage.getItem("nickName");
 
   useEffect(() => {
     checkAuth().then(() => {
@@ -54,10 +55,18 @@ function App() {
             element={<PrivateRoute element={<MyPage />} />}
           />
           <Route
+            path="/:nickName/poi/create"
+            element={<PrivateRoute element={<POIPage />} />}
+          />
+          <Route
+            path="/:nickName/poi/:poiId"
+            element={<PrivateRoute element={<POIPage />} />}
+          />
+          <Route
             path="*"
             element={
-              isAuthenticated && getNicknameToken() ? (
-                <Navigate to={`/${getNicknameToken()}`} replace />
+              isAuthenticated && nickName ? (
+                <Navigate to={`/${nickName}`} replace />
               ) : (
                 <Navigate to="/login" replace />
               )

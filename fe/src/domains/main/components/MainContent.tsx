@@ -1,81 +1,82 @@
-import React from "react";
-import {
-  Box,
-  Grid,
-  useBreakpointValue,
-  GridItem,
-  VStack,
-  Heading,
-} from "@chakra-ui/react";
+import React, { useEffect, useMemo } from "react";
+import { Box, Grid, useBreakpointValue } from "@chakra-ui/react";
 import { useTranslation } from "react-i18next";
-import POIList from "./POIList";
-import NetworkStatus from "./NetwortStatus";
-import Advertisement from "./Advertisement";
-import BusinessCard from "./BusinessCard";
+import POIList from "../../poi/components/POIList";
+import NetworkStatus from "./NetworkStatus";
+import Advertisement from "../../ad/components/Advertisement";
+import CardComponent from "../../card/components/CardComponent";
+import AdComponent from "../../ad/components/AdComponent";
+import { Section, SectionData } from "./Section";
+import { useAdStore } from "../../ad/stores/AdStore";
 
-interface SectionHeaderProps {
-  title: string;
-  isMobile: boolean;
-}
-
-const SectionHeader: React.FC<SectionHeaderProps> = ({ title, isMobile }) => (
-  <Heading
-    size={isMobile ? "xs" : "sm"}
-    w="100%"
-    textAlign="center"
-    bg="white"
-    p={isMobile ? 2 : 0}
-    borderTop={isMobile ? "1px solid #CDCDCD" : ""}
-    borderBottom={isMobile ? "1px solid #CDCDCD" : ""}
-  >
-    {title}
-  </Heading>
-);
-
-interface SectionProps {
-  area: string;
-  title: string;
-  Component: React.ComponentType;
-  isMobile: boolean;
-}
-
-const Section: React.FC<SectionProps> = ({
-  area,
-  title,
-  Component,
-  isMobile,
-}) => (
-  <GridItem area={area}>
-    <VStack h="100%" bg={isMobile ? "#F6F6F6" : "white"}>
-      <SectionHeader title={title} isMobile={isMobile} />
-      <Component />
-    </VStack>
-  </GridItem>
-);
-
-interface SectionData {
-  area: string;
-  title: string;
-  Component: React.ComponentType;
+interface Ad {
+  id: number;
+  content: string;
 }
 
 const MainContent: React.FC = () => {
   const isMobile = useBreakpointValue({ base: true, md: false });
   const { t } = useTranslation();
-
-  const gridTemplateAreas = isMobile
-    ? `"card" "poi" "network" "ad"`
-    : `"poi card ad" "poi network ad"`;
-
-  const gridTemplateRows = isMobile ? "400px 400px 300px 400px" : "2fr 1fr";
-  const gridTemplateColumns = isMobile ? "1fr" : "2fr 3fr 2fr";
-
+  const { ads } = useAdStore();
   const sections: SectionData[] = [
-    { area: "poi", title: "POI List", Component: POIList },
-    { area: "card", title: "명함카드", Component: BusinessCard },
-    { area: "network", title: "네트워크 현황", Component: NetworkStatus },
-    { area: "ad", title: "광고", Component: Advertisement },
+    {
+      area: "card",
+      title: t("main.MainContent.businessCard"),
+      Component: CardComponent,
+    },
+    {
+      area: "poi",
+      title: "POI List",
+      Component: POIList,
+    },
+    {
+      area: "network",
+      title: t("main.MainContent.networkStatus"),
+      Component: NetworkStatus,
+    },
   ];
+
+  const mobileLayout = useMemo(() => {
+    const result: SectionData[] = [];
+    const adGroups: Ad[][] = [[], [], []];
+
+    ads.forEach((ad, index) => {
+      adGroups[index % 3].push(ad);
+    });
+
+    sections.forEach((section, index) => {
+      result.push(section);
+      if (adGroups[index].length > 0) {
+        result.push({
+          area: `ad${index + 1}`,
+          title: "",
+          Component: () => (
+            <>
+              {adGroups[index].map((ad) => (
+                <Advertisement key={ad.id} ad={ad} />
+              ))}
+            </>
+          ),
+        });
+      }
+    });
+
+    return result;
+  }, [sections, ads]);
+
+  const gridTemplateAreas = useMemo(() => {
+    if (!isMobile) return `"poi card ad" "poi network ad"`;
+    return mobileLayout.map((section) => `"${section.area}"`).join(" ");
+  }, [isMobile, mobileLayout]);
+
+  const gridTemplateRows = useMemo(() => {
+    if (!isMobile) return "2fr 1fr";
+    return mobileLayout
+      .map((section) => (section.area.startsWith("ad") ? "auto" : "400px"))
+      .join(" ");
+  }, [isMobile, mobileLayout]);
+
+  const gridTemplateColumns = isMobile ? "1fr" : "2fr 3fr 2fr";
 
   return (
     <Box
@@ -94,13 +95,24 @@ const MainContent: React.FC = () => {
         h={isMobile ? "auto" : "100%"}
         bg={isMobile ? "#F6F6F6" : "white"}
       >
-        {sections.map((section) => (
-          <Section
-            key={section.area}
-            {...section}
-            isMobile={isMobile as boolean}
-          />
-        ))}
+        {isMobile ? (
+          mobileLayout.map((section) => (
+            <Section key={section.area} {...section} isMobile={true} />
+          ))
+        ) : (
+          <>
+            {sections.map((section) => (
+              <Section key={section.area} {...section} isMobile={false} />
+            ))}
+            <Section
+              key="ad"
+              area="ad"
+              title={t("main.MainContent.advertisement")}
+              Component={AdComponent}
+              isMobile={false}
+            />
+          </>
+        )}
       </Grid>
     </Box>
   );

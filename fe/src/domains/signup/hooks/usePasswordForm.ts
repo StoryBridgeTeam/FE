@@ -1,10 +1,10 @@
 import { useEffect } from "react";
-import { usePasswordStore } from "../stores/usePasswordStore";
-import { useStepsStore } from "../stores/useStepsStore";
+import { useSignUpStore } from "../stores/SignUpStore";
+import { useStepsStore } from "../stores/StepsStore";
 
 export const usePasswordForm = () => {
   const { password, confirmPassword, setPassword, setConfirmPassword } =
-    usePasswordStore();
+    useSignUpStore();
   const { setCondition } = useStepsStore();
 
   const handlePasswordChange = (value: string) => {
@@ -28,7 +28,7 @@ export const usePasswordForm = () => {
   };
 
   const hasPasswordSpecialChar = (): boolean => {
-    return /[!@#$%^&*(),.?":{}|<>]/.test(password);
+    return /[~!@#$%^&*()+|=]/.test(password);
   };
 
   const isSamePassword = (): boolean => {
@@ -45,12 +45,8 @@ export const usePasswordForm = () => {
   };
 
   useEffect(() => {
-    if (isValidPassword() && isSamePassword()) {
-      setCondition(5, true);
-    } else {
-      setCondition(5, false);
-    }
-  }, [password, confirmPassword]);
+    setCondition(5, isValidPassword() && isSamePassword());
+  }, [password, confirmPassword, setCondition]);
 
   return {
     password,

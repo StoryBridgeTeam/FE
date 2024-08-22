@@ -34,7 +34,7 @@ export const SlideUpModal: React.FC<SlideUpModalProps> = ({
       onClose={onClose}
       closeOnOverlayClick={false}
       motionPreset="slideInBottom"
-      size={isMobile ? "full" : "md"}
+      size={isMobile ? "xl" : "md"}
     >
       <ModalOverlay bg="blackAlpha.600" />
       <ModalContent
@@ -44,7 +44,7 @@ export const SlideUpModal: React.FC<SlideUpModalProps> = ({
         bottom={0}
         left={0}
         right={0}
-        mt={isMobile ? 0 : "20vh"}
+        mt={isMobile ? "20vh" : "20vh"}
         transform={isOpen ? "translateY(0)" : "translateY(100%)"}
         transition="transform 0.3s ease"
         p={4}

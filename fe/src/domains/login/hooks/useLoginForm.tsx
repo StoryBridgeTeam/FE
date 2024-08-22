@@ -149,8 +149,13 @@ export const useLoginForm = () => {
 
       try {
         if (response && response.accessToken && response.refreshToken) {
-          const { accessToken, refreshToken } = response;
-          await handleLogin(accessToken, refreshToken, values.rememberMe);
+          const { accessToken, refreshToken, nickname } = response;
+          await handleLogin(
+            accessToken,
+            refreshToken,
+            values.rememberMe,
+            nickname
+          );
         }
       } catch {
         showToast("login.failTitle", "login.loginError", "error");

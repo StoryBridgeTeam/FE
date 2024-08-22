@@ -1,5 +1,4 @@
 import axiosInstance from "../../../common/api/axiosInstance";
-import { getNicknameToken } from "../../../common/utils/nickname";
 
 export const getComments = async (id: number, page: number) => {
   try {
@@ -36,8 +35,9 @@ export const updateComment = async (
   token?: string
 ) => {
   try {
+    const nickName = localStorage.getItem("nickName");
     const response = await axiosInstance.put(`/comments/${commentId}`, {
-      nickName: getNicknameToken(),
+      nickName,
       commentId,
       content: editText,
     });

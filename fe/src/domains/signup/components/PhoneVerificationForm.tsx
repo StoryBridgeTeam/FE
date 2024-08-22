@@ -3,14 +3,18 @@ import { useTranslation } from "react-i18next";
 import { usePhoneVerification } from "../hooks/usePhoneVerification";
 import InputMask from "react-input-mask";
 
+type gender = "MALE" | "FEMALE";
+type telCompany = "SKT" | "KT" | "LGU" | "SKT_MVNO" | "KT_MVNO" | "LGU_MVNO";
+
 const PhoneVerificationForm = () => {
   const { t } = useTranslation();
   const {
-    username,
+    name,
     gender,
-    birthDate,
+    birth,
     phoneNumber,
     telecom,
+    isNational,
     handleNameChange,
     handleGenderChange,
     handleBirthDateChange,
@@ -19,6 +23,7 @@ const PhoneVerificationForm = () => {
     isInputNameValid,
     isInputNumberValid,
     isInputDateValid,
+    handleNationChange,
   } = usePhoneVerification();
 
   return (
@@ -27,15 +32,27 @@ const PhoneVerificationForm = () => {
         인증을 위한 정보를 입력해주세요
       </Text>
       <Stack spacing={10} mt={4} mb={6}>
-        <Input
-          ml="2"
-          isInvalid={username !== "" && !isInputNameValid()}
-          variant="flushed"
-          borderColor="gray.300"
-          placeholder="성명"
-          value={username}
-          onChange={(e) => handleNameChange(e.target.value)}
-        />
+        <InputGroup>
+          <Select
+            ml="2"
+            width="30%"
+            value={isNational.toString()}
+            variant="flushed"
+            onChange={(e) => handleNationChange(e.target.value === "true")}
+          >
+            <option value="true">내국인</option>
+            <option value="false">외국인</option>
+          </Select>
+          <Input
+            ml="2"
+            isInvalid={name !== "" && !isInputNameValid()}
+            variant="flushed"
+            borderColor="gray.300"
+            placeholder="성명"
+            value={name}
+            onChange={(e) => handleNameChange(e.target.value)}
+          />
+        </InputGroup>
 
         <InputGroup>
           <Select
@@ -43,24 +60,24 @@ const PhoneVerificationForm = () => {
             width="30%"
             value={gender}
             variant="flushed"
-            onChange={(e) => handleGenderChange(e.target.value)}
+            onChange={(e) => handleGenderChange(e.target.value as gender)}
           >
             <option value="" disabled style={{ color: "gray" }}>
               성별
             </option>
-            <option value="male">남성</option>
-            <option value="felmale">여성</option>
+            <option value="MALE">남성</option>
+            <option value="FEMALE">여성</option>
           </Select>
           <Input
             ml="2"
-            isInvalid={birthDate !== "" && !isInputDateValid()}
+            isInvalid={birth !== "" && !isInputDateValid()}
             variant="flushed"
             borderColor="gray.300"
             placeholder="생년월일 8자리"
             as={InputMask}
             mask="99999999"
             maskChar={null}
-            value={birthDate}
+            value={birth}
             onChange={(e) => handleBirthDateChange(e.target.value)}
           />
         </InputGroup>
@@ -71,7 +88,7 @@ const PhoneVerificationForm = () => {
             width="30%"
             value={telecom}
             variant="flushed"
-            onChange={(e) => handleTelecomChange(e.target.value)}
+            onChange={(e) => handleTelecomChange(e.target.value as telCompany)}
           >
             <option value="" disabled style={{ color: "gray" }}>
               통신사

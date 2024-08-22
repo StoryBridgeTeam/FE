@@ -1,63 +1,80 @@
-import { useState, useEffect } from "react";
-import { useStepsStore } from "../stores/useStepsStore";
-import { usePhoneVerificationStore } from "../stores/usePhoneVerificationStore";
-import { useVerificationCodeStore } from "../stores/useVerificationCodeStore";
+import { useEffect } from "react";
+import { useSignUpStore } from "../stores/SignUpStore";
+import { useVerificationStore } from "../stores/VerificationStore";
+import { useStepsStore } from "../stores/StepsStore";
+import { requestPhoneVerification } from "../api/auth";
+
+type gender = "MALE" | "FEMALE";
+type telCompany = "SKT" | "KT" | "LGU" | "SKT_MVNO" | "KT_MVNO" | "LGU_MVNO";
 
 export const usePhoneVerification = () => {
-  const { nextStep, setCondition } = useStepsStore();
   const {
-    username,
+    name,
     gender,
-    birthDate,
+    birth,
     phoneNumber,
     telecom,
-    setUsername,
+    isNational, //확정x
+    setName,
     setGender,
-    setBirthDate,
+    setBirth,
     setPhoneNumber,
     setTelecom,
-  } = usePhoneVerificationStore();
-  const { setVerficationCode } = useVerificationCodeStore();
+    setIsNational,
+  } = useSignUpStore();
+  const { setVerificationCode } = useVerificationStore();
+  const { nextStep, setCondition } = useStepsStore();
 
   const handleNameChange = (inputName: string) => {
-    setUsername(inputName);
+    setName(inputName);
   };
 
-  const handleGenderChange = (inputGender: string) => {
+  const handleGenderChange = (inputGender: gender) => {
     setGender(inputGender);
   };
 
   const handleBirthDateChange = (inputDate: string) => {
-    setBirthDate(inputDate);
+    setBirth(inputDate);
   };
 
   const handlePhoneNumberChange = (inputNumber: string) => {
-    const numericValue = inputNumber.replace(/\D/g, ""); //하이푼 제거
+    const numericValue = inputNumber.replace(/\D/g, ""); //숫자만남기기(하이푼제거)
     setPhoneNumber(numericValue);
   };
 
-  const handleTelecomChange = (selectTelecom: string) => {
+  const handleTelecomChange = (selectTelecom: telCompany) => {
     setTelecom(selectTelecom);
   };
 
   const isInputNameValid = (): boolean => {
     const nameRegex = /^[a-zA-Z가-힣\s]+$/;
-
-    return nameRegex.test(username);
+    return nameRegex.test(name);
   };
 
   const isInputDateValid = (): boolean => {
-    return birthDate.length === 8;
+    return birth.length === 8;
   };
 
   const isInputNumberValid = (): boolean => {
     return phoneNumber.length === 11;
   };
 
-  const handleSendRequestPhone = () => {
-    // 인증코드 발송 API 호출, d이후 setVerficationCode에 저장
-    setVerficationCode("123456");
-    nextStep();
+  const handleSendRequestPhone = async () => {
+    // 인증코드 발송 API 호출, 이후 setVerificationCode에 저장
+    try {
+      const response = await requestPhoneVerification({
+        phoneNumber,
+        name,
+        telCompany: telecom,
+        birth,
+        gender,
+      });
+      setVerificationCode(response.data.identityVerificationId);
+      nextStep();
+    } catch (error) {
+      console.log("Error:", error);
+      //에어로직 따로 추가하기
+    }
   };
 
   const isInputValid = (): boolean => {
@@ -70,21 +87,21 @@ export const usePhoneVerification = () => {
     );
   };
 
+  const handleNationChange = (inputNation: boolean) => {
+    setIsNational(inputNation);
+  };
+
   useEffect(() => {
-    if (isInputValid()) {
-      setCondition(3, true);
-      console.log(username + gender + birthDate + phoneNumber + telecom);
-    } else {
-      setCondition(3, false);
-    }
-  }, [username, gender, birthDate, phoneNumber, telecom]);
+    setCondition(3, isInputValid());
+  }, [name, gender, birth, phoneNumber, telecom, setCondition]);
 
   return {
-    username,
+    name,
     gender,
-    birthDate,
+    birth,
     phoneNumber,
     telecom,
+    isNational, //확정x
     handleNameChange,
     handleGenderChange,
     handleBirthDateChange,
@@ -94,85 +111,6 @@ export const usePhoneVerification = () => {
     isInputNameValid,
     isInputNumberValid,
     isInputDateValid,
+    handleNationChange, //확정x
   };
 };
-
-// import { useState, useEffect } from "react";
-// import { useStepsStore } from "../stores/useStepsStore";
-// import { usePhoneVerificationStore } from "../stores/usePhoneVerificationStore";
-// import { useVerificationCodeStore } from "../stores/useVerificationCodeStore";
-
-// interface inputVerificationValues {
-//   name: string;
-//   number: string;
-//   telecom: string;
-// }
-
-// export const usePhoneVerification = () => {
-//   const { nextStep, setCondition } = useStepsStore();
-//   const { setUsername, setPhoneNumber, setTelecom } =
-//     usePhoneVerificationStore();
-
-//   const { setVerficationCode } = useVerificationCodeStore();
-
-//   const [values, setValues] = useState<inputVerificationValues>({
-//     name: "",
-//     number: "",
-//     telecom: "",
-//   });
-
-//   const handleNameChange = (value: string) => {
-//     setValues((prev) => ({
-//       ...prev,
-//       name: value,
-//     }));
-//   };
-
-//   const handlePhoneNumberChange = (value: string) => {
-//     setValues((prev) => ({
-//       ...prev,
-//       number: value,
-//     }));
-//   };
-
-//   const handleTelecomChange = (value: string) => {
-//     setValues((prev) => ({
-//       ...prev,
-//       telecom: value,
-//     }));
-//   };
-
-//   const isInputNameValid = (): boolean => {
-//     const nameRegex = /^[a-zA-Z가-힣\s]+$/;
-//     return nameRegex.test(values.name) && values.number !== "";
-//   };
-
-//   const isInputNumberValid = (): boolean => {
-//     return values.number.length === 13; // 010-1234-5678
-//   };
-
-//   const handleSendRequestPhone = () => {
-//     // 인증코드 발송 API 호출, d이후 setVerficationCode에 저장
-//     setVerficationCode("123456");
-//     nextStep();
-//   };
-
-//   useEffect(() => {
-//     if (isInputNameValid() && isInputNumberValid() && !!values.telecom) {
-//       setUsername(values.name);
-//       setPhoneNumber(values.number.replace(/-/g, "")); // 하이픈 제거
-//       setTelecom(values.telecom);
-//       setCondition(3, true);
-//     } else {
-//       setCondition(3, false);
-//     }
-//   }, [values.name, values.number, values.telecom]);
-
-//   return {
-//     inputs: values,
-//     handleNameChange,
-//     handlePhoneNumberChange,
-//     handleTelecomChange,
-//     handleSendRequestPhone,
-//   };
-// };

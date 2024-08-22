@@ -11,7 +11,8 @@ import {
   Text,
   useBreakpointValue,
 } from "@chakra-ui/react";
-import { getNicknameToken } from "../../../common/utils/nickname";
+import { useAuthStore } from "../../../common/stores/AuthStore";
+import { use } from "i18next";
 
 const ProfileForm: React.FC = () => {
   const isMobile = useBreakpointValue({ base: true, md: false });
@@ -20,9 +21,6 @@ const ProfileForm: React.FC = () => {
   const [image, setImage] = useState<string>("");
   const [profile, setProfile] = useState({
     nickname: "",
-    existPassword: "",
-    newPassword: "",
-    correctPassword: "",
   });
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -101,7 +99,7 @@ const ProfileForm: React.FC = () => {
             닉네임
           </Text>
           <Input
-            placeholder={getNicknameToken()}
+            placeholder={useAuthStore().nickname}
             name="nickname"
             value={profile.nickname}
             onChange={handleInputChange}
@@ -123,25 +121,22 @@ const ProfileForm: React.FC = () => {
           <Flex w={"50%"} direction={"column"}>
             <Input
               placeholder={"기존 비밀번호"}
-              type="password"
-              name="existPassword"
-              value={profile.existPassword}
-              onChange={handleInputChange}
-              mb={3}
-            />
-            <Input
-              placeholder={"새 비밀번호"}
-              type="password"
-              name="newPassword"
-              value={profile.newPassword}
+              name="기존 비밀번호"
+              value={profile.nickname}
               onChange={handleInputChange}
               mb={3}
             />
             <Input
               placeholder={"새 비밀번호 확인"}
-              type="password"
-              name="correctPassword"
-              value={profile.correctPassword}
+              name="새 비밀번호 확인"
+              value={profile.nickname}
+              onChange={handleInputChange}
+              mb={3}
+            />
+            <Input
+              placeholder={"새 비밀번호 확인"}
+              name="새 비밀번호 확인"
+              value={profile.nickname}
               onChange={handleInputChange}
             />
           </Flex>

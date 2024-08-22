@@ -2,7 +2,7 @@ import { Flex, useBreakpointValue } from "@chakra-ui/react";
 import { FC } from "react";
 import LoginAppBar from "../../common/components/LoginAppBar";
 import { useToastMessage } from "../../common/hooks/useToastMessage";
-import { useAuthStore } from "../login/stores/useAuthStore";
+import { useAuthStore } from "../../common/stores/AuthStore";
 import DynamicForm from "./components/DynamicForm";
 
 const MyPage: FC = () => {

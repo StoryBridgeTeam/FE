@@ -3,13 +3,16 @@ import axios from "axios";
 
 export const getCard = async (nickname: string, token?: string) => {
   try {
-    const response = await axiosInstance.get(`/members/${nickname}/card`, {
-      params: {
-        type: "DETAIL",
-        token,
-      },
-    });
-    return response.data;
+    const response = await axiosInstance.get(
+      `/members/${nickname}/public-card`,
+      {
+        params: {
+          type: "BRIEF",
+          token,
+        },
+      }
+    );
+    return response.data.data.entries;
   } catch (error) {
     if (axios.isAxiosError(error)) {
       if (error.response?.data?.code === 4040000) {

@@ -16,6 +16,7 @@ import CommentList from "./CommentList";
 import { useCommentStore } from "../Store/CommentStore";
 import { renderContentWithIcons } from "./renderContentWithIcons";
 import { useProfileStore } from "../Store/useProfileStore";
+import { useParams } from "react-router-dom";
 
 interface DetailPageProps {
   id: number;
@@ -37,6 +38,9 @@ const DetailPage: React.FC<DetailPageProps> = ({
   const [editedTitle, setEditedTitle] = useState<string>(data.title);
   const [editedContent, setEditedContent] = useState<string>(data.content);
   const { isEdit, setEdit } = useProfileStore();
+  const { nickName } = useParams<{ nickName: string }>();
+  const name = localStorage.getItem("nickName");
+  const ishost = nickName === name;
 
   const handleEditClick = () => {
     setEdit(true);
@@ -115,9 +119,11 @@ const DetailPage: React.FC<DetailPageProps> = ({
             <Check size={24} color="black" />
           </Button>
         ) : (
-          <Button onClick={handleEditClick}>
-            <Edit size={24} color="black" />
-          </Button>
+          ishost && (
+            <Button onClick={handleEditClick}>
+              <Edit size={24} color="black" />
+            </Button>
+          )
         )}
       </Flex>
       <Flex
