@@ -1,11 +1,11 @@
 import { Flex, useBreakpointValue, Box } from "@chakra-ui/react";
 import LoginAppBar from "../../common/components/LoginAppBar";
-import { useAuthStore } from "../../common/stores/AuthStore";
 import { useToastMessage } from "../../common/hooks/useToastMessage";
 import { FC } from "react";
 import { useNavigate } from "react-router-dom";
 import AmtTree from "./components/AmtTree";
 import NetWork from "./components/NewWork";
+import { useAuthStore } from "../../common/stores/AuthStore";
 
 const AmtPage: FC = () => {
   const isMobile = useBreakpointValue({ base: true, md: false });
@@ -32,7 +32,7 @@ const AmtPage: FC = () => {
       <Flex
         mt={isMobile ? "50px" : "60px"}
         minH={isMobile ? "calc(100vh - 50px)" : "calc(100vh - 60px)"}
-        direction={isMobile ? "column" : "row"}
+        direction={isMobile ? "column-reverse" : "row"}
       >
         <AmtTree />
         <NetWork />

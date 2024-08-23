@@ -42,7 +42,6 @@ type EducationItem = {
 const ProfileSidebar: FC = () => {
   const { nickName } = useParams<{ nickName: string }>();
   const isMobile = useBreakpointValue({ base: true, md: false });
-  console.log("isMobile2", isMobile);
   const name = localStorage.getItem("nickName");
   const { t } = useTranslation();
   const [aboutMe, setAboutMe] = useState<AboutMeItem[]>([]);
@@ -103,7 +102,6 @@ const ProfileSidebar: FC = () => {
   useEffect(() => {
     fetchCardData();
     fetchAdditionalInfo();
-    console.log("isMobile", isMobile);
   }, [fetchCardData, fetchAdditionalInfo]);
 
   const addEducation = async () => {

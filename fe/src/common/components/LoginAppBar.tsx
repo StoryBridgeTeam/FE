@@ -10,7 +10,7 @@ import {
 } from "@chakra-ui/react";
 import { FaRegBell, FaSearch } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams, useLocation } from "react-router-dom";
 
 interface LoginAppBarProps {
   field1?: string;
@@ -31,7 +31,22 @@ const LoginAppBar: React.FC<LoginAppBarProps> = ({
   const isMobile = useBreakpointValue({ base: true, md: false });
   const appBarHeight = isMobile ? "50px" : "60px";
   const navigate = useNavigate();
-  const nickName = localStorage.getItem("nickName");
+  const { nickName } = useParams<{ nickName: string }>();
+  const location = useLocation();
+
+  const queryParams = new URLSearchParams(location.search);
+  const token = queryParams.get("token");
+
+  const handleNavigate = () => {
+    const url = `/${nickName}`;
+    const searchParams = new URLSearchParams();
+
+    if (token) {
+      searchParams.append("token", token);
+    }
+
+    navigate(`${url}?${searchParams.toString()}`, { replace: true });
+  };
 
   return (
     <Flex
@@ -52,9 +67,8 @@ const LoginAppBar: React.FC<LoginAppBarProps> = ({
         fontWeight="700"
         align={"center"}
         paddingLeft={isMobile ? "15px" : "20px"}
-        onClick={() => {
-          navigate(`/${nickName}`, { replace: true });
-        }}
+        cursor={"pointer"}
+        onClick={handleNavigate}
       >
         StoryBridge
       </Text>
@@ -92,7 +106,7 @@ const LoginAppBar: React.FC<LoginAppBarProps> = ({
             as={FaSearch}
           ></Text>
         )}
-        {field1 && (
+        {field1 && !token && (
           <Text
             marginLeft={3}
             fontSize={isMobile ? "xs" : "md"}
@@ -104,7 +118,7 @@ const LoginAppBar: React.FC<LoginAppBarProps> = ({
             {t(field1)}
           </Text>
         )}
-        {field2 && (
+        {field2 && !token && (
           <Text
             marginLeft={3}
             fontSize={isMobile ? "xs" : "md"}

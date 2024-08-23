@@ -1,9 +1,15 @@
 import axiosInstance from "../../../common/api/axiosInstance";
 
-export const getComments = async (id: number, page: number) => {
+export const getComments = async (id: number, page: number, token?: string) => {
   try {
     const response = await axiosInstance.get(
-      `/cover-letter/${id}/comments?page=${page}`
+      `/cover-letter/${id}/comments?page=${page}`,
+      {
+        params: {
+          type: "BRIEF",
+          token,
+        },
+      }
     );
     return response.data.data.comments.content;
   } catch (error) {
@@ -20,7 +26,13 @@ export const postComment = async (
   try {
     const response = await axiosInstance.post(
       `/cover-letter/${id}/comments`,
-      comment
+      comment,
+      {
+        params: {
+          type: "BRIEF",
+          token,
+        },
+      }
     );
     return response.data.data;
   } catch (error) {
@@ -36,11 +48,20 @@ export const updateComment = async (
 ) => {
   try {
     const nickName = localStorage.getItem("nickName");
-    const response = await axiosInstance.put(`/comments/${commentId}`, {
-      nickName,
-      commentId,
-      content: editText,
-    });
+    const response = await axiosInstance.put(
+      `/comments/${commentId}`,
+      {
+        nickName,
+        commentId,
+        content: editText,
+      },
+      {
+        params: {
+          type: "BRIEF",
+          token,
+        },
+      }
+    );
     return response.data;
   } catch (error) {
     console.error("Failed to update comment:", error);
@@ -48,9 +69,17 @@ export const updateComment = async (
   }
 };
 
-export const deleteCommentServer = async (commentId: number) => {
+export const deleteCommentServer = async (
+  commentId: number,
+  token?: string
+) => {
   try {
-    const response = await axiosInstance.delete(`/comments/${commentId}`);
+    const response = await axiosInstance.delete(`/comments/${commentId}`, {
+      params: {
+        type: "BRIEF",
+        token,
+      },
+    });
     return response.data;
   } catch (error) {
     console.error("Failed to delete comment:", error);

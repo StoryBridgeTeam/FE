@@ -4,12 +4,12 @@ interface AuthState {
   isAuthenticated: boolean;
   accessToken: string | null;
   refreshToken: string | null;
-  nickname: string;
+  nickName: string;
   login: (
     accessToken: string,
     refreshToken: string,
     rememberMe: boolean,
-    nickname: string
+    nickName: string
   ) => void;
   logout: () => void;
   checkAuth: () => Promise<void>;
@@ -19,16 +19,16 @@ export const useAuthStore = create<AuthState>((set) => ({
   isAuthenticated: false,
   accessToken: null,
   refreshToken: null,
-  nickname: "",
+  nickName: "",
   login: (
     accessToken: string,
     refreshToken: string,
     rememberMe: boolean,
-    nickname: string
+    nickName: string
   ) => {
     localStorage.setItem("accessToken", accessToken);
     localStorage.setItem("refreshToken", refreshToken);
-    localStorage.setItem("nickName", nickname);
+    localStorage.setItem("nickName", nickName);
     set({ isAuthenticated: true, accessToken, refreshToken });
   },
   logout: () => {
@@ -49,11 +49,22 @@ export const useAuthStore = create<AuthState>((set) => ({
     if (accessToken && refreshToken && nickName) {
       set({ isAuthenticated: true, accessToken, refreshToken });
     } else {
-      set({
-        isAuthenticated: false,
-        accessToken: null,
-        refreshToken: null,
-      });
+      const queryParams = new URLSearchParams(window.location.search);
+      const token = queryParams.get("token");
+
+      if (token) {
+        set({
+          isAuthenticated: true,
+          accessToken: null,
+          refreshToken: null,
+        });
+      } else {
+        set({
+          isAuthenticated: false,
+          accessToken: null,
+          refreshToken: null,
+        });
+      }
     }
   },
 }));

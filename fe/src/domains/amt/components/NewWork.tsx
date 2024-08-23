@@ -1,34 +1,86 @@
 import {
+  Text,
   Flex,
-  useBreakpointValue,
   Box,
   CircularProgress,
   CircularProgressLabel,
+  Avatar,
+  AvatarGroup,
+  useBreakpointValue,
 } from "@chakra-ui/react";
 
 const NetWork = () => {
   const isMobile = useBreakpointValue({ base: true, md: false });
-
   return (
-    <Box
-      p={4}
-      bg="white"
-      shadow="md"
+    <Flex
+      p={6}
+      shadow="lg"
       borderRadius="3xl"
       mt={"40px"}
-      width="400px"
-      h="200px"
-      border={"1px solid black"}
-      alignContent={"center"}
+      width={isMobile ? "100% " : "400px"}
+      h="240px"
+      border={"1px solid"}
+      borderColor={"gray.200"}
+      alignItems={"center"}
+      justifyContent={"space-between"}
+      direction={"column"}
     >
-      <CircularProgress value={40} size={"150px"}>
-        <CircularProgressLabel fontSize={"20px"}>
-          총 점수
-          <br />
-          40
-        </CircularProgressLabel>
-      </CircularProgress>
-    </Box>
+      <Box
+        w={"200px"}
+        h={"30px"}
+        mb={4}
+        textAlign={"center"}
+        borderRadius="xl"
+        border={"1px solid"}
+        borderColor={"gray.200"}
+        shadow="lg"
+      >
+        <Text fontWeight={"bold"} color={"gray.700"}>
+          Activity 지수
+        </Text>
+      </Box>
+      <Flex w={"100%"} alignItems={"center"} justifyContent={"space-around"}>
+        <CircularProgress value={40} size={"120px"} color={"gray.400"}>
+          <CircularProgressLabel fontSize={"20px"} color={"blue.700"}>
+            총 점수
+            <br />
+            40
+          </CircularProgressLabel>
+        </CircularProgress>
+        <Box ml={4} textAlign={"left"}>
+          <Text fontSize={"lg"} fontWeight={"semibold"} color={"gray.600"}>
+            온라인 활동 30점
+          </Text>
+          <AvatarGroup size="sm" max={6} mb={2}>
+            <Avatar name="Profile 1" src="https://bit.ly/dan-abramov" />
+            <Avatar name="Profile 2" src="https://bit.ly/ryan-florence" />
+            <Avatar name="Profile 3" src="https://bit.ly/kent-c-dodds" />
+            <Avatar name="Profile 4" src="https://bit.ly/prosper-baba" />
+            <Avatar name="Profile 5" src="https://bit.ly/code-beast" />
+            <Avatar name="Profile 6" src="https://bit.ly/sage-adebayo" />
+            <Text fontSize="lg" ml={2} color="gray.600">
+              ...
+            </Text>
+          </AvatarGroup>
+
+          <Text fontSize={"lg"} fontWeight={"semibold"} color={"gray.600"}>
+            오프라인 활동 10점
+          </Text>
+
+          <AvatarGroup size="sm" max={6} mb={2}>
+            <Avatar name="Profile 1" src="https://bit.ly/dan-abramov" />
+            <Avatar name="Profile 2" src="https://bit.ly/ryan-florence" />
+            <Avatar name="Profile 3" src="https://bit.ly/kent-c-dodds" />
+            <Avatar name="Profile 4" src="https://bit.ly/prosper-baba" />
+            <Avatar name="Profile 5" src="https://bit.ly/code-beast" />
+            <Avatar name="Profile 6" src="https://bit.ly/sage-adebayo" />
+            <Text fontSize="lg" ml={2} color="gray.600">
+              ...
+            </Text>
+          </AvatarGroup>
+        </Box>
+      </Flex>
+    </Flex>
   );
 };
 

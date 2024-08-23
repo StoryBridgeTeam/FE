@@ -22,10 +22,15 @@ export const getCard = async (nickname: string, token?: string) => {
   }
 };
 
-export const getAdditionalInfo = async (nickname: string) => {
+export const getAdditionalInfo = async (nickname: string, token?: string) => {
   try {
     const response = await axiosInstance.get(
-      `/members/${nickname}/card/additional-info`
+      `/members/${nickname}/card/additional-info`,
+      {
+        params: {
+          token,
+        },
+      }
     );
     return response.data.data;
   } catch (error) {

@@ -10,6 +10,7 @@ import MainPage from "./domains/main/MainPage";
 import MyPage from "./domains/mypage/MyPage";
 import AmtPage from "./domains/amt/AmtPage";
 import POIPage from "./domains/poi/POIPage";
+import DetailPage from "./domains/info/components/DetailPage";
 
 const theme = extendTheme({
   fonts: {
@@ -45,6 +46,10 @@ function App() {
           <Route
             path="/:nickName/info"
             element={<PrivateRoute element={<InfoPage />} />}
+          />
+          <Route
+            path="/:nickName/info/:id"
+            element={<PrivateRoute element={<DetailPage />} />}
           />
           <Route
             path="/:nickName/amt"

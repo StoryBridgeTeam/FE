@@ -99,7 +99,7 @@ const ProfileForm: React.FC = () => {
             닉네임
           </Text>
           <Input
-            placeholder={useAuthStore().nickname}
+            placeholder={useAuthStore().nickName}
             name="nickname"
             value={profile.nickname}
             onChange={handleInputChange}

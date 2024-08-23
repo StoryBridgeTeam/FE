@@ -9,7 +9,6 @@ import {
 } from "@chakra-ui/react";
 import { FC, useEffect, useState } from "react";
 import { Edit, Check } from "tabler-icons-react";
-import DetailPage from "./DetailPage";
 import { useTranslation } from "react-i18next";
 import TextSection from "./TextSection";
 import ProfileSidebar from "./ProfileSideBar";
@@ -18,11 +17,11 @@ import {
   deleteCoverLetters,
   getCoverLetters,
   postCoverLetters,
-  putCoverLetters,
 } from "../api/InfoAPI";
 import { useCommentStore } from "../Store/CommentStore";
 import { getComments } from "../api/CommentAPI";
-import { useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
+import InviteModal from "../../../common/components/InviteModal";
 
 interface MockData {
   id: number;
@@ -41,11 +40,24 @@ const MainContent: FC = () => {
   const { setComments } = useCommentStore();
   const name = localStorage.getItem("nickName");
   const ishost = nickName === name;
+  const navigte = useNavigate();
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const token = queryParams.get("token");
 
   const fetchCoverData = async () => {
     try {
       setLoading(true);
-      const { entries } = await getCoverLetters(nickName!);
+      let entries;
+
+      if (token) {
+        const response = await getCoverLetters(nickName!, token);
+        entries = response.entries;
+      } else {
+        const response = await getCoverLetters(nickName!);
+        entries = response.entries;
+      }
+
       if (entries.content === null) {
         setMockData([]);
       } else {
@@ -76,11 +88,7 @@ const MainContent: FC = () => {
     }
 
     setSelectedId(id);
-  };
-
-  const handleBackClick = () => {
-    setComments([]);
-    setSelectedId(null);
+    navigte(`/${nickName}/info/${id}`);
   };
 
   const handleEditClick = () => {
@@ -105,14 +113,6 @@ const MainContent: FC = () => {
     await fetchCoverData();
   };
 
-  const handleSaveDetail = async (
-    id: number,
-    updatedData: { title: string; content: string }
-  ) => {
-    await putCoverLetters(nickName!, { ...updatedData, id });
-    await fetchCoverData();
-  };
-
   return (
     <>
       {isMobile && selectedId ? undefined : <ProfileSidebar />}
@@ -121,13 +121,6 @@ const MainContent: FC = () => {
           <Flex justifyContent="center" alignItems="center" h="100vh">
             <Spinner />
           </Flex>
-        ) : selectedId ? (
-          <DetailPage
-            id={selectedId}
-            data={mockData.find((item) => item.id === selectedId)!}
-            onSave={handleSaveDetail}
-            onBack={handleBackClick}
-          />
         ) : (
           <>
             {ishost && (
@@ -142,9 +135,12 @@ const MainContent: FC = () => {
                     <Check size={24} color="black" />
                   </Button>
                 ) : (
-                  <Button onClick={handleEditClick}>
-                    <Edit size={24} color="black" />
-                  </Button>
+                  <>
+                    <Button onClick={handleEditClick}>
+                      <Edit size={24} color="black" />
+                    </Button>
+                    <InviteModal />
+                  </>
                 )}
               </Flex>
             )}
