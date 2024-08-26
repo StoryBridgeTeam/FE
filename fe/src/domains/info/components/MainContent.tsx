@@ -40,7 +40,7 @@ const MainContent: FC = () => {
   const { setComments } = useCommentStore();
   const name = localStorage.getItem("nickName");
   const ishost = nickName === name;
-  const navigte = useNavigate();
+  const navigate = useNavigate();
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const token = queryParams.get("token");
@@ -77,8 +77,12 @@ const MainContent: FC = () => {
 
   const handleSectionClick = async (id: number) => {
     try {
-      const response = await getComments(id, 0);
-      if (response) {
+      let response;
+      if (token) {
+        response = await getComments(id, 0, token);
+      } else {
+        response = await getComments(id, 0);
+      }      if (response) {
         setComments(response);
       } else {
         setComments([]);
@@ -88,7 +92,14 @@ const MainContent: FC = () => {
     }
 
     setSelectedId(id);
-    navigte(`/${nickName}/info/${id}`);
+    const url = `/${nickName}/info/${id}`;
+    const searchParams = new URLSearchParams();
+
+    if (token) {
+      searchParams.append("token", token);
+    }
+
+    navigate(`${url}?${searchParams.toString()}`, { replace: true });
   };
 
   const handleEditClick = () => {

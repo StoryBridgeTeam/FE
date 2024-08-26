@@ -31,6 +31,7 @@ import {
   updateComment,
   tagComment,
 } from "../api/CommentAPI";
+import { useLocation } from "react-router-dom";
 
 interface CommentListProps {
   id: number;
@@ -61,6 +62,10 @@ const CommentList: React.FC<CommentListProps> = ({
     onClose: onConnectClose,
   } = useDisclosure();
   const { showToast } = useToastMessage();
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const token = queryParams.get("token");
+
   const { t } = useTranslation();
   const {
     selectedText,
@@ -82,7 +87,12 @@ const CommentList: React.FC<CommentListProps> = ({
   const fetchCommentData = async (page: number) => {
     try {
       setLoading(true);
-      const response = await getComments(id, page);
+      let response;
+      if (token) {
+        response = await getComments(id, page, token);
+      } else {
+        response = await getComments(id, page);
+      }
       if (page > 0 && response && response.length > 0) {
         setComments([...comments, ...response]);
       } else if (response && response.length > 0) {

@@ -19,7 +19,8 @@ export const getCoverLetters = async (nickname: string, token?: string) => {
 
 export const putCoverLetters = async (
   nickname: string,
-  entries: { id: number; title: string; content: string }
+  entries: { id: number; title: string; content: string },
+  imageIds: number[]
 ) => {
   try {
     const response = await axiosInstance.put(
@@ -27,6 +28,7 @@ export const putCoverLetters = async (
       {
         title: entries.title,
         content: entries.content,
+        imageIds,
       }
     );
     return response.data.data;

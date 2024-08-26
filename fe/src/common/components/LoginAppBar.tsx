@@ -130,6 +130,27 @@ const LoginAppBar: React.FC<LoginAppBarProps> = ({
             {t(field2)}
           </Text>
         )}
+        {token && (
+          <Text
+            marginLeft={3}
+            fontSize={isMobile ? "xs" : "md"}
+            lineHeight={appBarHeight}
+            fontWeight="400"
+            cursor="pointer"
+            onClick={() => {
+              const url = `/signup`;
+              const searchParams = new URLSearchParams();
+
+              if (token) {
+                searchParams.append("token", token);
+              }
+
+              navigate(`${url}?${searchParams.toString()}`, { replace: true });
+            }}
+          >
+            {"회원가입"}
+          </Text>
+        )}
         <Box
           as={FaRegBell}
           fontSize="lg"
