@@ -30,7 +30,7 @@ const AmtPage: FC = () => {
         }}
       />
       <Flex
-        mt={isMobile ? "50px" : "60px"}
+        mt={isMobile ? "10px" : "60px"}
         minH={isMobile ? "calc(100vh - 50px)" : "calc(100vh - 60px)"}
         direction={isMobile ? "column-reverse" : "row"}
       >
