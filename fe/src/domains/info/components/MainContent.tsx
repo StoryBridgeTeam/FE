@@ -1,3 +1,4 @@
+import React, { FC, useState, useEffect } from "react";
 import {
   Container,
   Button,
@@ -6,8 +7,8 @@ import {
   useBreakpointValue,
   Text,
   Spinner,
+  useDisclosure,
 } from "@chakra-ui/react";
-import { FC, useEffect, useState } from "react";
 import { Edit, Check } from "tabler-icons-react";
 import { useTranslation } from "react-i18next";
 import TextSection from "./TextSection";
@@ -44,6 +45,8 @@ const MainContent: FC = () => {
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const token = queryParams.get("token");
+
+  const { isOpen, onOpen, onClose } = useDisclosure();
 
   const fetchCoverData = async () => {
     try {
@@ -150,7 +153,7 @@ const MainContent: FC = () => {
                     <Button onClick={handleEditClick}>
                       <Edit size={24} color="black" />
                     </Button>
-                    <InviteModal />
+                    <Button onClick={onOpen}>링크 생성</Button>
                   </>
                 )}
               </Flex>
@@ -183,6 +186,8 @@ const MainContent: FC = () => {
           </>
         )}
       </Container>
+
+      <InviteModal isOpen={isOpen} onClose={onClose} />
     </>
   );
 };

@@ -138,6 +138,7 @@ const LoginAppBar: React.FC<LoginAppBarProps> = ({
             fontWeight="400"
             cursor="pointer"
             onClick={() => {
+
               const url = `/signup`;
               const searchParams = new URLSearchParams();
 
@@ -149,6 +150,7 @@ const LoginAppBar: React.FC<LoginAppBarProps> = ({
             }}
           >
             {"회원가입"}
+
           </Text>
         )}
         <Box

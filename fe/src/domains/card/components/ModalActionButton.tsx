@@ -1,48 +1,46 @@
+import React from "react";
 import { Box, Button, Flex, Spacer } from "@chakra-ui/react";
 import { Check, Edit, Plus } from "tabler-icons-react";
-import { useCardEdit } from "../hooks/useCardEdit";
-import { CardType } from "../types/cardTypes";
-import { useCardStore } from "../stores/cardStore";
+import { EntryState, ModalElementProps } from "../types/cardTypes";
+import { useCard } from "../hooks/useCard";
 
-interface ModalActionButtonsProps {
-  cardType: CardType;
-  isEditing: boolean;
-  setIsEditing: (isEditing: boolean) => void;
-}
-
-const ModalActionButtons: React.FC<ModalActionButtonsProps> = ({
+const ModalActionButtons: React.FC<ModalElementProps> = ({
   cardType,
   isEditing,
+  nickName,
+  entries,
   setIsEditing,
+  setEntries,
 }) => {
-  const {
-    tempEntries,
-    handleAddTempEntry,
-    copyCardToTemp,
-    handleUpdateOriginalCard,
-    handleUpdatePublicCard,
-  } = useCardEdit();
-  const { hasCard } = useCardStore();
+  const { editOriginalCard, editPublicCard } = useCard();
 
   const onEdit = () => {
     setIsEditing(true);
-    copyCardToTemp(cardType);
   };
 
   const onSave = () => {
     setIsEditing(false);
-    if (!hasCard) {
-      return;
-    }
-    if (cardType === "public") {
-      handleUpdatePublicCard();
-    } else {
-      handleUpdateOriginalCard();
+    if (cardType === "NEW") {
+      // editPublicCard(nickName, entries);
+      // editOriginalCard(nickName, entries);
+    } else if (cardType === "PUBLIC") {
+      editPublicCard(nickName, entries);
+    } else if (cardType === "ORIGINAL") {
+      editOriginalCard(nickName, entries);
     }
   };
 
   const onAddNew = () => {
-    handleAddTempEntry();
+    setEntries([
+      ...entries,
+      {
+        id: -Date.now(),
+        title: "",
+        content: "",
+        index: entries.length,
+        isVisibleBriefCard: true,
+      },
+    ]);
   };
 
   return (

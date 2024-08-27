@@ -1,4 +1,3 @@
-//카드컴포넌트와 카드모달창(편집상태)에서 엔트리 항목을 출력해주는 컴포넌트
 import React from "react";
 import { Trash } from "tabler-icons-react";
 import CardInfoItem from "./CardInfoItem";
@@ -11,16 +10,31 @@ import {
   Input,
   ListItem,
 } from "@chakra-ui/react";
-import { useTempStore } from "../stores/tempStore";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { CardModalItemProps } from "../types/cardTypes";
 
-interface CardModalItemProps {
-  entry: EntryState;
-  isEditing: boolean;
-}
+// 카드 컴포넌트와 카드 모달 창(편집 상태)에서 엔트리 항목을 출력해주는 컴포넌트
+const CardModalItem: React.FC<CardModalItemProps> = ({
+  entry,
+  isEditing,
+  onChangeEntry,
+  onDeleteEntry,
+}) => {
+  const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    onChangeEntry(entry.id, { title: e.target.value });
+  };
 
-const CardModalItem: React.FC<CardModalItemProps> = ({ entry, isEditing }) => {
-  const { modifyTempEntry, deleteTempEntry } = useTempStore();
+  const handleContentChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    onChangeEntry(entry.id, { content: e.target.value });
+  };
+
+  const handleVisibilityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    onChangeEntry(entry.id, { isVisibleBriefCard: e.target.checked });
+  };
+
+  const handleDeleteClick = () => {
+    onDeleteEntry(entry.id);
+  };
 
   return (
     <ListItem>
@@ -28,19 +42,13 @@ const CardModalItem: React.FC<CardModalItemProps> = ({ entry, isEditing }) => {
         <Flex alignItems="center">
           <Checkbox
             isChecked={entry.isVisibleBriefCard}
-            onChange={(e) =>
-              modifyTempEntry(entry.id, {
-                isVisibleBriefCard: e.target.checked,
-              })
-            }
+            onChange={handleVisibilityChange}
             m={2}
             size="lg"
           />
           <Input
             value={entry.title}
-            onChange={(e) =>
-              modifyTempEntry(entry.id, { title: e.target.value })
-            }
+            onChange={handleTitleChange}
             fontWeight="bold"
             size="sm"
             width="35%"
@@ -49,31 +57,24 @@ const CardModalItem: React.FC<CardModalItemProps> = ({ entry, isEditing }) => {
           />
           <Input
             value={entry.content}
-            onChange={(e) =>
-              modifyTempEntry(entry.id, { content: e.target.value })
-            }
+            onChange={handleContentChange}
             size="sm"
             width="65%"
             placeholder="설명"
           />
-
-          <Button
-            size="sm"
-            onClick={() => deleteTempEntry(entry.id)}
-            bg="white"
-          >
+          <Button size="sm" onClick={handleDeleteClick} bg="white">
             <Trash color="red" />
           </Button>
         </Flex>
       ) : (
-        <>
+        <Flex alignItems="center">
           <CardInfoItem key={entry.id} {...entry} />
           <Icon
             as={entry.isVisibleBriefCard ? FaEye : FaEyeSlash}
             color={entry.isVisibleBriefCard ? "blue.500" : "red.500"}
             ml={2}
           />
-        </>
+        </Flex>
       )}
     </ListItem>
   );
