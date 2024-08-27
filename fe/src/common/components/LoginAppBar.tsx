@@ -138,10 +138,19 @@ const LoginAppBar: React.FC<LoginAppBarProps> = ({
             fontWeight="400"
             cursor="pointer"
             onClick={() => {
-              navigate(`/signup?token=${token}`);
+
+              const url = `/signup`;
+              const searchParams = new URLSearchParams();
+
+              if (token) {
+                searchParams.append("token", token);
+              }
+
+              navigate(`${url}?${searchParams.toString()}`, { replace: true });
             }}
           >
-            회원가입
+            {"회원가입"}
+
           </Text>
         )}
         <Box

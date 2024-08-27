@@ -162,7 +162,7 @@ const AmtTree = () => {
           />
         </HStack>
 
-        <Box position="relative" mb={5} pr={20}>
+        <Box position="relative" mb={5} pr={isMobile ? 5 : 20}>
           <Flex
             overflowX="auto"
             whiteSpace="nowrap"
@@ -196,7 +196,7 @@ const AmtTree = () => {
           <Box
             position="absolute"
             top={0}
-            right={20}
+            right={isMobile ? 0 : 20}
             height="100%"
             width="40px"
             bgGradient="linear(to-l, rgba(255,255,255,0.7), transparent)"
@@ -206,7 +206,12 @@ const AmtTree = () => {
             pointerEvents="none"
             zIndex={1}
           >
-            <Icon ml={20} as={ChevronRightIcon} boxSize={6} color="gray.600" />
+            <Icon
+              ml={isMobile ? 5 : 20}
+              as={ChevronRightIcon}
+              boxSize={6}
+              color="gray.600"
+            />
           </Box>
         </Box>
 
@@ -226,7 +231,7 @@ const AmtTree = () => {
                 </Text>
               </HStack>
             ) : (
-              <Box position="relative" pr={20}>
+              <Box position="relative" pr={isMobile ? 5 : 20}>
                 <Flex
                   overflowX="auto"
                   whiteSpace="nowrap"
@@ -260,7 +265,7 @@ const AmtTree = () => {
                 <Box
                   position="absolute"
                   top={0}
-                  right={20}
+                  right={isMobile ? 0 : 20}
                   height="100%"
                   width="40px"
                   bgGradient="linear(to-l, rgba(255,255,255,0.7), transparent)"
@@ -271,7 +276,7 @@ const AmtTree = () => {
                   zIndex={1}
                 >
                   <Icon
-                    ml={20}
+                    ml={isMobile ? 5 : 20}
                     as={ChevronRightIcon}
                     boxSize={6}
                     color="gray.600"

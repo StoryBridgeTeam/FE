@@ -80,8 +80,12 @@ const MainContent: FC = () => {
 
   const handleSectionClick = async (id: number) => {
     try {
-      const response = await getComments(id, 0);
-      if (response) {
+      let response;
+      if (token) {
+        response = await getComments(id, 0, token);
+      } else {
+        response = await getComments(id, 0);
+      }      if (response) {
         setComments(response);
       } else {
         setComments([]);
@@ -91,7 +95,14 @@ const MainContent: FC = () => {
     }
 
     setSelectedId(id);
-    navigate(`/${nickName}/info/${id}`);
+    const url = `/${nickName}/info/${id}`;
+    const searchParams = new URLSearchParams();
+
+    if (token) {
+      searchParams.append("token", token);
+    }
+
+    navigate(`${url}?${searchParams.toString()}`, { replace: true });
   };
 
   const handleEditClick = () => {

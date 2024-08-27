@@ -27,7 +27,7 @@ import {
   createAdditionalInfo,
   deleteAdditionalInfo,
 } from "../api/SideBarAPI";
-import { useParams } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
 type AboutMeItem = { [key: string]: string };
@@ -70,9 +70,20 @@ const ProfileSidebar: FC = () => {
   const [selectedEducation, setSelectedEducation] =
     useState<EducationItem | null>(null);
 
+  const location = useLocation();
+
+  const queryParams = new URLSearchParams(location.search);
+  const token = queryParams.get("token");
+
   const fetchAdditionalInfo = useCallback(async () => {
     try {
-      const additionalInfo = await getAdditionalInfo(nickName!);
+      let additionalInfo;
+      if (token) {
+        additionalInfo = await getAdditionalInfo(nickName!, token);
+      } else {
+        additionalInfo = await getAdditionalInfo(nickName!);
+      }
+
       if (Array.isArray(additionalInfo)) {
         setEducation(additionalInfo);
       } else {
@@ -87,7 +98,12 @@ const ProfileSidebar: FC = () => {
 
   const fetchCardData = useCallback(async () => {
     try {
-      const card = await getCard(nickName!);
+      let card;
+      if (token) {
+        card = await getCard(nickName!, token);
+      } else {
+        card = await getCard(nickName!);
+      }
       if (Array.isArray(card)) {
         setAboutMe(card);
       } else {
@@ -178,9 +194,7 @@ const ProfileSidebar: FC = () => {
 
     return aboutMe.map((item, index) => (
       <Flex key={index} justify="space-between" align="center" mb={2}>
-        <Text whiteSpace="pre-wrap">{`• ${Object.keys(item)[0]}: ${
-          item[Object.keys(item)[0]]
-        }`}</Text>
+        <Text whiteSpace="pre-wrap">{`• ${item.title}: ${item.content}`}</Text>
       </Flex>
     ));
   };

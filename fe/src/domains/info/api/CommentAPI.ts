@@ -6,7 +6,6 @@ export const getComments = async (id: number, page: number, token?: string) => {
       `/cover-letter/${id}/comments?page=${page}`,
       {
         params: {
-          type: "BRIEF",
           token,
         },
       }
@@ -29,7 +28,6 @@ export const postComment = async (
       comment,
       {
         params: {
-          type: "BRIEF",
           token,
         },
       }
@@ -57,7 +55,6 @@ export const updateComment = async (
       },
       {
         params: {
-          type: "BRIEF",
           token,
         },
       }
@@ -76,7 +73,6 @@ export const deleteCommentServer = async (
   try {
     const response = await axiosInstance.delete(`/comments/${commentId}`, {
       params: {
-        type: "BRIEF",
         token,
       },
     });
