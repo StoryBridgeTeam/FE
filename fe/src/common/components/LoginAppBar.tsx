@@ -130,6 +130,20 @@ const LoginAppBar: React.FC<LoginAppBarProps> = ({
             {t(field2)}
           </Text>
         )}
+        {token && (
+          <Text
+            marginLeft={3}
+            fontSize={isMobile ? "xs" : "md"}
+            lineHeight={appBarHeight}
+            fontWeight="400"
+            cursor="pointer"
+            onClick={() => {
+              navigate(`/signup?token=${token}`);
+            }}
+          >
+            회원가입
+          </Text>
+        )}
         <Box
           as={FaRegBell}
           fontSize="lg"

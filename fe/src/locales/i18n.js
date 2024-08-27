@@ -26,7 +26,7 @@ i18n
   .init({
     resources,
     debug: true,
-    lng: "ko",
+    // lng: "ko",
     fallbackLng: LANGUAGES.EN, // 번역 파일에서 찾을 수 없는 경우 기본 설정 언어
     interpolation: {
       escapeValue: false,

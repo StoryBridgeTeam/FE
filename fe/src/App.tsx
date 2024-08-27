@@ -60,11 +60,15 @@ function App() {
             element={<PrivateRoute element={<MyPage />} />}
           />
           <Route
+            path="/:nickName/poi/:poiId"
+            element={<PrivateRoute element={<POIPage />} />}
+          />
+          <Route
             path="/:nickName/poi/create"
             element={<PrivateRoute element={<POIPage />} />}
           />
           <Route
-            path="/:nickName/poi/:poiId"
+            path="/:nickName/poi/:poiId/modify"
             element={<PrivateRoute element={<POIPage />} />}
           />
           <Route

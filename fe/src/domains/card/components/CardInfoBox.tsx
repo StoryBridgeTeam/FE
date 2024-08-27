@@ -1,46 +1,30 @@
 import React from "react";
-
-import { Box, UnorderedList, ListItem, Center } from "@chakra-ui/react";
-import CardInfoItem from "./CardInfoItem";
 import { EntryState } from "../types/cardTypes";
+import { Box, Center, ListItem, UnorderedList } from "@chakra-ui/react";
+import CardInfoItem from "./CardInfoItem";
 
 //메인페이지에서 보여지는 명함카드 정보
 const CardInfoBox: React.FC<{
-  entries: EntryState[];
+  briefEntries: EntryState[];
   onClick: () => void;
   hasCard: boolean;
-}> = ({ entries, onClick, hasCard }) => (
+}> = ({ briefEntries, onClick, hasCard }) => (
   <Box
     border="1px dashed black"
     borderRadius="xl"
     p={4}
-    // m={4}
     onClick={onClick}
     cursor="pointer"
     h="100%"
     _hover={{ bg: "gray.200" }}
-    // flex={1}
-    // display="flex"
   >
     {hasCard ? (
-      // <Center ml={{ base: 0, md: 8 }}>
-      //   <UnorderedList styleType="disc" spacing={3}>
-      //     {entries
-      //       .filter((entry) => entry.isVisibleBriefCard)
-      //       .map((entry) => (
-      //         <ListItem key={entry.id}>
-      //           <CardInfoItem key={entry.id} {...entry} />
-      //         </ListItem>
-      //       ))}
-      //   </UnorderedList>
-      // </Center>
-      // <UnorderedList styleType="disc" spacing={3}>
       <UnorderedList styleType="disc">
-        {entries
-          .filter((entry) => entry.isVisibleBriefCard)
-          .map((entry) => (
+        {briefEntries
+          // .filter((entry) => entry.isVisibleBriefCard)
+          ?.map((entry) => (
             <ListItem key={entry.id}>
-              <CardInfoItem key={entry.id} {...entry} />
+              <CardInfoItem {...entry} />
             </ListItem>
           ))}
       </UnorderedList>
@@ -51,5 +35,4 @@ const CardInfoBox: React.FC<{
     )}
   </Box>
 );
-
 export default CardInfoBox;

@@ -1,68 +1,97 @@
 import React from "react";
-import { UnorderedList, Flex, Box, Container } from "@chakra-ui/react";
+import { UnorderedList, Flex, Box } from "@chakra-ui/react";
 import {
   DragDropContext,
   Droppable,
   Draggable,
   DropResult,
 } from "react-beautiful-dnd";
-import { GripVertical } from "tabler-icons-react";
+import { CardModalListProps, EntryState } from "../types/cardTypes";
 import CardModalItem from "./CardModalItem";
-import { CardType } from "../types/cardTypes";
-import { useCardStore } from "../stores/cardStore";
-import { useTempStore } from "../stores/tempStore";
-import { useCardEdit } from "../hooks/useCardEdit";
+import { GripVertical } from "tabler-icons-react";
 
-interface EntryListProps {
-  cardType: CardType;
-  isEditing: boolean;
-}
+const CardModalList: React.FC<CardModalListProps> = ({
+  isEditing,
+  entries,
+  setEntries,
+}) => {
+  const reorderEntries = (startIndex: number, endIndex: number) => {
+    const result = Array.from(entries);
+    const [removed] = result.splice(startIndex, 1);
+    result.splice(endIndex, 0, removed);
 
-//카드모달창 편집상태시 보여지는 컴포넌트
-const CardModalList: React.FC<EntryListProps> = ({ cardType, isEditing }) => {
-  const { publicEntries, originalEntries, hasCard } = useCardStore();
-  const { tempEntries, reorderEntries } = useTempStore();
-  const entries = cardType === "public" ? publicEntries : originalEntries;
+    const reindexedEntries = result.map((entry, index) => ({
+      ...entry,
+      index,
+    }));
+
+    setEntries(reindexedEntries);
+  };
 
   const onDragEnd = (result: DropResult) => {
     if (!result.destination) return;
     reorderEntries(result.source.index, result.destination.index);
   };
 
+  const handleEntryChange = (id: number, updatedEntry: Partial<EntryState>) => {
+    const updatedEntries = entries.map((entry) =>
+      entry.id === id ? { ...entry, ...updatedEntry } : entry
+    );
+    setEntries(updatedEntries);
+  };
+
+  const handleEntryDelete = (id: number) => {
+    const filteredEntries = entries
+      .filter((entry) => entry.id !== id)
+      .map((entry, index) => ({ ...entry, index }));
+    setEntries(filteredEntries);
+  };
+
   return isEditing ? (
     <DragDropContext onDragEnd={onDragEnd}>
-      <Droppable droppableId="tempEntries">
+      <Droppable droppableId="entries">
         {(provided) => (
           <UnorderedList
+            {...provided.droppableProps}
+            ref={provided.innerRef}
             styleType="none"
             px={{ base: 0, md: 8 }}
             pb={{ base: 0, md: 10 }}
-            spacing={4}
-            {...provided.droppableProps}
-            ref={provided.innerRef}
+            spacing={2}
           >
-            {tempEntries.map((entry, index) => (
+            {entries.map((entry, index) => (
               <Draggable
-                key={entry.id}
-                draggableId={entry.id.toString()}
+                key={entry.id !== null ? entry.id.toString() : `temp-${index}`}
+                draggableId={
+                  entry.id !== null ? entry.id.toString() : `temp-${index}`
+                }
                 index={index}
               >
                 {(provided) => (
-                  <Container maxWidth="container.md" centerContent>
-                    <Flex
-                      ref={provided.innerRef}
-                      {...provided.draggableProps}
-                      alignItems="center"
-                      width="80%"
-                    >
-                      <Box {...provided.dragHandleProps}>
-                        <GripVertical size={20} />
-                      </Box>
-                      <Box flex={1}>
-                        <CardModalItem entry={entry} isEditing={isEditing} />
-                      </Box>
-                    </Flex>
-                  </Container>
+                  <Flex
+                    ref={provided.innerRef}
+                    {...provided.draggableProps}
+                    {...provided.dragHandleProps}
+                    mb={2}
+                    p={3}
+                    borderWidth="1px"
+                    borderRadius="lg"
+                    alignItems="center"
+                    bg="gray.100"
+                  >
+                    <GripVertical />
+                    <CardModalItem
+                      key={
+                        entry.id !== null
+                          ? entry.id.toString()
+                          : `temp-${index}`
+                      }
+                      entry={entry}
+                      isEditing={isEditing}
+                      onChangeEntry={handleEntryChange}
+                      onDeleteEntry={handleEntryDelete}
+                    />
+                  </Flex>
                 )}
               </Draggable>
             ))}
@@ -79,15 +108,20 @@ const CardModalList: React.FC<EntryListProps> = ({ cardType, isEditing }) => {
         pb={{ base: 0, md: 10 }}
         spacing={2}
       >
-        {hasCard
-          ? entries.map((entry) => (
-              <CardModalItem entry={entry} isEditing={isEditing} />
-            ))
-          : tempEntries.map((entry) => (
-              <CardModalItem entry={entry} isEditing={isEditing} />
-            ))}
+        {entries.map((entry) => (
+          <CardModalItem
+            key={
+              entry.id !== null ? entry.id.toString() : `temp-${entry.index}`
+            }
+            entry={entry}
+            isEditing={isEditing}
+            onChangeEntry={handleEntryChange}
+            onDeleteEntry={handleEntryDelete}
+          />
+        ))}
       </UnorderedList>
     </Box>
   );
 };
+
 export default CardModalList;

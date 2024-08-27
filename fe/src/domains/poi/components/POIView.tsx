@@ -20,12 +20,14 @@ import {
   AlertDialogHeader,
   AlertDialogContent,
   AlertDialogOverlay,
+  useDisclosure,
 } from "@chakra-ui/react";
 import { FiMoreHorizontal, FiEdit, FiTrash2, FiLink } from "react-icons/fi";
 import { POI, usePOI } from "../hooks/usePOI";
 import CommentList from "./CommentList";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { useToastMessage } from "../../../common/hooks/useToastMessage";
+import InviteModal from "../../../common/components/InviteModal";
 
 interface POIViewProps {
   poiId: string | undefined;
@@ -34,24 +36,36 @@ interface POIViewProps {
 const POIView: React.FC<POIViewProps> = ({ poiId }) => {
   const isMobile = useBreakpointValue({ base: true, md: false });
   const navigate = useNavigate();
-  const nickname = localStorage.getItem("nickName");
+  const { nickName } = useParams<{ nickName: string }>();
+  const savedNickName = localStorage.getItem("nickName");
+  const isHost = nickName === savedNickName;
   const [poi, setPoi] = useState<POI>();
-  const { fetchPOI, loading, error, removePOI } = usePOI();
+  const { fetchPOI, loading, error, removePOI, formatTimestamp } = usePOI();
   const { showToast } = useToastMessage();
-
   const [isAlertOpen, setIsAlertOpen] = useState(false);
   const cancelRef = React.useRef<HTMLButtonElement>(null);
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const token = queryParams.get("token");
+
+  const {
+    isOpen: isInviteModalOpen,
+    onOpen: onInviteModalOpen,
+    onClose: onInviteModalClose,
+  } = useDisclosure();
 
   useEffect(() => {
-    if (nickname && poiId) {
-      fetchPOI(nickname, Number(poiId)).then((data) => setPoi(data));
+    if (nickName && poiId) {
+      if (token)
+        fetchPOI(nickName, Number(poiId), token).then((data) => setPoi(data));
+      else fetchPOI(nickName, Number(poiId)).then((data) => setPoi(data));
     }
-  }, [nickname, poiId]);
+  }, [nickName, poiId]);
 
   const handleRemovePOI = async () => {
     await removePOI(Number(poiId));
     setIsAlertOpen(false);
-    navigate(`/${nickname}`);
+    navigate(`/${nickName}`);
     showToast("POI 삭제 성공", "POI가 성공적으로 삭제되었습니다.", "success");
   };
 
@@ -78,53 +92,67 @@ const POIView: React.FC<POIViewProps> = ({ poiId }) => {
         >
           {poi?.title}
         </Heading>
-        <Popover placement="bottom-end">
-          <PopoverTrigger>
-            <IconButton
-              icon={<FiMoreHorizontal />}
-              aria-label="Menu"
-              variant="ghost"
-              position="absolute"
-              right="0"
-              top="50%"
-              transform="translateY(-50%)"
-              size="lg"
-              fontSize={30}
-            />
-          </PopoverTrigger>
-          <PopoverContent w={isMobile ? "200px" : "140px"}>
-            <PopoverArrow />
-            <PopoverBody display="flex" flexDirection="column" shadow="xl">
-              <Button
+        {isHost && (
+          <Popover placement="bottom-end">
+            <PopoverTrigger>
+              <IconButton
+                icon={<FiMoreHorizontal />}
+                aria-label="Menu"
                 variant="ghost"
-                justifyContent="flex-start"
-                size={isMobile ? "md" : "sm"}
-                leftIcon={<FiEdit />}
-              >
-                편집
-              </Button>
-              <Button
-                variant="ghost"
-                justifyContent="flex-start"
-                size={isMobile ? "md" : "sm"}
-                leftIcon={<FiTrash2 />}
-                onClick={openAlert}
-              >
-                삭제
-              </Button>
-              <Button
-                variant="ghost"
-                justifyContent="flex-start"
-                size={isMobile ? "md" : "sm"}
-                leftIcon={<FiLink />}
-              >
-                초대링크
-              </Button>
-            </PopoverBody>
-          </PopoverContent>
-        </Popover>
+                position="absolute"
+                right="0"
+                top="50%"
+                transform="translateY(-50%)"
+                size="lg"
+                fontSize={30}
+              />
+            </PopoverTrigger>
+            <PopoverContent w={isMobile ? "200px" : "140px"}>
+              <PopoverArrow />
+              <PopoverBody display="flex" flexDirection="column" shadow="xl">
+                <Button
+                  variant="ghost"
+                  justifyContent="flex-start"
+                  size={isMobile ? "md" : "sm"}
+                  leftIcon={<FiEdit />}
+                  onClick={() => navigate(`/${nickName}/poi/${poiId}/modify`)}
+                >
+                  편집
+                </Button>
+                <Button
+                  variant="ghost"
+                  justifyContent="flex-start"
+                  size={isMobile ? "md" : "sm"}
+                  leftIcon={<FiTrash2 />}
+                  onClick={openAlert}
+                >
+                  삭제
+                </Button>
+                <Button
+                  variant="ghost"
+                  justifyContent="flex-start"
+                  size={isMobile ? "md" : "sm"}
+                  leftIcon={<FiLink />}
+                  onClick={onInviteModalOpen}
+                >
+                  초대링크
+                </Button>
+              </PopoverBody>
+            </PopoverContent>
+          </Popover>
+        )}
       </Box>
-      <Divider borderColor="#828282" borderWidth="1px" mt={5} mb={5} />
+      <Divider borderColor="#828282" borderWidth="1px" mt={5} />
+      {poi?.updatedAt ? (
+        <Text fontSize="sm" color="gray.500" textAlign="left">
+          {formatTimestamp(poi?.updatedAt || "")} (수정됨)
+        </Text>
+      ) : (
+        <Text fontSize="sm" color="gray.500" textAlign="left">
+          {formatTimestamp(poi?.createdAt || "")} (생성됨)
+        </Text>
+      )}
+
       <Box minHeight="300px" px={6}>
         {poi?.content.split(/\n/).map((line, index) => (
           <React.Fragment key={index}>
@@ -136,8 +164,8 @@ const POIView: React.FC<POIViewProps> = ({ poiId }) => {
         ))}
       </Box>
       <Divider borderColor="#828282" borderWidth="1px" mt={5} />
-      {poiId && nickname && (
-        <CommentList poiId={Number(poiId)} nickName={nickname} />
+      {poiId && nickName && (
+        <CommentList poiId={Number(poiId)} nickName={nickName} />
       )}
 
       <AlertDialog
@@ -167,6 +195,8 @@ const POIView: React.FC<POIViewProps> = ({ poiId }) => {
           </AlertDialogContent>
         </AlertDialogOverlay>
       </AlertDialog>
+
+      <InviteModal isOpen={isInviteModalOpen} onClose={onInviteModalClose} />
     </VStack>
   );
 };

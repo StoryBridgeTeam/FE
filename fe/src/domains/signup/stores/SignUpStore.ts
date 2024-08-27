@@ -60,7 +60,7 @@ export const useSignUpStore = create<SignUpState>((set) => ({
     optional1: false,
     optional2: false,
   },
-  invitationToken: "test5", //테스트용
+  invitationToken: "", //테스트용
   identityVerificationToken: "",
 
   setNickname: (nickname) => set({ nickname }),

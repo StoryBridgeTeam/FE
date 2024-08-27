@@ -1,62 +1,57 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import {
   Box,
-  useBreakpointValue,
-  Text,
-  Spinner,
-  HStack,
-  IconButton,
   VStack,
+  Spinner,
+  Text,
+  useBreakpointValue,
+  Center,
+  Button,
 } from "@chakra-ui/react";
-import { FiPlusCircle } from "react-icons/fi";
 import { useTranslation } from "react-i18next";
-import {
-  DragDropContext,
-  Droppable,
-  Draggable,
-  DropResult,
-} from "react-beautiful-dnd";
-import { useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { POI, usePOI } from "../../poi/hooks/usePOI";
-import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
+import { css } from "@emotion/react";
+import AddButton from "./AddButton";
+import POIItem from "./POIItem";
+import { FaAngleDown } from "react-icons/fa";
 
-const AddButton: React.FC<{ isMobile: boolean; onClick: () => void }> =
-  React.memo(({ isMobile, onClick }) => (
-    <Box
-      m={4}
-      mt={isMobile ? 5 : 8}
-      bg="white"
-      color="black"
-      h="5%"
-      onClick={onClick}
-      _hover={{ cursor: "pointer", bg: "gray.500" }}
-      borderRadius="3xl"
-      display="flex"
-      alignItems="center"
-      justifyContent="center"
-      border="2px solid #CDCDCD"
-      p={isMobile ? 4 : 0}
-    >
-      <FiPlusCircle />
-    </Box>
-  ));
+const scrollbarStyle = css`
+  &::-webkit-scrollbar {
+    width: 7px;
+  }
+  &::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 10px;
+  }
+  &::-webkit-scrollbar-thumb:hover {
+    background: #555;
+  }
+`;
 
 const POIList: React.FC = () => {
   const isMobile = useBreakpointValue({ base: true, md: false });
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { nickName } = useParams<{ nickName: string }>();
+  const savedNickName = localStorage.getItem("nickName");
   const [pois, setPois] = useState<POI[]>([]);
-  const { loading, error, fetchTitles, reorderPOIs, totalPages, currentPage } =
-    usePOI();
+  const [page, setPage] = useState(0);
+  const ishost = nickName === savedNickName;
+  const { loading, error, fetchTitles, isLastPage } = usePOI();
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const token = queryParams.get("token");
 
-  // 화면 너비에 따라 size를 결정
   const calculateSize = () => {
     const width = window.innerWidth;
     if (width < 768) return 4;
-    else return 11;
+    else return 9;
   };
-
   const [size, setSize] = useState(calculateSize());
 
   useEffect(() => {
@@ -70,44 +65,24 @@ const POIList: React.FC = () => {
 
   useEffect(() => {
     if (nickName) {
-      fetchTitles(nickName, 0, size).then((data) => setPois(data));
+      loadTitles();
     }
   }, [nickName, size]);
 
-  const loadTitles = async (page = 0) => {
+  const loadTitles = async () => {
     try {
-      const data = await fetchTitles(nickName!, page, size);
-      setPois(data);
+      console.log("loadTitles", page, size);
+      let data: POI[];
+      if (token) {
+        data = await fetchTitles(nickName!, page, size, token);
+      } else data = await fetchTitles(nickName!, page, size);
+
+      setPois((prevPois) => [...prevPois, ...data]);
+      setPage((prevPage) => prevPage + 1);
     } catch (err) {
-      console.error("Failed to fetch poi titles", err);
+      console.error("Failed to fetch titles", err);
     }
   };
-
-  const handleDragEnd = useCallback(
-    async (result: DropResult) => {
-      if (!result.destination) return;
-
-      const newItems = Array.from(pois);
-      const [reorderedItem] = newItems.splice(result.source.index, 1);
-      newItems.splice(result.destination.index, 0, reorderedItem);
-
-      setPois(newItems);
-
-      const modifyList = newItems.map((item, index) => ({
-        id: item.id as number,
-        index: index + 1,
-      }));
-
-      try {
-        if (nickName) {
-          await reorderPOIs(nickName, modifyList);
-        }
-      } catch (error) {
-        console.error("Failed to update POI indexes:", error);
-      }
-    },
-    [pois, nickName, reorderPOIs]
-  );
 
   const handleCreatePOI = useCallback(() => {
     if (nickName) {
@@ -118,17 +93,14 @@ const POIList: React.FC = () => {
   const handleGetPOI = useCallback(
     (poiId: number) => {
       if (nickName) {
-        navigate(`/${nickName}/poi/${poiId}`);
+        if (token) navigate(`/${nickName}/poi/${poiId}?token=${token}`);
+        else navigate(`/${nickName}/poi/${poiId}`);
       }
     },
     [nickName, navigate]
   );
 
-  const handlePageChange = (newPage: number) => {
-    loadTitles(newPage);
-  };
-
-  if (loading) {
+  if (loading && page === 0) {
     return <Spinner />;
   }
 
@@ -138,7 +110,7 @@ const POIList: React.FC = () => {
 
   return (
     <VStack
-      spacing={4}
+      spacing={ishost ? 1 : 3}
       align="stretch"
       bg="#F6F6F6"
       borderRadius="3xl"
@@ -149,77 +121,40 @@ const POIList: React.FC = () => {
       color="#CDCDCD"
       border={isMobile ? "" : "1px solid"}
     >
-      <DragDropContext onDragEnd={handleDragEnd}>
-        <Droppable droppableId="poi-list">
-          {(provided) => (
-            <Box
-              h="100%"
-              overflowY="auto"
-              ref={provided.innerRef}
-              {...provided.droppableProps}
-            >
-              {pois.map((item, index) => (
-                <Draggable
-                  key={item.id?.toString()}
-                  draggableId={item.id?.toString() || ""}
-                  index={index}
-                >
-                  {(provided) => (
-                    <Box
-                      ref={provided.innerRef}
-                      {...provided.draggableProps}
-                      {...provided.dragHandleProps}
-                      m={4}
-                      bg="white"
-                      color="black"
-                      h="5%"
-                      shadow="md"
-                      borderRadius="3xl"
-                      onClick={() => handleGetPOI(item.id as number)}
-                      _hover={{ cursor: "pointer", bg: "gray.300" }}
-                      display="flex"
-                      alignItems="center"
-                      justifyContent="center"
-                      border="1px solid #CDCDCD"
-                      fontSize="sm"
-                      overflow="hidden"
-                      p={isMobile ? 4 : 0}
-                    >
-                      <Text isTruncated maxWidth="90%" px={2}>
-                        {item.title}
-                      </Text>
-                    </Box>
-                  )}
-                </Draggable>
-              ))}
-              {provided.placeholder}
-              <AddButton
-                isMobile={isMobile as boolean}
-                onClick={handleCreatePOI}
-              />
-            </Box>
-          )}
-        </Droppable>
-      </DragDropContext>
-      {totalPages <= 1 ? null : (
-        <HStack justify="space-between" mt={4}>
-          <IconButton
-            aria-label="Previous Page"
-            icon={<FaChevronLeft />}
-            onClick={() => handlePageChange(currentPage - 1)}
-            isDisabled={currentPage === 0}
-            bg="#F6F6F6"
-          />
-          <Text>{`${currentPage + 1} / ${totalPages}`}</Text>
-          <IconButton
-            aria-label="Next Page"
-            icon={<FaChevronRight />}
-            onClick={() => handlePageChange(currentPage + 1)}
-            isDisabled={currentPage === totalPages - 1}
-            bg="#F6F6F6"
-          />
-        </HStack>
+      {ishost && (
+        <AddButton isMobile={isMobile as boolean} onClick={handleCreatePOI} />
       )}
+      <Box h="100%" overflowY="auto" css={scrollbarStyle}>
+        {pois.length === 0 ? (
+          <Center h="80%">
+            <Text color={"gray.500"}>{t("POI 목록이 비어 있습니다.")}</Text>
+          </Center>
+        ) : (
+          <>
+            {pois.map((item) => (
+              <POIItem
+                key={item.id?.toString()}
+                id={item.id as number}
+                title={item.title}
+                isMobile={isMobile as boolean}
+                onClick={handleGetPOI}
+              />
+            ))}
+            {!isLastPage && (
+              <Center>
+                <Button
+                  onClick={loadTitles}
+                  isLoading={loading}
+                  size="md"
+                  bg="#F6F6F6"
+                >
+                  <FaAngleDown fontSize="24px" />
+                </Button>
+              </Center>
+            )}
+          </>
+        )}
+      </Box>
     </VStack>
   );
 };

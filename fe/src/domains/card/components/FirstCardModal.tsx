@@ -10,35 +10,30 @@ import {
   Box,
   Button,
 } from "@chakra-ui/react";
+import { FirstCardModalProps, EntryState } from "../types/cardTypes";
 import React, { useEffect } from "react";
-import { useCardStore } from "../stores/cardStore";
-import ModalActionButtons from "./ModalActionButtons";
-import { CardModalProps } from "../types/cardTypes";
+import { useCard } from "../hooks/useCard";
+import ModalActionButtons from "./ModalActionButton";
 import CardModalList from "./CardModalList";
-import { useCardEdit } from "../hooks/useCardEdit";
-import { useTempStore } from "../stores/tempStore";
-import { useNavigate } from "react-router-dom";
-// import CardList from "./CardList";
+import { use } from "i18next";
 
-//첫번째 카드생성을 위해 명함모달창을 띄워준다.
-const FirstCardModal: React.FC<CardModalProps> = ({
+//첫번째 카드생성을 위한 모달창
+const FirstCardModal: React.FC<FirstCardModalProps> = ({
   isOpen,
   onClose,
-  name,
+  nickName,
 }) => {
+  const { createNewCard } = useCard();
   const [isEditing, setIsEditing] = React.useState<boolean>(true);
-  const { handleCreateCard } = useCardEdit();
-  const { nickName } = useCardStore();
-  // const [cardType, setCardType] = React.useState<CardType>("public");
+  const [newEntries, setNewEntries] = React.useState<EntryState[]>([]);
 
   const handleModalClose = () => {
     onClose();
   };
 
-  const handleButtonClick = () => {
-    handleCreateCard();
+  const handleSubmit = () => {
+    createNewCard(nickName, newEntries);
     onClose();
-    // window.location.href = `/${nickName}`;
   };
 
   return (
@@ -53,8 +48,7 @@ const FirstCardModal: React.FC<CardModalProps> = ({
         <ModalCloseButton onClick={handleModalClose} />
         <ModalBody display="flex" flexDirection="column" alignItems="center">
           <Text fontSize="sm" mb={4} textAlign="center">
-            체크박스를 통해 메인페이지에 표시여부를 설정할 수 있습니다 (최대
-            5개)
+            체크박스를 통해 메인페이지에 표시여부를 설정할 수 있습니다
           </Text>
 
           <Box
@@ -65,15 +59,22 @@ const FirstCardModal: React.FC<CardModalProps> = ({
             width="100%"
           >
             <ModalActionButtons
-              cardType={"public"}
+              cardType={"NEW"}
               isEditing={isEditing}
               setIsEditing={setIsEditing}
+              nickName={nickName}
+              entries={newEntries}
+              setEntries={setNewEntries}
             />
-            <CardModalList cardType={"public"} isEditing={isEditing} />
+            <CardModalList
+              isEditing={isEditing}
+              entries={newEntries}
+              setEntries={setNewEntries}
+            />
           </Box>
         </ModalBody>
         <ModalFooter justifyContent="center">
-          <Button colorScheme="blue" onClick={handleButtonClick}>
+          <Button colorScheme="blue" onClick={handleSubmit}>
             카드 생성하기!
           </Button>
         </ModalFooter>

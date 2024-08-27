@@ -1,27 +1,28 @@
 import axiosInstance from "../../../common/api/axiosInstance";
-import { EntryStateForAPI } from "../types/cardTypes";
+import { EntryState } from "../types/cardTypes";
+import { prepareEntriesForAPI } from "../utils/apiUtils";
 
 export const getIsCreatedCard = async (nickname: string) => {
   const response = await axiosInstance.get(
     `/members/${nickname}/card/is-create`
   );
+  console.log("getIsCreatedCard_response:", response.data);
   return response.data;
 };
 
 export const createCardInfo = async (
   nickname: string,
-  entries: EntryStateForAPI[]
+  entries: EntryState[]
 ) => {
+  const preparedEntries = prepareEntriesForAPI(entries); // ID를 처리
+  console.log("preparedEntries: ", preparedEntries);
   const response = await axiosInstance.post(`/members/${nickname}/card`, {
-    entries,
+    entries: preparedEntries,
   });
   return response.data;
 };
 
-export const getOriginalCardInfo = async (
-  nickname: string,
-  type: string = "DETAIL"
-) => {
+export const getOriginalCardInfo = async (nickname: string, type: string) => {
   const response = await axiosInstance.get(`/members/${nickname}/origin-card`, {
     params: { type },
   });
@@ -30,17 +31,18 @@ export const getOriginalCardInfo = async (
 
 export const updateOriginalCardInfo = async (
   nickname: string,
-  entries: EntryStateForAPI[]
+  entries: EntryState[]
 ) => {
+  const preparedEntries = prepareEntriesForAPI(entries); // ID를 처리
   const response = await axiosInstance.put(`/members/${nickname}/origin-card`, {
-    entries,
+    entries: preparedEntries,
   });
   return response.data;
 };
 
 export const getPublicCardInfo = async (
   nickname: string,
-  type: string = "DETAIL",
+  type: string,
   token?: string
 ) => {
   console.log("nickname: ", nickname);
@@ -52,11 +54,11 @@ export const getPublicCardInfo = async (
 
 export const updatePublicCardInfo = async (
   nickname: string,
-  entries: EntryStateForAPI[]
+  entries: EntryState[]
 ) => {
-  console.log("tempEntries: ", entries);
+  const preparedEntries = prepareEntriesForAPI(entries);
   const response = await axiosInstance.put(`/members/${nickname}/public-card`, {
-    entries,
+    entries: preparedEntries,
   });
   return response.data;
 };

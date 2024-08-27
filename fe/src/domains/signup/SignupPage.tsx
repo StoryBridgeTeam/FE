@@ -1,5 +1,12 @@
 import React, { useEffect } from "react";
-import { Box, Flex, Stack, useBreakpointValue } from "@chakra-ui/react";
+import {
+  Box,
+  Center,
+  Flex,
+  Stack,
+  Text,
+  useBreakpointValue,
+} from "@chakra-ui/react";
 import { useStepsStore } from "./stores/StepsStore";
 import { useSignUpStore } from "./stores/SignUpStore";
 import NextStepsButton from "./components/NextStepsButton";
@@ -13,18 +20,26 @@ import PasswordForm from "./components/PasswordForm";
 import NicknameForm from "./components/NicknameForm";
 import SignupComplete from "./components/SignupComplete";
 import { useTranslation } from "react-i18next";
+import { useLocation } from "react-router-dom";
 
 const SignupPage: React.FC = () => {
   const isMobile = useBreakpointValue({ base: true, md: false });
   const currentStep = useStepsStore((state) => state.step);
   const region = useSignUpStore((state) => state.region);
+  const { setInvitationToken } = useSignUpStore();
   const { i18n } = useTranslation();
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const token = queryParams.get("token");
 
   useEffect(() => {
     if (region === "KR") {
       i18n.changeLanguage("ko");
     } else {
       i18n.changeLanguage("en");
+    }
+    if (token) {
+      setInvitationToken(token);
     }
   }, [region, i18n]);
 
@@ -51,6 +66,9 @@ const SignupPage: React.FC = () => {
     }
   };
 
+  if (token) {
+  }
+
   return (
     <Flex minH="100vh" align="center" justify="center" direction="column">
       <Box
@@ -63,14 +81,28 @@ const SignupPage: React.FC = () => {
         w="full"
         borderRadius="3xl"
       >
-        <ProgressBar />
-        <Stack spacing={1} mb={24}>
-          {renderStep()}
-        </Stack>
-        {currentStep !== 1 && (
-          <Box mt="auto">
-            <NextStepsButton currentStep={currentStep} />
-          </Box>
+        {token ? (
+          <>
+            <ProgressBar />
+            <Stack spacing={1} mb={24}>
+              {renderStep()}
+            </Stack>
+            {currentStep !== 1 && (
+              <Box mt="auto">
+                <NextStepsButton currentStep={currentStep} />
+              </Box>
+            )}
+          </>
+        ) : (
+          <Center>
+            <Text fontSize="lg" color="red.500" textAlign="center">
+              초대토큰이 존재하지 않습니다. <br />
+              회원가입이 불가능합니다. <br />
+              <br />
+              Invitation token does not exist. <br />
+              Unable to sign up.
+            </Text>
+          </Center>
         )}
       </Box>
     </Flex>

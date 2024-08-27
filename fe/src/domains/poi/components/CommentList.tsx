@@ -30,7 +30,9 @@ const CommentList: React.FC<CommentListProps> = ({ poiId, nickName }) => {
     error,
     totalCommentPages,
     currentCommentPage,
+    formatTimestamp,
   } = usePOI();
+  const savedNickName = localStorage.getItem("nickName");
 
   const loadComments = async (page = 0) => {
     try {
@@ -48,7 +50,7 @@ const CommentList: React.FC<CommentListProps> = ({ poiId, nickName }) => {
   const handleAddComment = async () => {
     if (newComment.trim() !== "") {
       try {
-        await addComment(poiId, nickName, newComment);
+        await addComment(poiId, savedNickName!, newComment);
         setNewComment("");
         await loadComments(); //첫 페이지로 이동
       } catch (err) {
@@ -59,39 +61,6 @@ const CommentList: React.FC<CommentListProps> = ({ poiId, nickName }) => {
 
   const handlePageChange = (newPage: number) => {
     loadComments(newPage);
-  };
-
-  const formatTimestamp = (timestamp: string) => {
-    const utcDate = new Date(timestamp + "Z"); //UTC 시간을 올바르게 파싱하기 위해 'Z'를 추가
-    const now = new Date();
-
-    const timeDifferenceInMinutes = Math.floor(
-      (now.getTime() - utcDate.getTime()) / 60000
-    );
-
-    if (timeDifferenceInMinutes < 60) {
-      // 1시간 이내일 때
-      return `${timeDifferenceInMinutes}분 전`;
-    } else if (timeDifferenceInMinutes < 1440) {
-      // 1일 이내일 때
-      const timeDifferenceInHours = Math.floor(timeDifferenceInMinutes / 60);
-      return `${timeDifferenceInHours}시간 전`;
-    }
-
-    // 현재 연도와 같으면 연도 생략
-    const options: Intl.DateTimeFormatOptions = {
-      month: "2-digit",
-      day: "2-digit",
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: true,
-    };
-
-    if (utcDate.getFullYear() !== now.getFullYear()) {
-      options.year = "numeric";
-    }
-
-    return utcDate.toLocaleString(undefined, options);
   };
 
   if (loading) {
