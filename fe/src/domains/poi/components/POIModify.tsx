@@ -9,6 +9,9 @@ import {
   Text,
   Spinner,
   useBreakpointValue,
+  Image,
+  IconButton,
+  Flex,
 } from "@chakra-ui/react";
 import {
   Navigate,
@@ -17,8 +20,9 @@ import {
   useParams,
 } from "react-router-dom";
 import { useToastMessage } from "../../../common/hooks/useToastMessage";
-import { usePOI, POI } from "../../poi/hooks/usePOI";
-import { set } from "date-fns";
+import { usePOI, POI, GETPOI, ImageData } from "../../poi/hooks/usePOI";
+import { Edit, Check, File, X } from "tabler-icons-react"; // X 아이콘 추가
+import { deleteImage, uploadImage } from "../../../common/api/imageAPI";
 
 const POIModify: React.FC<{ poiId: string }> = ({ poiId }) => {
   const isMobile = useBreakpointValue({ base: true, md: false });
@@ -29,20 +33,22 @@ const POIModify: React.FC<{ poiId: string }> = ({ poiId }) => {
   const { nickName } = useParams<{ nickName: string }>();
   const localNickname = localStorage.getItem("nickName");
   const isHost = nickName === localNickname;
-  const [poi, setPoi] = useState<POI>();
+  const [poi, setPoi] = useState<GETPOI>();
   const { fetchPOI, loading, error, modifyPOI } = usePOI();
   const { showToast } = useToastMessage();
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const MAX_TITLE_LENGTH = 50;
+  const [images, setImages] = useState<ImageData[]>([]);
 
   useEffect(() => {
     if (isHost && nickName && poiId) {
-      // fetchPOI(nickName, Number(poiId)).then((data) => setPoi(data));
+      fetchPOI(nickName, Number(poiId)).then((data) => setPoi(data));
       fetchPOI(nickName, Number(poiId)).then((data) => {
         setPoi(data);
         setTitle(data.title);
         setContent(data.content);
+        setImages(data.images);
       });
     }
   }, [nickName, poiId]);
@@ -65,7 +71,7 @@ const POIModify: React.FC<{ poiId: string }> = ({ poiId }) => {
         id: Number(poiId),
         title,
         content,
-        images: poi?.images as string[], // 이미지 추가
+        images: images.map((image) => image.id), // 이미지 추가
         index: poi?.index as number,
       };
       await modifyPOI(Number(poiId), poiData);
@@ -76,6 +82,37 @@ const POIModify: React.FC<{ poiId: string }> = ({ poiId }) => {
       showToast("POI 수정 실패", "POI 수정에 실패했습니다.", "error");
     }
   }, [title, content, poiId, modifyPOI, navigate, nickName, showToast]);
+
+  const handleDeleteImage = async (imageId: number) => {
+    setImages((prevImages) =>
+      prevImages.filter((image) => image.id !== imageId)
+    );
+    await deleteImage(imageId);
+  };
+
+  const handleUpload = async () => {
+    try {
+      const input = document.createElement("input");
+      input.type = "file";
+      input.accept = "image/*";
+      input.onchange = async (event: any) => {
+        const file = event.target.files[0];
+        if (file) {
+          const formData = new FormData();
+          formData.append("file", file);
+
+          const uploadType = "POI";
+
+          const uploadedImage = await uploadImage(uploadType, formData);
+          setImages((prevImages) => [...prevImages, uploadedImage]);
+        }
+      };
+
+      input.click();
+    } catch (error) {
+      console.error("Image upload failed:", error);
+    }
+  };
 
   if (!isHost) {
     if (token) return <Navigate to={`/${nickName}?token=${token}`} replace />;
@@ -92,6 +129,11 @@ const POIModify: React.FC<{ poiId: string }> = ({ poiId }) => {
 
   return (
     <VStack spacing={4} align="stretch" p={6}>
+      <Flex w="full" justifyContent="flex-end" alignItems="center" mb={5}>
+        <Button onClick={handleUpload} mr={2}>
+          <File size={24} color="black" />
+        </Button>
+      </Flex>
       <Input
         placeholder="제목"
         size="lg"
@@ -109,6 +151,47 @@ const POIModify: React.FC<{ poiId: string }> = ({ poiId }) => {
         {title.length}/{MAX_TITLE_LENGTH}
       </Text>
       <Divider borderColor="#828282" borderWidth="1px" />
+      {images.length !== 0 && (
+        <Flex
+          overflowX="auto"
+          mt={4}
+          mb={4}
+          p={2}
+          sx={{
+            "::-webkit-scrollbar": {
+              height: "8px",
+            },
+            "::-webkit-scrollbar-thumb": {
+              background: "#a0a0a0",
+              borderRadius: "8px",
+            },
+          }}
+        >
+          {images.map((imgSrc, index) => (
+            <Box key={index} position="relative" display="inline-block" mr={2}>
+              <IconButton
+                aria-label="Delete image"
+                icon={<X size={18} />}
+                position="absolute"
+                colorScheme="red"
+                top="2px"
+                right="2px"
+                size="xs"
+                zIndex={1}
+                onClick={() => handleDeleteImage(imgSrc.id)}
+              />
+              <Image
+                src={`http://image.storyb.kr/${imgSrc.path}`}
+                alt={imgSrc.name}
+                display="block"
+                maxH="500px"
+                maxW="none"
+                objectFit="contain"
+              />
+            </Box>
+          ))}
+        </Flex>
+      )}
       <Textarea
         minHeight="550px"
         placeholder="본문 내용을 작성해주세요"

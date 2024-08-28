@@ -31,7 +31,7 @@ import {
   updateComment,
   tagComment,
 } from "../api/CommentAPI";
-import { useLocation } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 
 interface CommentListProps {
   id: number;
@@ -65,6 +65,10 @@ const CommentList: React.FC<CommentListProps> = ({
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const token = queryParams.get("token");
+  const name = localStorage.getItem("nickName");
+  const { nickName } = useParams<{ nickName: string }>();
+
+  const ishost = nickName === name;
 
   const { t } = useTranslation();
   const {
@@ -236,47 +240,53 @@ const CommentList: React.FC<CommentListProps> = ({
               >
                 {formatDistanceToNow(new Date(comment.createdTime))} ago
               </Text>
-              <Menu>
-                <MenuButton
-                  as={Button}
-                  variant="ghost"
-                  size="xs"
-                  aria-label="More options"
-                  rightIcon={<BiDotsVerticalRounded />}
-                  p={0}
-                  m={0}
-                  minW={0}
-                />
-                <MenuList>
-                  <MenuItem
-                    icon={<Link />}
-                    onClick={() => handleConnect(comment.id, comment.content)}
-                  >
-                    Connect
-                  </MenuItem>
-                  <MenuItem
-                    icon={<Edit />}
-                    onClick={() => handleEdit(comment.id, comment.content)}
-                  >
-                    Edit
-                  </MenuItem>
-                  <MenuItem
-                    icon={<Trash />}
-                    onClick={async () => {
-                      await deleteCommentServer(comment.id);
-                      deleteComment(comment.id);
-                      await fetchCommentData(0);
-                      showToast(
-                        t(`info.commentDelete`),
-                        t(`info.commentDeleteMessage`),
-                        "success"
-                      );
-                    }}
-                  >
-                    Delete
-                  </MenuItem>
-                </MenuList>
-              </Menu>
+              {(ishost || comment.author.nickName === name) && (
+                <Menu>
+                  <MenuButton
+                    as={Button}
+                    variant="ghost"
+                    size="xs"
+                    aria-label="More options"
+                    rightIcon={<BiDotsVerticalRounded />}
+                    p={0}
+                    m={0}
+                    minW={0}
+                  />
+                  <MenuList>
+                    {ishost && (
+                      <MenuItem
+                        icon={<Link />}
+                        onClick={() =>
+                          handleConnect(comment.id, comment.content)
+                        }
+                      >
+                        Connect
+                      </MenuItem>
+                    )}
+                    <MenuItem
+                      icon={<Edit />}
+                      onClick={() => handleEdit(comment.id, comment.content)}
+                    >
+                      Edit
+                    </MenuItem>
+                    <MenuItem
+                      icon={<Trash />}
+                      onClick={async () => {
+                        await deleteCommentServer(comment.id);
+                        deleteComment(comment.id);
+                        await fetchCommentData(0);
+                        showToast(
+                          t(`info.commentDelete`),
+                          t(`info.commentDeleteMessage`),
+                          "success"
+                        );
+                      }}
+                    >
+                      Delete
+                    </MenuItem>
+                  </MenuList>
+                </Menu>
+              )}
             </Flex>
             {comment.tagInfo &&
               (comment.tagInfo.startIndex !== 0 ||

@@ -10,8 +10,9 @@ import {
   Container,
   Image,
   IconButton,
+  useDisclosure,
 } from "@chakra-ui/react";
-import { Edit, Check, File, X } from "tabler-icons-react"; // X 아이콘 추가
+import { Edit, Check, File, X, Link } from "tabler-icons-react"; // X 아이콘 추가
 import { useTranslation } from "react-i18next";
 import { useTextSelection } from "../hook/useTextSelection";
 import CommentInput from "./CommentInput";
@@ -23,6 +24,7 @@ import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { getCoverLetters, putCoverLetters } from "../api/InfoAPI";
 import ProfileSidebar from "./ProfileSideBar";
 import { deleteImage, uploadImage } from "../../../common/api/imageAPI";
+import InviteModal from "../../../common/components/InviteModal";
 
 interface ImageData {
   id: number;
@@ -69,6 +71,7 @@ const DetailContent: FC = () => {
 
   const isHost = nickName === name;
   const navigate = useNavigate();
+  const { isOpen, onOpen, onClose } = useDisclosure();
 
   const fetchCoverData = async () => {
     try {
@@ -255,9 +258,15 @@ const DetailContent: FC = () => {
               </Box>
             ) : (
               isHost && (
-                <Button onClick={handleEditClick}>
-                  <Edit size={24} color="black" />
-                </Button>
+                <Box>
+                  <Button onClick={handleEditClick} mr={2}>
+                    <Edit size={24} color="black" />
+                  </Button>
+                  <Button onClick={onOpen}>
+                    <Link />
+                    초대링크
+                  </Button>
+                </Box>
               )
             )}
           </Flex>
@@ -332,7 +341,7 @@ const DetailContent: FC = () => {
                           top="2px"
                           right="2px"
                           size="xs"
-                          zIndex={1} 
+                          zIndex={1}
                           onClick={() => handleDeleteImage(imgSrc.id)}
                         />
                       )}
@@ -341,7 +350,7 @@ const DetailContent: FC = () => {
                         alt={imgSrc.name}
                         display="block"
                         maxH="500px"
-                        maxW="none" 
+                        maxW="none"
                         objectFit="contain"
                       />
                     </Box>
@@ -373,8 +382,10 @@ const DetailContent: FC = () => {
             </Box>
           </Flex>
           {!isEdit && <CommentInput id={id} />}
-        </Box>{" "}
+        </Box>
       </Container>
+
+      <InviteModal isOpen={isOpen} onClose={onClose} />
     </>
   );
 };

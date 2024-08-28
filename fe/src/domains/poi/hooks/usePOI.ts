@@ -10,15 +10,41 @@ import {
   getPOIComments,
   linkPOICommentTag,
 } from "../../poi/api/poiAPI";
+import axios from "axios";
+import { useToastMessage } from "../../../common/hooks/useToastMessage";
+
+export interface ImageData {
+  id: number;
+  name: string;
+  contentType: string;
+  size: number;
+  path: string;
+}
+
+export interface GETPOI {
+  id: number | null;
+  title: string;
+  content: string;
+  images: ImageData[];
+  index: number;
+  createdAt?: string;
+  updatedAt?: string | null;
+}
 
 export interface POI {
   id: number | null;
   title: string;
   content: string;
-  images: string[];
+  images: number[];
   index: number;
   createdAt?: string;
   updatedAt?: string | null;
+
+  // interface Author {
+  //   name: string;
+  //   nickName: string;
+  //   role: string;
+  // }
 }
 
 export interface Comment {
@@ -45,8 +71,17 @@ interface UsePOIResult {
     size: number,
     token?: string
   ) => Promise<POI[]>;
-  fetchPOI: (nickname: string, poiId: number, token?: string) => Promise<POI>;
-  addPOI: (nickname: string, title: string, content: string) => Promise<void>;
+  fetchPOI: (
+    nickname: string,
+    poiId: number,
+    token?: string
+  ) => Promise<GETPOI>;
+  addPOI: (
+    nickname: string,
+    title: string,
+    content: string,
+    images: number[]
+  ) => Promise<void>;
   modifyPOI: (poiId: number, poiData: POI) => Promise<void>;
   removePOI: (poiId: number) => Promise<void>;
   reorderPOIs: (
@@ -81,7 +116,7 @@ export const usePOI = (): UsePOIResult => {
   const [isLastPage, setIsLastPage] = useState<boolean>(false);
   const [totalCommentPages, setTotalCommentPages] = useState<number>(1);
   const [currentCommentPage, setCurrentCommentPage] = useState<number>(0);
-
+  const { showToast } = useToastMessage();
   const fetchTitles = async (
     nickname: string,
     page: number,
@@ -110,7 +145,6 @@ export const usePOI = (): UsePOIResult => {
     try {
       const data = await getPOI(nickname, poiId, token);
       const poi = data.data;
-      console.log("fetchPOI:", poi);
       return poi;
     } catch (error) {
       setError("POI를 가져오는 중 오류가 발생했습니다.");
@@ -121,7 +155,12 @@ export const usePOI = (): UsePOIResult => {
     }
   };
 
-  const addPOI = async (nickname: string, title: string, content: string) => {
+  const addPOI = async (
+    nickname: string,
+    title: string,
+    content: string,
+    images: number[]
+  ) => {
     setLoading(true);
     setError(null);
     try {
@@ -129,7 +168,7 @@ export const usePOI = (): UsePOIResult => {
         id: null,
         title,
         content,
-        images: [],
+        imageIds: images,
         index: 1,
       });
     } catch (error) {
@@ -197,9 +236,15 @@ export const usePOI = (): UsePOIResult => {
     try {
       await createPOIComment(poiId, nickname, content, token);
     } catch (error) {
-      setError("댓글을 생성하는 중 오류가 발생했습니다.");
-      console.log("addComment_error:", error);
-      throw error;
+      if (axios.isAxiosError(error) && error.response?.data?.code === 2260300) {
+        showToast(
+          "초대링크 제한",
+          "초대링크당 하나의 댓글만 달 수 있습니다",
+          "error"
+        );
+      } else {
+        showToast("Error", "댓글을 등록하는 중 오류가 발생했습니다.", "error");
+      }
     } finally {
       setLoading(false);
     }

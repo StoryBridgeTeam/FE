@@ -1,4 +1,4 @@
-import React, { FC, useState, useEffect } from "react";
+import { FC, useState, useEffect } from "react";
 import {
   Container,
   Button,
@@ -9,7 +9,7 @@ import {
   Spinner,
   useDisclosure,
 } from "@chakra-ui/react";
-import { Edit, Check } from "tabler-icons-react";
+import { Edit, Check, Link } from "tabler-icons-react";
 import { useTranslation } from "react-i18next";
 import TextSection from "./TextSection";
 import ProfileSidebar from "./ProfileSideBar";
@@ -85,7 +85,8 @@ const MainContent: FC = () => {
         response = await getComments(id, 0, token);
       } else {
         response = await getComments(id, 0);
-      }      if (response) {
+      }
+      if (response) {
         setComments(response);
       } else {
         setComments([]);
@@ -150,10 +151,13 @@ const MainContent: FC = () => {
                   </Button>
                 ) : (
                   <>
-                    <Button onClick={handleEditClick}>
+                    <Button onClick={handleEditClick} mr={2}>
                       <Edit size={24} color="black" />
                     </Button>
-                    <Button onClick={onOpen}>링크 생성</Button>
+                    <Button onClick={onOpen}>
+                      <Link />
+                      초대링크
+                    </Button>
                   </>
                 )}
               </Flex>

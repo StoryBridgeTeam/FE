@@ -21,6 +21,8 @@ import { useTranslation } from "react-i18next";
 import { postComment } from "../api/CommentAPI";
 import { useCommentStore } from "../Store/CommentStore";
 import { useLocation } from "react-router-dom";
+import axios from "axios";
+import { useToastMessage } from "../../../common/hooks/useToastMessage";
 
 interface CommentInputProps {
   id: number;
@@ -31,12 +33,13 @@ const CommentInput: React.FC<CommentInputProps> = ({ id }) => {
   const [comment, setComment] = useState("");
   const { t } = useTranslation();
   const isMobile = useBreakpointValue({ base: true, md: false });
-  const nicknameFromStorage = localStorage.getItem("nickName");
-  const [nickname, setNickname] = useState(nicknameFromStorage || "");
+  const storedNickname = localStorage.getItem("nickName");
+  const [nickname, setNickname] = useState(storedNickname || "");
   const { isOpen, onOpen, onClose } = useDisclosure();
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const token = queryParams.get("token");
+  const { showToast } = useToastMessage();
 
   const handleCommentChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setComment(e.target.value);
@@ -45,37 +48,54 @@ const CommentInput: React.FC<CommentInputProps> = ({ id }) => {
   const handleCommentSubmit = async () => {
     if (!nickname) {
       onOpen();
+      return;
     }
-    if (comment.trim() && nickname) {
+
+    if (comment.trim()) {
       try {
-        let response;
-        if (token) {
-          response = await postComment(
-            id,
-            {
-              nickName: nickname,
-              content: comment,
-            },
-            token
-          );
-        } else {
-          response = await postComment(id, {
-            nickName: nickname,
-            content: comment,
-          });
-        }
+        const response = token
+          ? await postComment(
+              id,
+              { nickName: nickname, content: comment },
+              token
+            )
+          : await postComment(id, { nickName: nickname, content: comment });
+
         if (response) {
           addComments(response);
+          setComment("");
         }
       } catch (error) {
-        console.error("Failed to post comment:", error);
+        if (
+          axios.isAxiosError(error) &&
+          error.response?.data?.code === 2260300
+        ) {
+          showToast(
+            "초대링크 제한",
+            "초대링크당 하나의 댓글만 달 수 있습니다",
+            "error"
+          );
+        } else {
+          showToast(
+            "Error",
+            "댓글을 등록하는 중 오류가 발생했습니다.",
+            "error"
+          );
+        }
       }
-      setComment("");
     }
+    onClose(); // Close the modal if it was open
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
+      handleCommentSubmit();
+    }
+  };
+
+  const handleNicknameSubmit = () => {
+    if (nickname.trim()) {
+      setNickname(nickname)
       handleCommentSubmit();
     }
   };
@@ -95,7 +115,7 @@ const CommentInput: React.FC<CommentInputProps> = ({ id }) => {
             />
           </ModalBody>
           <ModalFooter>
-            <Button colorScheme="blue" onClick={onClose}>
+            <Button colorScheme="blue" onClick={handleNicknameSubmit}>
               {t("info.submit")}
             </Button>
           </ModalFooter>
@@ -127,7 +147,7 @@ const CommentInput: React.FC<CommentInputProps> = ({ id }) => {
                 value={comment}
                 onChange={handleCommentChange}
                 onKeyDown={handleKeyDown}
-                placeholder={t(`info.commentPlaceHolder`)}
+                placeholder={t("info.commentPlaceHolder")}
               />
             </Box>
             <Button onClick={handleCommentSubmit}>

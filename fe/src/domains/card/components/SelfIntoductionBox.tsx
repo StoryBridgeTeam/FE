@@ -1,14 +1,26 @@
 import { Box } from "@chakra-ui/react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
 //자기소개페이지로 이동하는 버튼
 const SelfIntroductionBox: React.FC = () => {
   const navigate = useNavigate();
-  const { nickname } = useParams<{ nickname: string }>();
+  const { nickName } = useParams<{ nickName: string }>();
   const { t } = useTranslation();
+  const location = useLocation();
+
+  const queryParams = new URLSearchParams(location.search);
+  const token = queryParams.get("token");
+
   const handleClick = () => {
-    navigate(`/${nickname}/info`);
+    const url = `/${nickName}/info`;
+    const searchParams = new URLSearchParams();
+
+    if (token) {
+      searchParams.append("token", token);
+    }
+
+    navigate(`${url}?${searchParams.toString()}`, { replace: true });
   };
 
   return (

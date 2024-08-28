@@ -4,7 +4,16 @@ interface POI {
   id: number | null;
   title: string;
   content: string;
-  images: string[];
+  images: number[];
+  index: number;
+  createdAt?: string;
+}
+
+interface POSTPOI {
+  id: number | null;
+  title: string;
+  content: string;
+  imageIds: number[];
   index: number;
 }
 
@@ -41,13 +50,13 @@ export const getPOI = async (
   }
 
   const response = await axiosInstance.get(
-    `/poies/${poiId}/members/${nickname}`,
+    `/members/${nickname}/poies/${poiId}`,
     { params }
   );
   return response.data;
 };
 
-export const createPOI = async (nickname: string, poiData: POI) => {
+export const createPOI = async (nickname: string, poiData: POSTPOI) => {
   console.log("createPOI_poiData:", poiData);
   const response = await axiosInstance.post(
     `members/${nickname}/poies`,
@@ -57,7 +66,15 @@ export const createPOI = async (nickname: string, poiData: POI) => {
 };
 
 export const updatePOI = async (poiId: number, poiData: POI) => {
-  const response = await axiosInstance.put(`/poies/${poiId}`, poiData);
+  const response = await axiosInstance.put(`/poies/${poiId}`, {
+    id: poiData.id,
+    title: poiData.title,
+    content: poiData.content,
+    index: poiData.index,
+    imageIds: poiData.images,
+    createdAt: poiData.createdAt,
+    updatedAt: null,
+  });
   return response.data;
 };
 
@@ -117,6 +134,38 @@ export const getPOIComments = async (
     params,
   });
   return response.data;
+};
+
+export const deleteComment = async (commentId: number) => {
+  const response = await axiosInstance.delete(`/comments/${commentId}`);
+  return response.data;
+};
+
+export const updateComment = async (
+  commentId: number,
+  editText: string,
+  token?: string
+) => {
+  try {
+    const nickName = localStorage.getItem("nickName");
+    const response = await axiosInstance.put(
+      `/comments/${commentId}`,
+      {
+        nickName,
+        commentId,
+        content: editText,
+      },
+      {
+        params: {
+          token,
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Failed to update comment:", error);
+    throw error;
+  }
 };
 
 export const linkPOICommentTag = async (

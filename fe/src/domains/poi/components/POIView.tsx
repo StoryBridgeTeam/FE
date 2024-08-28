@@ -21,13 +21,17 @@ import {
   AlertDialogContent,
   AlertDialogOverlay,
   useDisclosure,
+  Image,
+  Flex,
 } from "@chakra-ui/react";
 import { FiMoreHorizontal, FiEdit, FiTrash2, FiLink } from "react-icons/fi";
-import { POI, usePOI } from "../hooks/usePOI";
+import { GETPOI, POI, usePOI } from "../hooks/usePOI";
 import CommentList from "./CommentList";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { useToastMessage } from "../../../common/hooks/useToastMessage";
 import InviteModal from "../../../common/components/InviteModal";
+import { renderContentWithIcons } from "../../info/components/renderContentWithIcons";
+import { useCommentStore } from "../store/POIComment";
 
 interface POIViewProps {
   poiId: string | undefined;
@@ -39,7 +43,7 @@ const POIView: React.FC<POIViewProps> = ({ poiId }) => {
   const { nickName } = useParams<{ nickName: string }>();
   const savedNickName = localStorage.getItem("nickName");
   const isHost = nickName === savedNickName;
-  const [poi, setPoi] = useState<POI>();
+  const [poi, setPoi] = useState<GETPOI>();
   const { fetchPOI, loading, error, removePOI, formatTimestamp } = usePOI();
   const { showToast } = useToastMessage();
   const [isAlertOpen, setIsAlertOpen] = useState(false);
@@ -47,7 +51,7 @@ const POIView: React.FC<POIViewProps> = ({ poiId }) => {
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const token = queryParams.get("token");
-
+  const { comments } = useCommentStore();
   const {
     isOpen: isInviteModalOpen,
     onOpen: onInviteModalOpen,
@@ -79,6 +83,57 @@ const POIView: React.FC<POIViewProps> = ({ poiId }) => {
   if (error) {
     return <Text color="red.500">{error}</Text>;
   }
+
+  const scrollToHighlightedComment = (
+    startIndex?: number,
+    endIndex?: number
+  ) => {
+    if (startIndex === undefined || endIndex === undefined) return;
+
+    const comment = comments.find(
+      (c) =>
+        c.tagInfo?.startIndex === startIndex &&
+        c.tagInfo?.lastIndex === endIndex
+    );
+    if (comment) {
+      const elementId = `comment-${comment.id}`;
+      const element = document.getElementById(elementId);
+
+      if (element) {
+        element.scrollIntoView({ behavior: "smooth", block: "center" });
+      } else {
+        console.warn(`Element with id '${elementId}' not found.`);
+      }
+    } else {
+      console.warn("Comment not found with specified indexes.");
+    }
+  };
+
+  const scrollToHighlightedText = (startIndex?: number, endIndex?: number) => {
+    if (startIndex === undefined || endIndex === undefined) return;
+
+    const highlightElements = document.querySelectorAll(`[id^='highlight-']`);
+    highlightElements.forEach((element) => {
+      const id = element.id.replace("highlight-", "");
+      const comment = comments.find((c) => c.id.toString() === id);
+      if (
+        comment?.tagInfo?.startIndex === startIndex &&
+        comment?.tagInfo?.lastIndex === endIndex
+      ) {
+        (element as HTMLElement).scrollIntoView({
+          behavior: "smooth",
+          block: "center",
+        });
+      }
+    });
+  };
+
+  const processedComments = comments.map((comment) => ({
+    id: comment.id,
+    content: comment.content,
+    startIndex: comment.tagInfo?.startIndex || 0,
+    endIndex: comment.tagInfo?.lastIndex || 0,
+  }));
 
   return (
     <VStack spacing={4} align="stretch" p={6}>
@@ -153,19 +208,32 @@ const POIView: React.FC<POIViewProps> = ({ poiId }) => {
         </Text>
       )}
 
+      {poi?.images.map((imgSrc, index) => (
+        <Box key={index} position="relative" display="inline-block" mr={2}>
+          <Image
+            src={`http://image.storyb.kr/${imgSrc.path}`}
+            alt={imgSrc.name}
+            display="block"
+            maxH="500px"
+            maxW="none"
+            objectFit="contain"
+          />
+        </Box>
+      ))}
       <Box minHeight="300px" px={6}>
-        {poi?.content.split(/\n/).map((line, index) => (
-          <React.Fragment key={index}>
-            <Text mb={2} display="inline">
-              {line}
-            </Text>
-            {index < poi?.content.split(/\n/).length - 1 && <br />}
-          </React.Fragment>
-        ))}
+        {renderContentWithIcons(
+          poi?.content || " ",
+          processedComments,
+          scrollToHighlightedComment
+        )}
       </Box>
       <Divider borderColor="#828282" borderWidth="1px" mt={5} />
       {poiId && nickName && (
-        <CommentList poiId={Number(poiId)} nickName={nickName} />
+        <CommentList
+          poiId={Number(poiId)}
+          nickName={nickName}
+          highlightComment={scrollToHighlightedText}
+        />
       )}
 
       <AlertDialog

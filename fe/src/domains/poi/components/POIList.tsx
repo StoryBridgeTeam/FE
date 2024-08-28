@@ -71,7 +71,6 @@ const POIList: React.FC = () => {
 
   const loadTitles = async () => {
     try {
-      console.log("loadTitles", page, size);
       let data: POI[];
       if (token) {
         data = await fetchTitles(nickName!, page, size, token);
