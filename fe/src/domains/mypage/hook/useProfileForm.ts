@@ -30,7 +30,9 @@ const useProfileForm = () => {
         newPassword: "",
         confirmNewPassword: "",
       });
-      setImage(data.profileImage.path || "");
+      if (data.profileImage) {
+        setImage(data.profileImage.path || "");
+      }
     } catch (error) {
       toast({
         title: "Error fetching profile",

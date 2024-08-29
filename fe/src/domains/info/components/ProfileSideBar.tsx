@@ -26,6 +26,7 @@ import {
   getAdditionalInfo,
   createAdditionalInfo,
   deleteAdditionalInfo,
+  getCardProfile,
 } from "../api/SideBarAPI";
 import { useLocation, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -47,6 +48,7 @@ const ProfileSidebar: FC = () => {
   const [aboutMe, setAboutMe] = useState<AboutMeItem[]>([]);
   const [education, setEducation] = useState<EducationItem[]>([]);
   const ishost = nickName === name;
+  const [image, setImage] = useState<string>();
 
   const {
     isOpen: isAddEducationOpen,
@@ -98,11 +100,14 @@ const ProfileSidebar: FC = () => {
 
   const fetchCardData = useCallback(async () => {
     try {
+      let image;
       let card;
       if (token) {
         card = await getCard(nickName!, token);
+        image = await getCardProfile(nickName!, token);
       } else {
         card = await getCard(nickName!);
+        image = await getCardProfile(nickName!);
       }
       if (Array.isArray(card)) {
         setAboutMe(card);
@@ -110,6 +115,8 @@ const ProfileSidebar: FC = () => {
         console.error("Unexpected format for card:", card);
         setAboutMe([]);
       }
+      console.log(image.path);
+      setImage(image.path);
     } catch (error) {
       console.error("Card error:", error);
     }
@@ -207,7 +214,14 @@ const ProfileSidebar: FC = () => {
       bg="#F6F6F6"
       spacing={4}
     >
-      <ProfileImage />
+      <Box
+        w="150px"
+        h="150px"
+        borderRadius="full"
+        backgroundImage={`http://image.storyb.kr/${image}`}
+        backgroundSize="cover"
+        backgroundPosition="center"
+      />
       <Heading size="md">{nickName}</Heading>
       <Divider borderColor="#C5C5C5" />
       <InfoSection
@@ -297,17 +311,6 @@ const ProfileSidebar: FC = () => {
     </VStack>
   );
 };
-
-const ProfileImage: FC = () => (
-  <Box
-    w="150px"
-    h="150px"
-    borderRadius="full"
-    backgroundImage="url(https://image.idus.com/image/files/da17e0c53a4e480284c5d49932722e5a.jpg)"
-    backgroundSize="cover"
-    backgroundPosition="center"
-  />
-);
 
 const InfoSection: FC<{
   title: string;

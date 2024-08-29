@@ -30,25 +30,31 @@ export const datalist: DataNode[] = [
     nickname: "nickname",
     imageUrl: default_img,
     isBlocked: false,
-  },{
+  },
+  {
     nickname: "nickname",
     imageUrl: default_img,
     isBlocked: false,
-  },{
+  },
+  {
     nickname: "nickname",
     imageUrl: default_img,
     isBlocked: false,
-  },{
+  },
+  {
     nickname: "nickname",
     imageUrl: default_img,
     isBlocked: false,
-  },{
+  },
+  {
     nickname: "nickname",
     imageUrl: default_img,
     isBlocked: false,
-  },{
+  },
+  {
     nickname: "nickname",
     imageUrl: default_img,
     isBlocked: false,
-  }
-]
+  },
+];
+

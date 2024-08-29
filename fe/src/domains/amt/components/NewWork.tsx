@@ -8,9 +8,56 @@ import {
   AvatarGroup,
   useBreakpointValue,
 } from "@chakra-ui/react";
+import { useEffect, useState } from "react";
+import { getNetwork } from "../api/AmtAPI";
+import { useLocation, useParams } from "react-router-dom";
+
+interface ProfileImage {
+  id: number;
+  name: string;
+  contentType: string;
+  size: number;
+  path: string;
+}
+
+interface ActivistDetails {
+  activistId: number | null;
+  monthlyTotalPoint: number;
+  monthlyTotalOnlinePoint: number;
+  monthlyTotalOfflinePoint: number;
+  activistNickname: string;
+  profileImage: ProfileImage;
+}
+
+interface NetWorkPoint {
+  monthlyTotalPoint: number;
+  monthlyTotalOnlinePoint: number;
+  monthlyTotalOfflinePoint: number;
+  mostActivityDetails: ActivistDetails[];
+}
 
 const NetWork = () => {
   const isMobile = useBreakpointValue({ base: true, md: false });
+  const { nickName } = useParams<{ nickName: string }>();
+  const location = useLocation();
+  const [network, setNetwork] = useState<NetWorkPoint>();
+
+  const queryParams = new URLSearchParams(location.search);
+  const token = queryParams.get("token");
+  useEffect(() => {
+    const fetchNetwork = async () => {
+      let data;
+      if (token) {
+        data = await getNetwork(nickName!, token);
+      } else {
+        data = await getNetwork(nickName!);
+      }
+
+      setNetwork(data);
+    };
+
+    fetchNetwork();
+  }, []);
   return (
     <Flex
       p={6}
@@ -40,18 +87,22 @@ const NetWork = () => {
         </Text>
       </Box>
       <Flex w={"100%"} alignItems={"center"} justifyContent={"space-around"}>
-        <CircularProgress value={40} size={"120px"} color={"gray.400"}>
+        <CircularProgress
+          value={network?.monthlyTotalPoint}
+          size={"120px"}
+          color={"gray.400"}
+        >
           <CircularProgressLabel fontSize={"20px"} color={"blue.700"}>
             총 점수
             <br />
-            40
+            {network?.monthlyTotalPoint}
           </CircularProgressLabel>
         </CircularProgress>
         <Box ml={4} textAlign={"left"}>
           <Text fontSize={"lg"} fontWeight={"semibold"} color={"gray.600"}>
-            온라인 활동 30점
+            온라인 활동 {network?.monthlyTotalOnlinePoint}점
           </Text>
-          <AvatarGroup size="sm" max={6} mb={2}>
+          {/* <AvatarGroup size="sm" max={6} mb={2}>
             <Avatar name="Profile 1" src="https://bit.ly/dan-abramov" />
             <Avatar name="Profile 2" src="https://bit.ly/ryan-florence" />
             <Avatar name="Profile 3" src="https://bit.ly/kent-c-dodds" />
@@ -61,13 +112,13 @@ const NetWork = () => {
             <Text fontSize="lg" ml={2} color="gray.600">
               ...
             </Text>
-          </AvatarGroup>
+          </AvatarGroup> */}
 
           <Text fontSize={"lg"} fontWeight={"semibold"} color={"gray.600"}>
-            오프라인 활동 10점
+            오프라인 활동 {network?.monthlyTotalOfflinePoint}점
           </Text>
 
-          <AvatarGroup size="sm" max={6} mb={2}>
+          {/* <AvatarGroup size="sm" max={6} mb={2}>
             <Avatar name="Profile 1" src="https://bit.ly/dan-abramov" />
             <Avatar name="Profile 2" src="https://bit.ly/ryan-florence" />
             <Avatar name="Profile 3" src="https://bit.ly/kent-c-dodds" />
@@ -77,7 +128,7 @@ const NetWork = () => {
             <Text fontSize="lg" ml={2} color="gray.600">
               ...
             </Text>
-          </AvatarGroup>
+          </AvatarGroup> */}
         </Box>
       </Flex>
     </Flex>

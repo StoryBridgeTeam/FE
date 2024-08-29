@@ -56,3 +56,21 @@ export const getAmtChild = async (
     return [];
   }
 };
+
+export const getNetwork = async (
+  nickname: string,
+  token?: string
+) => {
+  try {
+    const response = await axiosInstance.get(`/members/${nickname}/activity`, {
+      params: {
+        token,
+      },
+    });
+    return response.data.data;
+  } catch (error) {
+    console.error(error);
+    return [];
+  }
+};
+
