@@ -12,7 +12,7 @@ import { GripVertical } from "tabler-icons-react";
 
 const CardModalList: React.FC<CardModalListProps> = ({
   isEditing,
-  entries = [], // 기본값을 빈 배열로 설정
+  entries = [],
   setEntries,
 }) => {
   const reorderEntries = (startIndex: number, endIndex: number) => {
@@ -50,7 +50,7 @@ const CardModalList: React.FC<CardModalListProps> = ({
   return (
     <>
       {entries.length === 0 ? (
-        <Box px={10} py={5} textAlign="center">
+        <Box px={10} pb={10} textAlign="center">
           <Text color="gray.500" fontSize="lg">
             빈 명함입니다
           </Text>
@@ -63,9 +63,12 @@ const CardModalList: React.FC<CardModalListProps> = ({
                 {...provided.droppableProps}
                 ref={provided.innerRef}
                 styleType="none"
-                px={{ base: 0, md: 8 }}
+                px={{ base: 0, md: 20 }}
                 pb={{ base: 0, md: 10 }}
                 spacing={2}
+                maxHeight="400px"
+                overflowY="auto"
+                width="100%"
               >
                 {entries.map((entry, index) => (
                   <Draggable
@@ -117,6 +120,8 @@ const CardModalList: React.FC<CardModalListProps> = ({
             px={{ base: 0, md: 8 }}
             pb={{ base: 0, md: 10 }}
             spacing={2}
+            maxHeight="400px"
+            overflowY="auto"
           >
             {entries.map((entry) => (
               <CardModalItem

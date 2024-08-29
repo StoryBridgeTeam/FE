@@ -16,17 +16,15 @@ export interface EntryStateForAPI {
 
 export type FetchType = "BRIEF" | "DETAIL";
 export type CardType = "ORIGINAL" | "PUBLIC";
+export type ModalTabType = "명함" | "댓글";
 
-export interface CardModalProps {
-  isOpen: boolean;
-  onClose: () => void;
+export interface CardViewProps {
   name: string;
   nickName: string;
+  cardId: number;
 }
 
 export interface FirstCardModalProps {
-  isOpen: boolean;
-  onClose: () => void;
   nickName: string;
 }
 

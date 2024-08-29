@@ -2,9 +2,12 @@ import axiosInstance from "../../../common/api/axiosInstance";
 import { EntryState } from "../types/cardTypes";
 import { prepareEntriesForAPI } from "../utils/apiUtils";
 
-export const getIsCreatedCard = async (nickname: string) => {
+export const getIsCreatedCard = async (nickname: string, token?: string) => {
   const response = await axiosInstance.get(
-    `/members/${nickname}/card/is-create`
+    `/members/${nickname}/card/is-create`,
+    {
+      params: { token },
+    }
   );
   console.log("getIsCreatedCard_response:", response.data);
   return response.data;
@@ -67,6 +70,80 @@ export const updatePublicCardInfo = async (
   return response.data;
 };
 
+export const deleteComment = async (commentId: number) => {
+  const response = await axiosInstance.delete(`/comments/${commentId}`);
+  return response.data;
+};
+
+export const updateComment = async (
+  commentId: number,
+  editText: string,
+  token?: string
+) => {
+  try {
+    const nickName = localStorage.getItem("nickName");
+    const response = await axiosInstance.put(
+      `/comments/${commentId}`,
+      {
+        nickName,
+        commentId,
+        content: editText,
+      },
+      {
+        params: {
+          token,
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Failed to update comment:", error);
+    throw error;
+  }
+};
+
+export const createCardComment = async (
+  cardId: number,
+  nickname: string,
+  content: string,
+  token?: string
+) => {
+  const params: Record<string, any> = {};
+  if (token && token.trim() !== "") {
+    params.token = token;
+  }
+
+  const response = await axiosInstance.post(
+    `/profile-card/${cardId}/comments`,
+    {
+      nickName: nickname,
+      content: content,
+    },
+    { params }
+  );
+  return response.data;
+};
+
+export const getCardComments = async (
+  cardId: number,
+  page: number,
+  size: number,
+  token?: string
+) => {
+  const params: Record<string, any> = {
+    page: page,
+    size: size,
+  };
+
+  if (token && token.trim() !== "") {
+    params.token = token;
+  }
+
+  const response = await axiosInstance.get(`/profile-card/${cardId}/comments`, {
+    params,
+  });
+  return response.data;
+};
 // // 명함 부가정보(학력 및 경력) 조회
 // export const getAdditionalInfo = async (nickname: string) => {
 //   const response = await axiosInstance.get(`/members/${nickname}/card/additional-info`);

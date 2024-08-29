@@ -11,6 +11,7 @@ import MyPage from "./domains/mypage/MyPage";
 import AmtPage from "./domains/amt/AmtPage";
 import POIPage from "./domains/poi/POIPage";
 import DetailPage from "./domains/info/components/DetailPage";
+import CardPage from "./domains/card/CardPage";
 
 const theme = extendTheme({
   fonts: {
@@ -70,6 +71,10 @@ function App() {
           <Route
             path="/:nickName/poi/:poiId/modify"
             element={<PrivateRoute element={<POIPage />} />}
+          />
+          <Route
+            path="/:nickName/card"
+            element={<PrivateRoute element={<CardPage />} />}
           />
           <Route
             path="*"

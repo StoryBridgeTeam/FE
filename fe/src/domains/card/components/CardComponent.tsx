@@ -3,21 +3,22 @@ import {
   Heading,
   Spinner,
   useBreakpointValue,
-  useDisclosure,
   VStack,
   Text,
   Flex,
   Button,
+  useDisclosure,
 } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
-import { useLocation, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { useCard } from "../hooks/useCard";
 import { EntryState } from "../types/cardTypes";
 import CardInfoBox from "./CardInfoBox";
-import CardModal from "./CardModal";
+import CardModal from "./CardModalComponent";
 import SelfIntroductionBox from "./SelfIntoductionBox";
 import FirstCardModal from "./FirstCardModal";
 import { Share } from "tabler-icons-react";
+import InviteModal from "../../../common/components/InviteModal";
 
 //명함카드 영역 컴포넌트
 const CardComponent: React.FC = () => {
@@ -26,39 +27,69 @@ const CardComponent: React.FC = () => {
   const { loading, error, checkCard, fetchPublicCard } = useCard();
   const [hasCard, setHasCard] = useState<boolean>(false);
   const [briefEntries, setBriefEntries] = useState<EntryState[]>([]);
-  const { isOpen, onOpen, onClose } = useDisclosure();
   const savedNickName = localStorage.getItem("nickName");
   const isHost = nickName === savedNickName;
   const [name, setName] = useState<string>("");
+  const [cardId, setCardId] = useState<number | null>(null);
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const token = queryParams.get("token");
+  const navigate = useNavigate();
+  const {
+    isOpen: isInviteModalOpen,
+    onOpen: onInviteModalOpen,
+    onClose: onInviteModalClose,
+  } = useDisclosure();
 
   useEffect(() => {
     if (nickName) {
-      checkCard(nickName).then((result) => {
-        console.log("checkCard_result:", result);
-        if (result) {
-          setHasCard(true);
-          if (token) {
+      if (token) {
+        checkCard(nickName, token).then((result) => {
+          if (result) {
+            setHasCard(true);
             fetchPublicCard(nickName, "BRIEF", token).then((data) => {
-              console.log("fdd2:", data);
               setBriefEntries(data.entries);
               setName(data.name);
+              setCardId(data.id);
             });
           } else {
+            setHasCard(false);
+          }
+        });
+      } else {
+        checkCard(nickName).then((result) => {
+          if (result) {
+            setHasCard(true);
             fetchPublicCard(nickName, "BRIEF").then((data) => {
-              console.log("fdd2:", data);
               setBriefEntries(data.entries);
               setName(data.name);
+              setCardId(data.id);
             });
+          } else {
+            setHasCard(false);
           }
-        } else {
-          setHasCard(false);
-        }
-      });
+        });
+      }
     }
   }, [nickName, token]);
+
+  const handleClick = () => {
+    const url = `/${nickName}/card`;
+    const searchParams = new URLSearchParams();
+
+    if (token) {
+      searchParams.append("token", token);
+    }
+
+    navigate(`${url}?${searchParams.toString()}`, {
+      state: {
+        name: name,
+        hasCard: hasCard,
+        cardId: cardId,
+      },
+      replace: true,
+    });
+  };
 
   if (loading) {
     return <Spinner />;
@@ -94,7 +125,7 @@ const CardComponent: React.FC = () => {
         <VStack align="stretch" spacing={2} color="black" flex={1}>
           {hasCard && (
             <Flex alignItems="center" justifyContent="space-between">
-              <Box flex="1" /> {/* 왼쪽 빈 공간 */}
+              <Box flex="1" />
               <Heading
                 fontSize={isMobile ? "md" : "xl"}
                 textAlign="center"
@@ -103,7 +134,7 @@ const CardComponent: React.FC = () => {
                 {name}
               </Heading>
               <Box flex="1" textAlign="right">
-                <Button size="sm" bg="white">
+                <Button size="sm" bg="white" onClick={onInviteModalOpen}>
                   <Share size={20} color="black" />
                 </Button>
               </Box>
@@ -111,28 +142,13 @@ const CardComponent: React.FC = () => {
           )}
           <CardInfoBox
             briefEntries={briefEntries}
-            onClick={onOpen}
+            onClick={handleClick}
             hasCard={hasCard}
           />
         </VStack>
-        {hasCard ? (
-          <CardModal
-            isOpen={isOpen}
-            onClose={onClose}
-            name={name}
-            nickName={nickName!}
-          />
-        ) : (
-          isHost && (
-            <FirstCardModal
-              isOpen={isOpen}
-              onClose={onClose}
-              nickName={nickName!}
-            />
-          )
-        )}
       </Box>
       <SelfIntroductionBox />
+      <InviteModal isOpen={isInviteModalOpen} onClose={onInviteModalClose} />
     </VStack>
   );
 };

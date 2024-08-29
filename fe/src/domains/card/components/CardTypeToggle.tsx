@@ -1,5 +1,11 @@
 import React from "react";
-import { Box, Text, Progress, Button } from "@chakra-ui/react";
+import {
+  Box,
+  Text,
+  Progress,
+  Button,
+  useBreakpointValue,
+} from "@chakra-ui/react";
 import { CardType } from "../types/cardTypes";
 
 interface CardTypeToggleProps {
@@ -11,11 +17,13 @@ const CardTypeToggle: React.FC<CardTypeToggleProps> = ({
   cardType,
   onToggle,
 }) => {
+  const isMobile = useBreakpointValue({ base: true, md: false });
+
   return (
     <Box textAlign="center">
       <Progress
         value={50}
-        size="xs"
+        size="sm"
         colorScheme="blackAlpha"
         borderRadius="full"
         mb={2}
@@ -34,8 +42,7 @@ const CardTypeToggle: React.FC<CardTypeToggleProps> = ({
         borderRadius="lg"
         bg="white"
         _hover={{ bg: "gray.100" }}
-        width="100px"
-        height="50px"
+        size={isMobile ? "md" : "lg"}
       >
         <Text fontSize="lg">{cardType === "PUBLIC" ? "공개" : "원본"}</Text>
       </Button>

@@ -12,6 +12,7 @@ import {
 } from "@chakra-ui/react";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { CardModalItemProps } from "../types/cardTypes";
+import { useParams } from "react-router-dom";
 
 // 카드 컴포넌트와 카드 모달 창(편집 상태)에서 엔트리 항목을 출력해주는 컴포넌트
 const CardModalItem: React.FC<CardModalItemProps> = ({
@@ -20,6 +21,10 @@ const CardModalItem: React.FC<CardModalItemProps> = ({
   onChangeEntry,
   onDeleteEntry,
 }) => {
+  const { nickName } = useParams<{ nickName: string }>();
+  const savedNickName = localStorage.getItem("nickName");
+  const isHost = nickName === savedNickName;
+
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     onChangeEntry(entry.id, { title: e.target.value });
   };
@@ -70,11 +75,13 @@ const CardModalItem: React.FC<CardModalItemProps> = ({
       ) : (
         <Flex alignItems="center">
           <CardInfoItem key={entry.id} {...entry} />
-          <Icon
-            as={entry.isVisibleBriefCard ? FaEye : FaEyeSlash}
-            color={entry.isVisibleBriefCard ? "blue.500" : "red.500"}
-            ml={2}
-          />
+          {isHost && (
+            <Icon
+              as={entry.isVisibleBriefCard ? FaEye : FaEyeSlash}
+              color={entry.isVisibleBriefCard ? "blue.500" : "red.500"}
+              ml={2}
+            />
+          )}
         </Flex>
       )}
     </ListItem>
