@@ -58,8 +58,8 @@ const POIModify: React.FC<{ poiId: string }> = ({ poiId }) => {
   const [selectedImage, setSelectedImage] = useState<ImageData | null>(null);
   useEffect(() => {
     if (isHost && nickName && poiId) {
-      fetchPOI(nickName, Number(poiId)).then((data) => setPoi(data));
-      fetchPOI(nickName, Number(poiId)).then((data) => {
+      fetchPOI(Number(poiId)).then((data) => setPoi(data));
+      fetchPOI(Number(poiId)).then((data) => {
         setPoi(data);
         setTitle(data.title);
         setContent(data.content);

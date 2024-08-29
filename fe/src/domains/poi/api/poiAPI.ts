@@ -10,11 +10,9 @@ interface POI {
 }
 
 interface POSTPOI {
-  id: number | null;
   title: string;
   content: string;
   imageIds: number[];
-  index: number;
 }
 
 export const getTitles = async (
@@ -40,7 +38,6 @@ export const getTitles = async (
 };
 
 export const getPOI = async (
-  nickname: string,
   poiId: number,
   token?: string
 ) => {
@@ -50,16 +47,15 @@ export const getPOI = async (
   }
 
   const response = await axiosInstance.get(
-    `/members/${nickname}/poies/${poiId}`,
+    `/poies/${poiId}`,
     { params }
   );
   return response.data;
 };
 
-export const createPOI = async (nickname: string, poiData: POSTPOI) => {
-  console.log("createPOI_poiData:", poiData);
+export const createPOI = async (poiData: POSTPOI) => {
   const response = await axiosInstance.post(
-    `members/${nickname}/poies`,
+    `/poies`,
     poiData
   );
   return response.data;
@@ -84,11 +80,11 @@ export const deletePOI = async (poiId: number) => {
 };
 
 export const updatePOIIndexes = async (
-  nickname: string,
-  modifyList: { id: number; index: number }[]
+  id: number,
+  index:number
 ) => {
-  const response = await axiosInstance.put(`/members/${nickname}/poies/index`, {
-    modifyList,
+  const response = await axiosInstance.put(`/poies/${id}/index`, {
+    index: index
   });
   return response.data;
 };

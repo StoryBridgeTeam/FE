@@ -86,7 +86,6 @@ const POICreate: React.FC = () => {
   const handleCreatePOI = useCallback(async () => {
     try {
       await addPOI(
-        localNickname!,
         title,
         content,
         images.map((image) => image.id)

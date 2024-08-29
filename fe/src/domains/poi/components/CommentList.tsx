@@ -106,10 +106,10 @@ const CommentList: React.FC<CommentListProps> = ({
       let data;
       if (token) {
         data = await fetchComments(poiId, page, 10, token);
-        data1 = await getPOI(nickName, poiId, token);
+        data1 = await getPOI(poiId, token);
       } else {
         data = await fetchComments(poiId, page, 10);
-        data1 = await getPOI(nickName, poiId);
+        data1 = await getPOI(poiId);
       }
       setComments(data);
       setPOIComments(data);

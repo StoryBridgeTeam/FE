@@ -1,4 +1,4 @@
-import React from "react";
+import React, {Ref} from "react";
 import { Box, Text } from "@chakra-ui/react";
 
 interface POIItemProps {

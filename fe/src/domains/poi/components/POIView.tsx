@@ -76,8 +76,8 @@ const POIView: React.FC<POIViewProps> = ({ poiId }) => {
   useEffect(() => {
     if (nickName && poiId) {
       if (token)
-        fetchPOI(nickName, Number(poiId), token).then((data) => setPoi(data));
-      else fetchPOI(nickName, Number(poiId)).then((data) => setPoi(data));
+        fetchPOI(Number(poiId), token).then((data) => setPoi(data));
+      else fetchPOI(Number(poiId)).then((data) => setPoi(data));
     }
   }, [nickName, poiId]);
 

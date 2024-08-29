@@ -73,12 +73,10 @@ interface UsePOIResult {
     token?: string
   ) => Promise<POI[]>;
   fetchPOI: (
-    nickname: string,
     poiId: number,
     token?: string
   ) => Promise<GETPOI>;
   addPOI: (
-    nickname: string,
     title: string,
     content: string,
     images: number[]
@@ -86,9 +84,9 @@ interface UsePOIResult {
   modifyPOI: (poiId: number, poiData: POI) => Promise<void>;
   removePOI: (poiId: number) => Promise<void>;
   reorderPOIs: (
-    nickname: string,
-    modifyList: { id: number; index: number }[]
-  ) => Promise<void>;
+      id:number,
+      index:number
+  ) => Promise<POI[]>;
   addComment: (
     poiId: number,
     nickname: string,
@@ -143,11 +141,11 @@ export const usePOI = (): UsePOIResult => {
     }
   };
 
-  const fetchPOI = async (nickname: string, poiId: number, token?: string) => {
+  const fetchPOI = async (poiId: number, token?: string) => {
     setLoading(true);
     setError(null);
     try {
-      const data = await getPOI(nickname, poiId, token);
+      const data = await getPOI(poiId, token);
       const poi = data.data;
       return poi;
     } catch (error) {
@@ -160,7 +158,6 @@ export const usePOI = (): UsePOIResult => {
   };
 
   const addPOI = async (
-    nickname: string,
     title: string,
     content: string,
     images: number[]
@@ -168,12 +165,10 @@ export const usePOI = (): UsePOIResult => {
     setLoading(true);
     setError(null);
     try {
-      await createPOI(nickname, {
-        id: null,
+      await createPOI({
         title,
         content,
         imageIds: images,
-        index: 1,
       });
     } catch (error) {
       setError("POI를 생성하는 중 오류가 발생했습니다.");
@@ -213,13 +208,17 @@ export const usePOI = (): UsePOIResult => {
   };
 
   const reorderPOIs = async (
-    nickname: string,
-    modifyList: { id: number; index: number }[]
+    id: number,
+    index:number,
   ) => {
     setLoading(true);
     setError(null);
     try {
-      await updatePOIIndexes(nickname, modifyList);
+      const data = await updatePOIIndexes(id, index);
+      const titles = data.data.content || [];
+      setIsLastPage(data.data.last);
+      // setTotalPOIs(data.data.totalElements);
+      return titles;
     } catch (error) {
       setError("POI 인덱스를 수정하는 중 오류가 발생했습니다.");
       console.log("reorderPOIs_error:", error);
