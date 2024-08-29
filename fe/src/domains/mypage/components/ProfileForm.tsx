@@ -45,7 +45,11 @@ const ProfileForm: React.FC = () => {
                 이미지
               </Text>
               {image ? (
-                <Image src={image} boxSize="200px" borderRadius="full" />
+                <Image
+                  src={`http://image.storyb.kr/${image}`}
+                  boxSize="200px"
+                  borderRadius="full"
+                />
               ) : (
                 <Image
                   src={"images/profile.png"}
