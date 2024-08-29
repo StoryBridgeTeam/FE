@@ -13,20 +13,21 @@ import {
 import axios from "axios";
 import { useToastMessage } from "../../../common/hooks/useToastMessage";
 import { set } from "date-fns";
+import {ImageRes} from "../../../common/hooks/useImage";
 
-export interface ImageData {
-  id: number;
-  name: string;
-  contentType: string;
-  size: number;
-  path: string;
-}
+// export interface ImageData {
+//   id: number;
+//   name: string;
+//   contentType: string;
+//   size: number;
+//   path: string;
+// }
 
 export interface GETPOI {
   id: number | null;
   title: string;
   content: string;
-  images: ImageData[];
+  images: ImageRes[];
   index: number;
   createdAt?: string;
   updatedAt?: string | null;
@@ -54,6 +55,7 @@ export interface Comment {
   content: string;
   timestamp: string;
   modifiedTime: string | null;
+  images: ImageRes[] | [];
   tagInfo: {
     startIndex: number;
     lastIndex: number;
@@ -91,7 +93,8 @@ interface UsePOIResult {
     poiId: number,
     nickname: string,
     content: string,
-    token?: string
+    token?: string,
+    imageIds? : number[]
   ) => Promise<void>;
   fetchComments: (
     poiId: number,
@@ -232,12 +235,13 @@ export const usePOI = (): UsePOIResult => {
     poiId: number,
     nickname: string,
     content: string,
-    token?: string
+    token?: string,
+    imageIds?: number[]
   ) => {
     setLoading(true);
     setError(null);
     try {
-      await createPOIComment(poiId, nickname, content, token);
+      await createPOIComment(poiId, nickname, content, token, imageIds);
     } catch (error) {
       if (axios.isAxiosError(error) && error.response?.data?.code === 2260300) {
         showToast(
@@ -271,6 +275,7 @@ export const usePOI = (): UsePOIResult => {
           timestamp: comment.createdTime,
           modifiedTime: comment.modifiedTime,
           tagInfo: comment.tagInfo,
+          images:comment.images
         })
       );
       setTotalCommentPages(data.data.comments.totalPages);

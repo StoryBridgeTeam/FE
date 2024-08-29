@@ -25,13 +25,14 @@ import {
   useParams,
 } from "react-router-dom";
 import { useToastMessage } from "../../../common/hooks/useToastMessage";
-import { usePOI, POI, GETPOI, ImageData } from "../../poi/hooks/usePOI";
+import { usePOI, POI, GETPOI } from "../../poi/hooks/usePOI";
 import { Plus, X } from "tabler-icons-react";
 import { deleteImage, uploadImage } from "../../../common/api/imageAPI";
 import { carouselSettings } from "../../amt/utils/carouselSetting";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import Slider from "react-slick";
+import {ImageRes} from "../../../common/hooks/useImage";
 
 const POIModify: React.FC<{ poiId: string }> = ({ poiId }) => {
   const isMobile = useBreakpointValue({ base: true, md: false });
@@ -48,14 +49,14 @@ const POIModify: React.FC<{ poiId: string }> = ({ poiId }) => {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const MAX_TITLE_LENGTH = 50;
-  const [images, setImages] = useState<ImageData[]>([]);
+  const [images, setImages] = useState<ImageRes[]>([]);
   const {
     isOpen: isModalOpen,
     onOpen: onModalOpen,
     onClose: onModalClose,
   } = useDisclosure();
 
-  const [selectedImage, setSelectedImage] = useState<ImageData | null>(null);
+  const [selectedImage, setSelectedImage] = useState<ImageRes | null>(null);
   useEffect(() => {
     if (isHost && nickName && poiId) {
       fetchPOI(Number(poiId)).then((data) => setPoi(data));
@@ -105,7 +106,7 @@ const POIModify: React.FC<{ poiId: string }> = ({ poiId }) => {
     await deleteImage(imageId);
   };
 
-  const handleImageClick = (imgSrc: ImageData) => {
+  const handleImageClick = (imgSrc: ImageRes) => {
     setSelectedImage(imgSrc);
     onModalOpen();
   };

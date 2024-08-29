@@ -44,6 +44,10 @@ import {
 import { useLocation } from "react-router-dom";
 import { renderContentWithHighlights } from "../../info/components/renderContentWithHighlights";
 import { useCommentStore } from "../store/POIComment";
+import {AddIcon, LinkIcon} from "@chakra-ui/icons";
+import {useImage} from "../../../common/hooks/useImage";
+import ImageUploader from "../../../common/components/ImageUploader";
+import ImagePresenter from "../../../common/components/ImagePresenter";
 
 interface CommentListProps {
   poiId: number;
@@ -99,6 +103,7 @@ const CommentList: React.FC<CommentListProps> = ({
   const token = queryParams.get("token");
   const { setPOIComments } = useCommentStore();
   const [nickname, setNickname] = useState(savedNickName || "");
+  const imageHook = useImage();
 
   const loadComments = async (page = 0) => {
     try {
@@ -114,6 +119,7 @@ const CommentList: React.FC<CommentListProps> = ({
       setComments(data);
       setPOIComments(data);
       setContent(data1.data.content);
+
     } catch (err) {
       console.error("Failed to fetch comments", err);
     }
@@ -132,9 +138,14 @@ const CommentList: React.FC<CommentListProps> = ({
       try {
         const response = token
           ? await addComment(poiId, nickname!, newComment, token)
-          : await addComment(poiId, savedNickName!, newComment);
+          : await addComment(poiId, savedNickName!,
+                newComment,
+                "",
+                imageHook.images.map(i => Number(i.id))
+            );
 
         setNewComment("");
+        imageHook.clearImage();
         await loadComments();
       } catch (err) {
         console.error("Failed to add comment", err);
@@ -257,29 +268,40 @@ const CommentList: React.FC<CommentListProps> = ({
         overflowY="auto"
       >
         <VStack spacing={4} align="stretch">
-          <InputGroup mb={4}>
+          <ImageUploader imageHook={imageHook} />
+          <HStack>
             <Input
-              placeholder="댓글을 입력하세요"
-              bg="#E9E9E9"
-              value={newComment}
-              onChange={(e) => setNewComment(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  handleAddComment();
-                }
-              }}
+                placeholder="댓글을 입력하세요"
+                bg="#E9E9E9"
+                value={newComment}
+                onChange={(e) => setNewComment(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    handleAddComment();
+                  }
+                }}
             />
-            <InputRightElement>
-              <IconButton
+            <Menu>
+              <MenuButton
+                  as={IconButton}
+                  icon={<AddIcon />}
+              />
+              <MenuList>
+                <MenuItem icon={<LinkIcon />}
+                          onClick={() => imageHook.handleUploadImage("COMMENT")}
+                >
+                  {t("info.commentImageBtn")}
+                </MenuItem>
+              </MenuList>
+            </Menu>
+            <IconButton
                 bg="#E9E9E9"
                 size="md"
                 icon={<FaPaperPlane />}
                 aria-label="Send comment"
                 onClick={handleAddComment}
-              />
-            </InputRightElement>
-          </InputGroup>
-
+            />
+          </HStack>
           {comments.length === 0 ? (
             <Text color="gray.500" align="center">
               첫 번째 댓글을 남겨보세요!
@@ -373,7 +395,17 @@ const CommentList: React.FC<CommentListProps> = ({
                         </TagLabel>
                       </Tag>
                     )}
-                  <Text mt={2}>{comment.content}</Text>
+                  {
+                    comment.images.length> 0 ?
+                        <HStack w={"100%"}>
+                          <Box w={"50%"}>
+                            <ImagePresenter images={comment.images} />
+                          </Box>
+                          <Text mt={2}>{comment.content}</Text>
+                        </HStack>
+                        :
+                        <Text mt={2}>{comment.content}</Text>
+                  }
                 </Box>
               </HStack>
             ))

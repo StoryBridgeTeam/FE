@@ -15,15 +15,15 @@ import Slider from "react-slick";
 import {carouselSettings} from "../../domains/amt/utils/carouselSetting";
 import {X} from "tabler-icons-react";
 import {AddIcon} from "@chakra-ui/icons";
-import {ImageData} from "../hooks/useImage";
+import {ImageRes} from "../hooks/useImage";
 
 interface ImagePresenterProps{
-    images:ImageData[]
+    images:ImageRes[]
 }
 
 interface ModalInfo{
     isModalOpen : boolean,
-    selectedImg : ImageData | null
+    selectedImg : ImageRes | null
 }
 
 const ImagePresenter:React.FC<ImagePresenterProps> = ({images}) => {
@@ -32,7 +32,7 @@ const ImagePresenter:React.FC<ImagePresenterProps> = ({images}) => {
         selectedImg : null
     });
 
-    const handleImageClick = (imgSrc : ImageData) => {
+    const handleImageClick = (imgSrc : ImageRes) => {
         setDetailInfo({
             isModalOpen : true,
             selectedImg : imgSrc

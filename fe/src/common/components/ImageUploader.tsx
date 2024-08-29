@@ -4,7 +4,7 @@ import Slider from "react-slick";
 import {carouselSettings} from "../../domains/amt/utils/carouselSetting";
 import {X} from "tabler-icons-react";
 import {AddIcon} from "@chakra-ui/icons";
-import {ImageData, useImageResponse} from "../hooks/useImage";
+import {ImageRes, useImageResponse} from "../hooks/useImage";
 
 interface ImageUploaderProps{
     imageHook : useImageResponse

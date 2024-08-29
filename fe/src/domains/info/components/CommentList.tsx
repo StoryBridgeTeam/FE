@@ -334,22 +334,29 @@ const CommentList: React.FC<CommentListProps> = ({
                 </Tag>
               )}
             {
-              isMobile ?
-                  <>
-                    <ImagePresenter images={comment.images} />
-                    <Text marginLeft={10} pr={5}>
-                      {comment.content}
-                    </Text>
-                  </>
-                  :
-                  <Stack direction={"row"} padding={5}>
-                    <Text marginLeft={10} w={"50%"}>
-                      {comment.content}
-                    </Text>
-                    <Box w={"50%"}>
+              comment.images.length>0 ?
+                  (isMobile ?
+                    <>
                       <ImagePresenter images={comment.images} />
-                    </Box>
-                  </Stack>
+                      <Text marginLeft={10} pr={5}>
+                        {comment.content}
+                      </Text>
+                    </>
+                    :
+                    <Stack direction={"row"} padding={5}>
+                      <Box w={"50%"}>
+                        <ImagePresenter images={comment.images} />
+                      </Box>
+                      <Text marginLeft={10} w={"50%"}>
+                        {comment.content}
+                      </Text>
+                    </Stack>
+                  )
+                  :
+                  <Text marginLeft={10}>
+                    kkkkkkk
+                    {/*{comment.content}*/}
+                  </Text>
             }
           </Box>
         ))}

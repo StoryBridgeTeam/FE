@@ -93,7 +93,8 @@ export const createPOIComment = async (
   poiId: number,
   nickname: string,
   content: string,
-  token?: string
+  token?: string,
+  imageIds?:number[]
 ) => {
   const params: Record<string, any> = {};
   if (token && token.trim() !== "") {
@@ -105,6 +106,7 @@ export const createPOIComment = async (
     {
       nickName: nickname,
       content: content,
+      imageIds: imageIds
     },
     { params }
   );

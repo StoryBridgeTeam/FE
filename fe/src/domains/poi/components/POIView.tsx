@@ -29,7 +29,7 @@ import {
   ModalCloseButton,
 } from "@chakra-ui/react";
 import { FiMoreHorizontal, FiEdit, FiTrash2, FiLink } from "react-icons/fi";
-import { GETPOI, ImageData, POI, usePOI } from "../hooks/usePOI";
+import { GETPOI, POI, usePOI } from "../hooks/usePOI";
 import CommentList from "./CommentList";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { useToastMessage } from "../../../common/hooks/useToastMessage";
@@ -40,6 +40,7 @@ import { carouselSettings } from "../../amt/utils/carouselSetting";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import Slider from "react-slick";
+import {ImageRes} from "../../../common/hooks/useImage";
 
 interface POIViewProps {
   poiId: string | undefined;
@@ -71,7 +72,7 @@ const POIView: React.FC<POIViewProps> = ({ poiId }) => {
     onClose: onModalClose,
   } = useDisclosure();
 
-  const [selectedImage, setSelectedImage] = useState<ImageData | null>(null);
+  const [selectedImage, setSelectedImage] = useState<ImageRes | null>(null);
 
   useEffect(() => {
     if (nickName && poiId) {
@@ -88,7 +89,7 @@ const POIView: React.FC<POIViewProps> = ({ poiId }) => {
     showToast("POI 삭제 성공", "POI가 성공적으로 삭제되었습니다.", "success");
   };
 
-  const handleImageClick = (imgSrc: ImageData) => {
+  const handleImageClick = (imgSrc: ImageRes) => {
     setSelectedImage(imgSrc);
     onModalOpen();
   };

@@ -1,7 +1,7 @@
 import React, {useState} from "react";
 import {deleteImage, uploadImage} from "../api/imageAPI";
 
-export interface ImageData {
+export interface ImageRes {
     id: number;
     name: string;
     contentType: string;
@@ -10,18 +10,18 @@ export interface ImageData {
 }
 
 export interface useImageResponse{
-    images:ImageData[],
+    images:ImageRes[],
     clearImage:()=>void,
     handleUploadImage:(
         uploadType: string
-    ) => Promise<ImageData[]>;
+    ) => Promise<ImageRes[]>;
     handleDeleteImage:(
         imageId: number
-    ) => Promise<ImageData>;
+    ) => Promise<ImageRes>;
 }
 
 export const useImage = () : useImageResponse => {
-    const [images, setImages] = useState<ImageData[]>([]);
+    const [images, setImages] = useState<ImageRes[]>([]);
 
     const clearImage = () => {
         setImages([])
