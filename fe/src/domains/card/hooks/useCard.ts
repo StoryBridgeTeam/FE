@@ -10,22 +10,25 @@ import {
 import { EntryState, FetchType } from "../types/cardTypes";
 
 interface UseCardResult {
-  name: string;
   loading: boolean;
   error: string | null;
   checkCard: (nickname: string) => Promise<boolean>;
   createNewCard: (nickname: string, entries: EntryState[]) => Promise<void>;
   fetchOriginalCard: (
     nickname: string,
-    type: FetchType
-  ) => Promise<EntryState[]>;
-  fetchPublicCard: (nickname: string, type: FetchType) => Promise<EntryState[]>;
+    type: FetchType,
+    token?: string
+  ) => Promise<{ name: string; entries: EntryState[] }>;
+  fetchPublicCard: (
+    nickname: string,
+    type: FetchType,
+    token?: string
+  ) => Promise<{ name: string; entries: EntryState[] }>;
   editOriginalCard: (nickname: string, entries: EntryState[]) => Promise<void>;
   editPublicCard: (nickname: string, entries: EntryState[]) => Promise<void>;
 }
 
 export const useCard = (): UseCardResult => {
-  const [name, setName] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -61,12 +64,17 @@ export const useCard = (): UseCardResult => {
     }
   };
 
-  const fetchOriginalCard = async (nickname: string, type: FetchType) => {
+  const fetchOriginalCard = async (
+    nickname: string,
+    type: FetchType,
+    token?: string
+  ) => {
     setLoading(true);
     setError(null);
     try {
-      const data = await getOriginalCardInfo(nickname, type);
-      return data.entries;
+      const data = await getOriginalCardInfo(nickname, type, token);
+      console.log("555:", data);
+      return { name: data.data.name, entries: data.data.entries };
     } catch (error) {
       setError("카드를 가져오는 중 오류가 발생했습니다.");
       console.log("fetchOriginalCard_error:", error);
@@ -76,13 +84,17 @@ export const useCard = (): UseCardResult => {
     }
   };
 
-  const fetchPublicCard = async (nickname: string, type: FetchType) => {
+  const fetchPublicCard = async (
+    nickname: string,
+    type: FetchType,
+    token?: string
+  ) => {
     setLoading(true);
     setError(null);
     try {
-      const data = await getPublicCardInfo(nickname, type);
-      setName(data.name);
-      return data.entries;
+      const data = await getPublicCardInfo(nickname, type, token);
+      console.log("fdd1:", data);
+      return { name: data.data.name, entries: data.data.entries };
     } catch (error) {
       setError("카드를 가져오는 중 오류가 발생했습니다.");
       console.log("fetchPublicCard_error:", error);
@@ -97,6 +109,7 @@ export const useCard = (): UseCardResult => {
     setError(null);
     try {
       const data = await updateOriginalCardInfo(nickname, entries);
+      console.log("edit5Card_data:", data);
       return data;
     } catch (error) {
       setError("카드를 수정하는 중 오류가 발생했습니다.");
@@ -112,6 +125,7 @@ export const useCard = (): UseCardResult => {
     setError(null);
     try {
       const data = await updatePublicCardInfo(nickname, entries);
+      console.log("editPublicCard_data:", data);
       return data;
     } catch (error) {
       setError("카드를 수정하는 중 오류가 발생했습니다.");
@@ -123,7 +137,6 @@ export const useCard = (): UseCardResult => {
   };
 
   return {
-    name,
     loading,
     error,
     checkCard,

@@ -15,7 +15,6 @@ import React, { useEffect } from "react";
 import { useCard } from "../hooks/useCard";
 import ModalActionButtons from "./ModalActionButton";
 import CardModalList from "./CardModalList";
-import { use } from "i18next";
 
 //첫번째 카드생성을 위한 모달창
 const FirstCardModal: React.FC<FirstCardModalProps> = ({

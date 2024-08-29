@@ -8,11 +8,13 @@ const ModalActionButtons: React.FC<ModalElementProps> = ({
   cardType,
   isEditing,
   nickName,
-  entries,
+  entries = [],
   setIsEditing,
   setEntries,
 }) => {
   const { editOriginalCard, editPublicCard } = useCard();
+  const savedNickName = localStorage.getItem("nickName");
+  const isHost = nickName === savedNickName;
 
   const onEdit = () => {
     setIsEditing(true);
@@ -43,7 +45,7 @@ const ModalActionButtons: React.FC<ModalElementProps> = ({
     ]);
   };
 
-  return (
+  return isHost ? (
     <Flex m={2}>
       <Spacer />
       {isEditing ? (
@@ -61,7 +63,7 @@ const ModalActionButtons: React.FC<ModalElementProps> = ({
         </Button>
       )}
     </Flex>
-  );
+  ) : null;
 };
 
 export default ModalActionButtons;

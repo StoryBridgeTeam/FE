@@ -12,6 +12,7 @@ import {
 } from "../../poi/api/poiAPI";
 import axios from "axios";
 import { useToastMessage } from "../../../common/hooks/useToastMessage";
+import { set } from "date-fns";
 
 export interface ImageData {
   id: number;
@@ -114,6 +115,7 @@ export const usePOI = (): UsePOIResult => {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [isLastPage, setIsLastPage] = useState<boolean>(false);
+  const [totalPOIs, setTotalPOIs] = useState<number>(0);
   const [totalCommentPages, setTotalCommentPages] = useState<number>(1);
   const [currentCommentPage, setCurrentCommentPage] = useState<number>(0);
   const { showToast } = useToastMessage();
@@ -127,8 +129,10 @@ export const usePOI = (): UsePOIResult => {
     setError(null);
     try {
       const data = await getTitles(nickname, page, size, token);
+      console.log("fetchTitles_data:", data);
       const titles = data.data.content || [];
       setIsLastPage(data.data.last);
+      // setTotalPOIs(data.data.totalElements);
       return titles;
     } catch (error) {
       setError("Title을 가져오는 중 오류가 발생했습니다.");
@@ -270,7 +274,6 @@ export const usePOI = (): UsePOIResult => {
           tagInfo: comment.tagInfo,
         })
       );
-      //여기서 isPoIOwner등을 처리해야할듯
       setTotalCommentPages(data.data.comments.totalPages);
       setCurrentCommentPage(page);
       return comments;

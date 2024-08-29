@@ -14,11 +14,18 @@ const CardTypeToggle: React.FC<CardTypeToggleProps> = ({
   return (
     <Box textAlign="center">
       <Progress
-        value={cardType === "PUBLIC" ? 50 : 100}
+        value={50}
         size="xs"
         colorScheme="blackAlpha"
         borderRadius="full"
         mb={2}
+        sx={{
+          "& div": {
+            transition: "all 0.3s ease-in-out",
+            transform:
+              cardType === "PUBLIC" ? "translateX(0)" : "translateX(100%)",
+          },
+        }}
       />
       <Button
         onClick={onToggle}

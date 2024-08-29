@@ -21,7 +21,7 @@ import {
 } from "react-router-dom";
 import { useToastMessage } from "../../../common/hooks/useToastMessage";
 import { usePOI, POI, GETPOI, ImageData } from "../../poi/hooks/usePOI";
-import { Edit, Check, File, X } from "tabler-icons-react"; // X 아이콘 추가
+import { Edit, Check, Photo, X } from "tabler-icons-react"; // X 아이콘 추가
 import { deleteImage, uploadImage } from "../../../common/api/imageAPI";
 
 const POIModify: React.FC<{ poiId: string }> = ({ poiId }) => {
@@ -129,11 +129,6 @@ const POIModify: React.FC<{ poiId: string }> = ({ poiId }) => {
 
   return (
     <VStack spacing={4} align="stretch" p={6}>
-      <Flex w="full" justifyContent="flex-end" alignItems="center" mb={5}>
-        <Button onClick={handleUpload} mr={2}>
-          <File size={24} color="black" />
-        </Button>
-      </Flex>
       <Input
         placeholder="제목"
         size="lg"
@@ -151,6 +146,11 @@ const POIModify: React.FC<{ poiId: string }> = ({ poiId }) => {
         {title.length}/{MAX_TITLE_LENGTH}
       </Text>
       <Divider borderColor="#828282" borderWidth="1px" />
+      <Flex w="full" justifyContent="flex-first" alignItems="center">
+        <Button onClick={handleUpload} ml={2} size="sm">
+          <Photo size={24} color="black" />
+        </Button>
+      </Flex>
       {images.length !== 0 && (
         <Flex
           overflowX="auto"

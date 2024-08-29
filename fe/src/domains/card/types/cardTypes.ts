@@ -1,11 +1,3 @@
-// export interface EntryState {
-//   id: number;
-//   title: string;
-//   content: string;
-//   index: number;
-//   isVisibleBriefCard: boolean;
-// }
-
 export interface EntryState {
   id: number;
   title: string;
@@ -29,6 +21,7 @@ export interface CardModalProps {
   isOpen: boolean;
   onClose: () => void;
   name: string;
+  nickName: string;
 }
 
 export interface FirstCardModalProps {

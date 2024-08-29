@@ -46,6 +46,7 @@ const CardModalItem: React.FC<CardModalItemProps> = ({
             m={2}
             size="lg"
           />
+
           <Input
             value={entry.title}
             onChange={handleTitleChange}

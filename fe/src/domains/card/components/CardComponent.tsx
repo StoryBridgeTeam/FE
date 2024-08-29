@@ -1,12 +1,14 @@
 import {
   Box,
   Heading,
+  Spinner,
   useBreakpointValue,
   useDisclosure,
   VStack,
+  Text,
 } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 import { useCard } from "../hooks/useCard";
 import { EntryState } from "../types/cardTypes";
 import CardInfoBox from "./CardInfoBox";
@@ -18,10 +20,16 @@ import FirstCardModal from "./FirstCardModal";
 const CardComponent: React.FC = () => {
   const isMobile = useBreakpointValue({ base: true, md: false });
   const { nickName } = useParams<{ nickName: string }>();
-  const { checkCard, fetchPublicCard, name } = useCard();
+  const { loading, error, checkCard, fetchPublicCard } = useCard();
   const [hasCard, setHasCard] = useState<boolean>(false);
   const [briefEntries, setBriefEntries] = useState<EntryState[]>([]);
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const savedNickName = localStorage.getItem("nickName");
+  const isHost = nickName === savedNickName;
+  const [name, setName] = useState<string>("");
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const token = queryParams.get("token");
 
   useEffect(() => {
     if (nickName) {
@@ -29,15 +37,33 @@ const CardComponent: React.FC = () => {
         console.log("checkCard_result:", result);
         if (result) {
           setHasCard(true);
-          fetchPublicCard(nickName, "BRIEF").then((entries) => {
-            setBriefEntries(entries);
-          });
+          if (token) {
+            fetchPublicCard(nickName, "BRIEF", token).then((data) => {
+              console.log("fdd2:", data);
+              setBriefEntries(data.entries);
+              setName(data.name);
+            });
+          } else {
+            fetchPublicCard(nickName, "BRIEF").then((data) => {
+              console.log("fdd2:", data);
+              setBriefEntries(data.entries);
+              setName(data.name);
+            });
+          }
         } else {
           setHasCard(false);
         }
       });
     }
-  }, [nickName]);
+  }, [nickName, token]);
+
+  if (loading) {
+    return <Spinner />;
+  }
+
+  if (error) {
+    return <Text color="red.500">{error}</Text>;
+  }
 
   return (
     <VStack
@@ -75,13 +101,20 @@ const CardComponent: React.FC = () => {
           />
         </VStack>
         {hasCard ? (
-          <CardModal isOpen={isOpen} onClose={onClose} name={name} />
-        ) : (
-          <FirstCardModal
+          <CardModal
             isOpen={isOpen}
             onClose={onClose}
+            name={name}
             nickName={nickName!}
           />
+        ) : (
+          isHost && (
+            <FirstCardModal
+              isOpen={isOpen}
+              onClose={onClose}
+              nickName={nickName!}
+            />
+          )
         )}
       </Box>
       <SelfIntroductionBox />

@@ -1,5 +1,5 @@
 import React from "react";
-import { UnorderedList, Flex, Box } from "@chakra-ui/react";
+import { UnorderedList, Flex, Box, Text } from "@chakra-ui/react";
 import {
   DragDropContext,
   Droppable,
@@ -12,7 +12,7 @@ import { GripVertical } from "tabler-icons-react";
 
 const CardModalList: React.FC<CardModalListProps> = ({
   isEditing,
-  entries,
+  entries = [], // 기본값을 빈 배열로 설정
   setEntries,
 }) => {
   const reorderEntries = (startIndex: number, endIndex: number) => {
@@ -47,80 +47,94 @@ const CardModalList: React.FC<CardModalListProps> = ({
     setEntries(filteredEntries);
   };
 
-  return isEditing ? (
-    <DragDropContext onDragEnd={onDragEnd}>
-      <Droppable droppableId="entries">
-        {(provided) => (
+  return (
+    <>
+      {entries.length === 0 ? (
+        <Box px={10} py={5} textAlign="center">
+          <Text color="gray.500" fontSize="lg">
+            빈 명함입니다
+          </Text>
+        </Box>
+      ) : isEditing ? (
+        <DragDropContext onDragEnd={onDragEnd}>
+          <Droppable droppableId="entries">
+            {(provided) => (
+              <UnorderedList
+                {...provided.droppableProps}
+                ref={provided.innerRef}
+                styleType="none"
+                px={{ base: 0, md: 8 }}
+                pb={{ base: 0, md: 10 }}
+                spacing={2}
+              >
+                {entries.map((entry, index) => (
+                  <Draggable
+                    key={
+                      entry.id !== null ? entry.id.toString() : `temp-${index}`
+                    }
+                    draggableId={
+                      entry.id !== null ? entry.id.toString() : `temp-${index}`
+                    }
+                    index={index}
+                  >
+                    {(provided) => (
+                      <Flex
+                        ref={provided.innerRef}
+                        {...provided.draggableProps}
+                        {...provided.dragHandleProps}
+                        mb={2}
+                        p={3}
+                        borderWidth="1px"
+                        borderRadius="lg"
+                        alignItems="center"
+                        bg="gray.100"
+                      >
+                        <GripVertical />
+                        <CardModalItem
+                          key={
+                            entry.id !== null
+                              ? entry.id.toString()
+                              : `temp-${index}`
+                          }
+                          entry={entry}
+                          isEditing={isEditing}
+                          onChangeEntry={handleEntryChange}
+                          onDeleteEntry={handleEntryDelete}
+                        />
+                      </Flex>
+                    )}
+                  </Draggable>
+                ))}
+                {provided.placeholder}
+              </UnorderedList>
+            )}
+          </Droppable>
+        </DragDropContext>
+      ) : (
+        <Box px={10}>
           <UnorderedList
-            {...provided.droppableProps}
-            ref={provided.innerRef}
-            styleType="none"
+            styleType="disc"
             px={{ base: 0, md: 8 }}
             pb={{ base: 0, md: 10 }}
             spacing={2}
           >
-            {entries.map((entry, index) => (
-              <Draggable
-                key={entry.id !== null ? entry.id.toString() : `temp-${index}`}
-                draggableId={
-                  entry.id !== null ? entry.id.toString() : `temp-${index}`
+            {entries.map((entry) => (
+              <CardModalItem
+                key={
+                  entry.id !== null
+                    ? entry.id.toString()
+                    : `temp-${entry.index}`
                 }
-                index={index}
-              >
-                {(provided) => (
-                  <Flex
-                    ref={provided.innerRef}
-                    {...provided.draggableProps}
-                    {...provided.dragHandleProps}
-                    mb={2}
-                    p={3}
-                    borderWidth="1px"
-                    borderRadius="lg"
-                    alignItems="center"
-                    bg="gray.100"
-                  >
-                    <GripVertical />
-                    <CardModalItem
-                      key={
-                        entry.id !== null
-                          ? entry.id.toString()
-                          : `temp-${index}`
-                      }
-                      entry={entry}
-                      isEditing={isEditing}
-                      onChangeEntry={handleEntryChange}
-                      onDeleteEntry={handleEntryDelete}
-                    />
-                  </Flex>
-                )}
-              </Draggable>
+                entry={entry}
+                isEditing={isEditing}
+                onChangeEntry={handleEntryChange}
+                onDeleteEntry={handleEntryDelete}
+              />
             ))}
-            {provided.placeholder}
           </UnorderedList>
-        )}
-      </Droppable>
-    </DragDropContext>
-  ) : (
-    <Box px={10}>
-      <UnorderedList
-        styleType="disc"
-        px={{ base: 0, md: 8 }}
-        pb={{ base: 0, md: 10 }}
-        spacing={2}
-      >
-        {entries.map((entry) => (
-          <CardModalItem
-            key={
-              entry.id !== null ? entry.id.toString() : `temp-${entry.index}`
-            }
-            entry={entry}
-            isEditing={isEditing}
-            onChangeEntry={handleEntryChange}
-            onDeleteEntry={handleEntryDelete}
-          />
-        ))}
-      </UnorderedList>
-    </Box>
+        </Box>
+      )}
+    </>
   );
 };
 

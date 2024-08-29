@@ -22,9 +22,13 @@ export const createCardInfo = async (
   return response.data;
 };
 
-export const getOriginalCardInfo = async (nickname: string, type: string) => {
+export const getOriginalCardInfo = async (
+  nickname: string,
+  type: string,
+  token?: string
+) => {
   const response = await axiosInstance.get(`/members/${nickname}/origin-card`, {
-    params: { type },
+    params: { type, token },
   });
   return response.data;
 };
