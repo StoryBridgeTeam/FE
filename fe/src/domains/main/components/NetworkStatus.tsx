@@ -6,20 +6,44 @@ import {
   Text,
   HStack,
 } from "@chakra-ui/react";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { getAmt } from "../../amt/api/AmtAPI";
+import { Data } from "../../amt/utils/atmUtils";
 
 const NetworkStatus: React.FC = () => {
   const isMobile = useBreakpointValue({ base: true, md: false });
   const navigate = useNavigate();
   const location = useLocation();
   const { nickName } = useParams<{ nickName: string }>();
+  const [amt, setAmt] = useState<Data>();
+  const [descendants, setDescendants] = useState<{ count: number }[]>([]);
 
   const queryParams = new URLSearchParams(location.search);
   const token = queryParams.get("token");
 
-  const ancestors = { name: "Ancestor 1", img: "/path/to/image1.jpg" };
-  const descendants = [{ count: 17 }, { count: 31 }];
+  useEffect(() => {
+    const getfetchAmt = async () => {
+      let data;
+      if (token) {
+        data = await getAmt(nickName!, token);
+      } else {
+        data = await getAmt(nickName!);
+      }
+
+      setAmt(data);
+
+      // descendants 설정
+      if (data) {
+        setDescendants([
+          { count: data.childCount || 0 }, 
+          { count: data.twoLevelChildCount || 0 }, 
+        ]);
+      }
+    };
+
+    getfetchAmt();
+  }, [nickName, token]);
 
   const maxCount = Math.max(...descendants.map((d) => d.count));
 
@@ -54,14 +78,14 @@ const NetworkStatus: React.FC = () => {
         overflow="auto"
       >
         <HStack spacing={1}>
-          <Avatar name={ancestors.name} src={ancestors.img} size="sm" />
+          <Avatar
+            src={amt?.parent?.imageUrl || "images/profile.png"}
+            size="sm"
+          />
         </HStack>
         <HStack spacing={1}>
           <Avatar
-            name={"나"}
-            src={
-              "https://image.idus.com/image/files/da17e0c53a4e480284c5d49932722e5a.jpg"
-            }
+            src={amt?.target?.imageUrl || "images/profile.png"}
             size="sm"
           />
         </HStack>

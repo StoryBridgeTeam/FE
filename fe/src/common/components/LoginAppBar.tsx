@@ -11,6 +11,7 @@ import {
 import { FaRegBell, FaSearch } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
+import { getNicknameToken } from "../utils/nickname";
 
 interface LoginAppBarProps {
   field1?: string;
@@ -31,13 +32,16 @@ const LoginAppBar: React.FC<LoginAppBarProps> = ({
   const isMobile = useBreakpointValue({ base: true, md: false });
   const appBarHeight = isMobile ? "50px" : "60px";
   const navigate = useNavigate();
-  const { nickName } = useParams<{ nickName: string }>();
+  let { nickName } = useParams<{ nickName: string }>();
   const location = useLocation();
 
   const queryParams = new URLSearchParams(location.search);
   const token = queryParams.get("token");
 
   const handleNavigate = () => {
+    if (!nickName) {
+      nickName = getNicknameToken();
+    }
     const url = `/${nickName}`;
     const searchParams = new URLSearchParams();
 
@@ -138,7 +142,6 @@ const LoginAppBar: React.FC<LoginAppBarProps> = ({
             fontWeight="400"
             cursor="pointer"
             onClick={() => {
-
               const url = `/signup`;
               const searchParams = new URLSearchParams();
 
@@ -150,7 +153,6 @@ const LoginAppBar: React.FC<LoginAppBarProps> = ({
             }}
           >
             {"회원가입"}
-
           </Text>
         )}
         <Box

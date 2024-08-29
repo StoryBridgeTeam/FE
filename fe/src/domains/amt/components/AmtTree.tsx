@@ -5,80 +5,44 @@ import {
   HStack,
   Text,
   useBreakpointValue,
-  Avatar,
   Heading,
   UnorderedList,
   ListItem,
   Flex,
   Icon,
   useDisclosure,
+  IconButton,
 } from "@chakra-ui/react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { SlideUpSmallModal } from "../../../common/components/SlideUpSmallModal";
-import { ancestors, cards } from "./data";
+import { Card, ProfileAvatar } from "../utils/data";
 import { ChevronRightIcon } from "@chakra-ui/icons";
-import { getAmt } from "../api/AmtAPI";
-import { Data } from "../utils/atmUtils";
-
-interface Ancestor {
-  name: string;
-  img: string;
-  top?: number;
-  left?: number;
-}
-
-interface Descendant {
-  count: number;
-  profile: Ancestor[];
-}
-
-interface ProfileAvatarProps {
-  ancestor: Ancestor;
-  onHover: (ancestor: Ancestor, event: React.MouseEvent) => void;
-  onLeave: () => void;
-  onClick: () => void;
-}
-
-const ProfileAvatar = ({
-  ancestor,
-  onHover,
-  onLeave,
-  onClick,
-}: ProfileAvatarProps) => {
-  return (
-    <Avatar
-      cursor={"pointer"}
-      name={ancestor.name}
-      src={ancestor.img}
-      size="md"
-      onMouseEnter={(event) => onHover(ancestor, event)}
-      onMouseLeave={onLeave}
-      onClick={onClick}
-    />
-  );
-};
+import { amtBlock, getAmt } from "../api/AmtAPI";
+import { data, Data, DataNode } from "../utils/atmUtils";
+import { getCard } from "../../info/api/SideBarAPI";
+import { MdBlock } from "react-icons/md";
+import { useToastMessage } from "../../../common/hooks/useToastMessage";
 
 const AmtTree = () => {
-  const [hoveredAncestor, setHoveredAncestor] = useState<Ancestor | null>(null);
+  const { showToast } = useToastMessage();
+  const [hoveredAncestor, setHoveredAncestor] = useState<DataNode | null>(null);
+  const [isHoveringCard, setIsHoveringCard] = useState<boolean>(false); // New state to track if hovering over card
   const isMobile = useBreakpointValue({ base: true, md: false });
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const [selectedAncestor, setSelectedAncestor] = useState<Ancestor | null>(
+  const [selectedAncestor, setSelectedAncestor] = useState<DataNode | null>(
     null
   );
+  const [isbar, setbar] = useState<boolean>(true);
   const navigate = useNavigate();
   const location = useLocation();
 
   const queryParams = new URLSearchParams(location.search);
   const token = queryParams.get("token");
-  const a: Ancestor = { name: "Ancestor", img: "/path/to/image.jpg" };
   const { nickName } = useParams<{ nickName: string }>();
   const [amt, setAmt] = useState<Data>();
-
-  const [descendants, setDescendants] = useState<Descendant[]>([
-    { count: 17, profile: [] },
-    { count: 31, profile: [] },
-  ]);
-
+  const [cards, setCards] = useState<Card[]>();
+  const name = localStorage.getItem("nickName");
+  const ishost = name === nickName;
   useEffect(() => {
     const getfetchAmt = async () => {
       let data;
@@ -87,33 +51,51 @@ const AmtTree = () => {
       } else data = await getAmt(nickName!);
 
       setAmt(data);
-      console.log(data);
     };
 
     getfetchAmt();
-  }, []);
+  }, [token, nickName]);
 
-  const maxCount = Math.max(...descendants.map((d) => d.count));
+  const fetchCard = async (name: string) => {
+    let data;
+    if (token) {
+      data = await getCard(name, token);
+    } else data = await getCard(name);
+    console.log(data);
+    setCards(data);
+  };
 
-  const handleMouseEnter = (ancestor: Ancestor, event: React.MouseEvent) => {
+  useEffect(() => {
+    if (selectedAncestor) {
+      fetchCard(selectedAncestor!.nickname);
+    }
+
+    if (hoveredAncestor && !isHoveringCard) {
+      fetchCard(hoveredAncestor!.nickname);
+    }
+  }, [selectedAncestor, hoveredAncestor, isHoveringCard]);
+
+  const handleMouseEnter = (ancestor: DataNode, event: React.MouseEvent) => {
     const rect = event.currentTarget.getBoundingClientRect();
     setHoveredAncestor({
       ...ancestor,
-      top: rect.top + window.scrollY + 20,
-      left: rect.left + window.scrollX - 30,
+      top: rect.top + window.scrollY - 10,
+      left: rect.left + window.scrollX - 50,
     });
   };
 
   const handleMouseLeave = () => {
-    setHoveredAncestor(null);
+    if (!isHoveringCard) {
+      setHoveredAncestor(null);
+    }
   };
 
-  const handleAvatarClick = (ancestor: Ancestor) => {
+  const handleAvatarClick = (ancestor: DataNode) => {
     if (isMobile) {
       setSelectedAncestor(ancestor);
       onOpen();
     } else {
-      const url = `/${ancestor.name}`;
+      const url = `/${ancestor.nickname}`;
       const searchParams = new URLSearchParams();
 
       if (token) {
@@ -124,10 +106,13 @@ const AmtTree = () => {
     }
   };
 
-  const barClick = (index: number) => {
-    const updatedDescendants = [...descendants];
-    updatedDescendants[index].profile = ancestors;
-    setDescendants(updatedDescendants);
+  const blockUser = async (nickname: string) => {
+    try {
+      await amtBlock(nickname);
+      showToast("유저 차단 성공", "차단에 성공했습니다", "success");
+    } catch {
+      showToast("유저 차단 실패", "차단에 실패했습니다", "error");
+    }
   };
 
   return (
@@ -146,174 +131,186 @@ const AmtTree = () => {
         position="relative"
         width={"100%"}
       >
-        <HStack spacing={1}>
-          <ProfileAvatar
-            ancestor={a}
-            onHover={handleMouseEnter}
-            onLeave={handleMouseLeave}
-            onClick={() => handleAvatarClick(a)}
-          />
-        </HStack>
+        {amt?.root && (
+          <HStack spacing={1} mb={5}>
+            <ProfileAvatar
+              ancestor={amt?.root || data}
+              onHover={handleMouseEnter}
+              onLeave={handleMouseLeave}
+              onClick={() => handleAvatarClick(amt!.root)}
+            />
+          </HStack>
+        )}
 
-        <Text fontSize="md" fontWeight={"bold"} mb={2} ml={5}>
+        {amt?.levelOneNode && (
+          <HStack spacing={1} mb={5}>
+            <ProfileAvatar
+              ancestor={amt?.levelOneNode || data}
+              onHover={handleMouseEnter}
+              onLeave={handleMouseLeave}
+              onClick={() => handleAvatarClick(amt!.levelOneNode)}
+            />
+          </HStack>
+        )}
+
+        <Text fontSize="md" fontWeight={"bold"} mt={-2} mb={2} ml={5}>
           ⋮
         </Text>
 
-        <HStack spacing={1} mb={5}>
-          <ProfileAvatar
-            ancestor={a}
-            onHover={handleMouseEnter}
-            onLeave={handleMouseLeave}
-            onClick={() => handleAvatarClick(a)}
-          />
-        </HStack>
-
-        <HStack spacing={1} mb={5}>
-          <ProfileAvatar
-            ancestor={{ name: "admin", img: "/your/image.jpg" }}
-            onHover={handleMouseEnter}
-            onLeave={handleMouseLeave}
-            onClick={() =>
-              handleAvatarClick({ name: "admin", img: "/your/image.jpg" })
-            }
-          />
-        </HStack>
-
-        <Box position="relative" mb={5} pr={isMobile ? 5 : 20}>
-          <Flex
-            overflowX="auto"
-            whiteSpace="nowrap"
-            sx={{
-              "::-webkit-scrollbar": {
-                display: "none",
-              },
-              scrollbarWidth: "none",
-            }}
-            pr={"30px"}
-          >
-            {ancestors.map((ancestor, index) => (
-              <Box key={index} mr={5}>
-                <HStack spacing={1}>
-                  <ProfileAvatar
-                    ancestor={ancestor}
-                    onHover={handleMouseEnter}
-                    onLeave={handleMouseLeave}
-                    onClick={() => handleAvatarClick(ancestor)}
-                  />
-                  {index === ancestors.length - 1 && (
-                    <Text fontSize="md" fontWeight="bold" ml={3}>
-                      ...
-                    </Text>
-                  )}
-                </HStack>
-              </Box>
-            ))}
-          </Flex>
-
-          <Box
-            position="absolute"
-            top={0}
-            right={isMobile ? 0 : 20}
-            height="100%"
-            width="40px"
-            bgGradient="linear(to-l, rgba(255,255,255,0.7), transparent)"
-            display="flex"
-            alignItems="center"
-            justifyContent="center"
-            pointerEvents="none"
-            zIndex={1}
-          >
-            <Icon
-              ml={isMobile ? 5 : 20}
-              as={ChevronRightIcon}
-              boxSize={6}
-              color="gray.600"
+        {amt?.parent && (
+          <HStack spacing={1} mb={5}>
+            <ProfileAvatar
+              ancestor={amt?.parent || data}
+              onHover={handleMouseEnter}
+              onLeave={handleMouseLeave}
+              onClick={() => handleAvatarClick(amt!.parent)}
             />
-          </Box>
-        </Box>
+          </HStack>
+        )}
 
-        <VStack spacing={5} align="stretch" width="100%" mb={5}>
-          {descendants.map((descendant, index) =>
-            descendant.profile.length === 0 ? (
-              <HStack key={index} spacing={4} onClick={() => barClick(index)}>
-                <Box
-                  bg="blackAlpha.800"
-                  height="30px"
-                  width={`${(descendant.count / maxCount) * 100}%`}
-                  borderRightRadius="3xl"
-                  position="relative"
-                ></Box>
-                <Text fontSize="sm" pr="1px">
-                  {descendant.count}
-                </Text>
-              </HStack>
-            ) : (
-              <Box position="relative" pr={isMobile ? 5 : 20}>
-                <Flex
-                  overflowX="auto"
-                  whiteSpace="nowrap"
-                  sx={{
-                    "::-webkit-scrollbar": {
-                      display: "none",
-                    },
-                    scrollbarWidth: "none",
-                  }}
-                  pr={"30px"}
-                >
-                  {ancestors.map((ancestor, index) => (
-                    <Box key={index} mr={5}>
-                      <HStack spacing={1}>
-                        <ProfileAvatar
-                          ancestor={ancestor}
-                          onHover={handleMouseEnter}
-                          onLeave={handleMouseLeave}
-                          onClick={() => handleAvatarClick(ancestor)}
-                        />
-                        {index === ancestors.length - 1 && (
-                          <Text fontSize="md" fontWeight="bold" ml={3}>
-                            ...
-                          </Text>
-                        )}
-                      </HStack>
-                    </Box>
-                  ))}
-                </Flex>
+        <HStack spacing={1} mb={5}>
+          <ProfileAvatar
+            ancestor={amt?.target || data}
+            onHover={handleMouseEnter}
+            onLeave={handleMouseLeave}
+            onClick={() => handleAvatarClick(amt!.target)}
+          />
+        </HStack>
 
-                <Box
-                  position="absolute"
-                  top={0}
-                  right={isMobile ? 0 : 20}
-                  height="100%"
-                  width="40px"
-                  bgGradient="linear(to-l, rgba(255,255,255,0.7), transparent)"
-                  display="flex"
-                  alignItems="center"
-                  justifyContent="center"
-                  pointerEvents="none"
-                  zIndex={1}
-                >
-                  <Icon
-                    ml={isMobile ? 5 : 20}
-                    as={ChevronRightIcon}
-                    boxSize={6}
-                    color="gray.600"
-                  />
+        {amt?.child.length !== 0 && (
+          <Box position="relative" mb={5} pr={isMobile ? 5 : 20}>
+            <Flex
+              overflowX="auto"
+              whiteSpace="nowrap"
+              sx={{
+                "::-webkit-scrollbar": {
+                  display: "none",
+                },
+                scrollbarWidth: "none",
+              }}
+              pr={"30px"}
+            >
+              {amt?.child.map((ancestor, index) => (
+                <Box key={index} mr={5}>
+                  <HStack spacing={1}>
+                    <ProfileAvatar
+                      ancestor={ancestor}
+                      onHover={handleMouseEnter}
+                      onLeave={handleMouseLeave}
+                      onClick={() => handleAvatarClick(ancestor)}
+                    />
+                    {index === amt?.child.length - 1 && (
+                      <Text fontSize="md" fontWeight="bold" ml={3}>
+                        ...
+                      </Text>
+                    )}
+                  </HStack>
                 </Box>
-              </Box>
-            )
-          )}
-        </VStack>
+              ))}
+            </Flex>
+
+            <Box
+              position="absolute"
+              top={0}
+              right={isMobile ? 0 : 20}
+              height="100%"
+              width="40px"
+              bgGradient="linear(to-l, rgba(255,255,255,0.7), transparent)"
+              display="flex"
+              alignItems="center"
+              justifyContent="center"
+              pointerEvents="none"
+              zIndex={1}
+            >
+              <Icon
+                ml={isMobile ? 5 : 20}
+                as={ChevronRightIcon}
+                boxSize={6}
+                color="gray.600"
+              />
+            </Box>
+          </Box>
+        )}
+
+        {isbar ? (
+          <HStack spacing={4} onClick={() => setbar(false)} mb={5}>
+            <Box
+              bg="blackAlpha.800"
+              height="30px"
+              width={`70%`}
+              borderRightRadius="3xl"
+              position="relative"
+            ></Box>
+            <Text fontSize="sm" pr="1px">
+              {amt?.twoLevelChildCount}
+            </Text>
+          </HStack>
+        ) : (
+          <Box position="relative" mb={5} pr={isMobile ? 5 : 20}>
+            <Flex
+              overflowX="auto"
+              whiteSpace="nowrap"
+              sx={{
+                "::-webkit-scrollbar": {
+                  display: "none",
+                },
+                scrollbarWidth: "none",
+              }}
+              pr={"30px"}
+            >
+              {amt?.twoLevelChild.map((ancestor, index) => (
+                <Box key={index} mr={5}>
+                  <HStack spacing={1}>
+                    <ProfileAvatar
+                      ancestor={ancestor}
+                      onHover={handleMouseEnter}
+                      onLeave={handleMouseLeave}
+                      onClick={() => handleAvatarClick(ancestor)}
+                    />
+                    {index === amt?.twoLevelChild.length - 1 && (
+                      <Text fontSize="md" fontWeight="bold" ml={3}>
+                        ...
+                      </Text>
+                    )}
+                  </HStack>
+                </Box>
+              ))}
+            </Flex>
+
+            <Box
+              position="absolute"
+              top={0}
+              right={isMobile ? 0 : 20}
+              height="100%"
+              width="40px"
+              bgGradient="linear(to-l, rgba(255,255,255,0.7), transparent)"
+              display="flex"
+              alignItems="center"
+              justifyContent="center"
+              pointerEvents="none"
+              zIndex={1}
+            >
+              <Icon
+                ml={isMobile ? 5 : 20}
+                as={ChevronRightIcon}
+                boxSize={6}
+                color="gray.600"
+              />
+            </Box>
+          </Box>
+        )}
+
         <Box
           border={"1px solid"}
           borderColor={"gray.300"}
           shadow="lg"
           height={"150px"}
-          w={"100%"}
+          w={isMobile ? "100%" : "90%"}
           textAlign={"center"}
           lineHeight={"150px"}
           borderRadius={"30px"}
         >
-          31,189,154 명이 함께 이용 중입니다.
+          {amt?.totalChildCount} 명이 초대받아 사용 중입니다.
         </Box>
 
         {/* Hover Card */}
@@ -325,7 +322,7 @@ const AmtTree = () => {
             transform="translateX(30px) translateY(-50%)"
             zIndex={10}
             width="400px"
-            shadow={"3xl"}
+            shadow="3xl"
           >
             <Box
               width="100%"
@@ -334,29 +331,50 @@ const AmtTree = () => {
               bg="white"
               shadow="md"
               borderRadius="3xl"
+              position="relative"
+              onMouseEnter={() => setIsHoveringCard(true)}
+              onMouseLeave={() => setIsHoveringCard(false)}
             >
+              {ishost && (
+                <IconButton
+                  aria-label="Block user"
+                  icon={<MdBlock />}
+                  position="absolute"
+                  top={2}
+                  right={2}
+                  size="sm"
+                  fontSize={"lg"}
+                  color={"red"}
+                  bg={"white"}
+                  onClick={() => blockUser(hoveredAncestor.nickname)}
+                />
+              )}
               <VStack align="stretch" spacing={2} color="black">
                 <Heading size="sm" textAlign="center">
-                  {hoveredAncestor.name}
+                  {hoveredAncestor.nickname}
                 </Heading>
                 <Box border="1px dashed black" borderRadius="xl" p={4} h="100%">
                   <UnorderedList>
-                    {cards.map((card) => (
-                      <ListItem key={card.id} display="flex">
-                        <Text
-                          as="span"
-                          fontWeight="bold"
-                          fontSize="sm"
-                          width="20%"
-                          mr={2}
-                        >
-                          {card.title}:
-                        </Text>
-                        <Text as="span" fontSize="sm">
-                          {card.content}
-                        </Text>
-                      </ListItem>
-                    ))}
+                    {cards?.length !== 0 ? (
+                      cards?.map((card) => (
+                        <ListItem key={card.id} display="flex">
+                          <Text
+                            as="span"
+                            fontWeight="bold"
+                            fontSize="sm"
+                            width="20%"
+                            mr={2}
+                          >
+                            {card.title}:
+                          </Text>
+                          <Text as="span" fontSize="sm">
+                            {card.content}
+                          </Text>
+                        </ListItem>
+                      ))
+                    ) : (
+                      <>명함이 등록되지 않은 사용자입니다.</>
+                    )}
                   </UnorderedList>
                 </Box>
               </VStack>
@@ -365,32 +383,49 @@ const AmtTree = () => {
         )}
       </Box>
 
-      {/* Mobile Modal */}
       {selectedAncestor && (
         <SlideUpSmallModal
           isOpen={isOpen}
           onClose={onClose}
-          title={selectedAncestor.name}
+          title={selectedAncestor.nickname}
         >
+          {ishost && (
+            <IconButton
+              aria-label="Block user"
+              icon={<MdBlock />}
+              position="absolute"
+              top={4}
+              right={50}
+              size="sm"
+              fontSize={"lg"}
+              color={"red"}
+              bg={"white"}
+              onClick={() => blockUser(selectedAncestor.nickname)}
+            />
+          )}
           <Box
             mt={-5}
             border="1px dashed black"
             borderRadius="xl"
             p={2}
             h="120%"
-            onClick={() => navigate(`/${selectedAncestor.name}`)}
+            onClick={() => navigate(`/${selectedAncestor.nickname}`)}
           >
             <UnorderedList>
-              {cards.map((card) => (
-                <ListItem key={card.id} display="flex">
-                  <Text as="span" fontWeight="bold" fontSize="sm" mr={2}>
-                    {card.title}:
-                  </Text>
-                  <Text as="span" fontSize="sm">
-                    {card.content}
-                  </Text>
-                </ListItem>
-              ))}
+              {cards?.length !== 0 ? (
+                cards?.map((card) => (
+                  <ListItem key={card.id} display="flex" mb={2}>
+                    <Text as="span" fontWeight="bold" fontSize="sm" mr={2}>
+                      {card.title}:
+                    </Text>
+                    <Text as="span" fontSize="sm">
+                      {card.content}
+                    </Text>
+                  </ListItem>
+                ))
+              ) : (
+                <>명함이 등록되지 않은 사용자입니다.</>
+              )}
             </UnorderedList>
           </Box>
         </SlideUpSmallModal>
