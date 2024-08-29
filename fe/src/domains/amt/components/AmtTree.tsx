@@ -12,21 +12,30 @@ import {
   Icon,
   useDisclosure,
   IconButton,
+  Spinner,
 } from "@chakra-ui/react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { SlideUpSmallModal } from "../../../common/components/SlideUpSmallModal";
 import { Card, ProfileAvatar } from "../utils/data";
 import { ChevronRightIcon } from "@chakra-ui/icons";
-import { amtBlock, getAmt } from "../api/AmtAPI";
+import { amtBlock, amtBlockReset, getAmt } from "../api/AmtAPI";
 import { data, Data, DataNode } from "../utils/atmUtils";
 import { getCard } from "../../info/api/SideBarAPI";
 import { MdBlock } from "react-icons/md";
 import { useToastMessage } from "../../../common/hooks/useToastMessage";
+import UnblockUserModal from "./UnBlockUserModal";
 
 const AmtTree = () => {
+  const {
+    isOpen: isOpenBlock,
+    onOpen: onOpenBlock,
+    onClose: onCloseBlock,
+  } = useDisclosure();
+
   const { showToast } = useToastMessage();
+  const [blockAncestor, setBlockAncestor] = useState<DataNode | null>(null);
   const [hoveredAncestor, setHoveredAncestor] = useState<DataNode | null>(null);
-  const [isHoveringCard, setIsHoveringCard] = useState<boolean>(false); // New state to track if hovering over card
+  const [isHoveringCard, setIsHoveringCard] = useState<boolean>(false);
   const isMobile = useBreakpointValue({ base: true, md: false });
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [selectedAncestor, setSelectedAncestor] = useState<DataNode | null>(
@@ -41,28 +50,35 @@ const AmtTree = () => {
   const { nickName } = useParams<{ nickName: string }>();
   const [amt, setAmt] = useState<Data>();
   const [cards, setCards] = useState<Card[]>();
+  const [isLoading, setIsLoading] = useState(false);
   const name = localStorage.getItem("nickName");
   const ishost = name === nickName;
+
+  const getfetchAmt = async () => {
+    let data;
+    if (token) {
+      data = await getAmt(nickName!, token);
+    } else data = await getAmt(nickName!);
+
+    setAmt(data);
+  };
+
   useEffect(() => {
-    const getfetchAmt = async () => {
-      let data;
-      if (token) {
-        data = await getAmt(nickName!, token);
-      } else data = await getAmt(nickName!);
-
-      setAmt(data);
-    };
-
     getfetchAmt();
   }, [token, nickName]);
 
   const fetchCard = async (name: string) => {
-    let data;
-    if (token) {
-      data = await getCard(name, token);
-    } else data = await getCard(name);
-    console.log(data);
-    setCards(data);
+    setIsLoading(true);
+    try {
+      let data;
+      if (token) {
+        data = await getCard(name, token);
+      } else data = await getCard(name);
+      console.log(data);
+      setCards(data);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -76,12 +92,23 @@ const AmtTree = () => {
   }, [selectedAncestor, hoveredAncestor, isHoveringCard]);
 
   const handleMouseEnter = (ancestor: DataNode, event: React.MouseEvent) => {
+    if (ancestor.isBlocked) return;
+
     const rect = event.currentTarget.getBoundingClientRect();
     setHoveredAncestor({
       ...ancestor,
       top: rect.top + window.scrollY - 10,
       left: rect.left + window.scrollX - 50,
     });
+  };
+
+  const handleUnblockUser = async () => {
+    if (blockAncestor) {
+      await amtBlockReset(blockAncestor.nickname);
+      setBlockAncestor(null);
+      onCloseBlock();
+      getfetchAmt();
+    }
   };
 
   const handleMouseLeave = () => {
@@ -91,6 +118,14 @@ const AmtTree = () => {
   };
 
   const handleAvatarClick = (ancestor: DataNode) => {
+    if (ishost && ancestor.isBlocked) {
+      setBlockAncestor(ancestor);
+      onOpenBlock();
+      return;
+    }
+
+    if (ancestor.isBlocked) return;
+
     if (isMobile) {
       setSelectedAncestor(ancestor);
       onOpen();
@@ -109,6 +144,7 @@ const AmtTree = () => {
   const blockUser = async (nickname: string) => {
     try {
       await amtBlock(nickname);
+      getfetchAmt();
       showToast("유저 차단 성공", "차단에 성공했습니다", "success");
     } catch {
       showToast("유저 차단 실패", "차단에 실패했습니다", "error");
@@ -134,7 +170,7 @@ const AmtTree = () => {
         {amt?.root && (
           <HStack spacing={1} mb={5}>
             <ProfileAvatar
-              ancestor={amt?.root || data}
+              ancestor={amt?.root}
               onHover={handleMouseEnter}
               onLeave={handleMouseLeave}
               onClick={() => handleAvatarClick(amt!.root)}
@@ -145,7 +181,7 @@ const AmtTree = () => {
         {amt?.levelOneNode && (
           <HStack spacing={1} mb={5}>
             <ProfileAvatar
-              ancestor={amt?.levelOneNode || data}
+              ancestor={amt?.levelOneNode}
               onHover={handleMouseEnter}
               onLeave={handleMouseLeave}
               onClick={() => handleAvatarClick(amt!.levelOneNode)}
@@ -160,7 +196,7 @@ const AmtTree = () => {
         {amt?.parent && (
           <HStack spacing={1} mb={5}>
             <ProfileAvatar
-              ancestor={amt?.parent || data}
+              ancestor={amt?.parent}
               onHover={handleMouseEnter}
               onLeave={handleMouseLeave}
               onClick={() => handleAvatarClick(amt!.parent)}
@@ -354,35 +390,38 @@ const AmtTree = () => {
                   {hoveredAncestor.nickname}
                 </Heading>
                 <Box border="1px dashed black" borderRadius="xl" p={4} h="100%">
-                  <UnorderedList>
-                    {cards?.length !== 0 ? (
-                      cards?.map((card) => (
-                        <ListItem key={card.id} display="flex">
-                          <Text
-                            as="span"
-                            fontWeight="bold"
-                            fontSize="sm"
-                            width="20%"
-                            mr={2}
-                          >
-                            {card.title}:
-                          </Text>
-                          <Text as="span" fontSize="sm">
-                            {card.content}
-                          </Text>
-                        </ListItem>
-                      ))
-                    ) : (
-                      <>명함이 등록되지 않은 사용자입니다.</>
-                    )}
-                  </UnorderedList>
+                  {isLoading ? (
+                    <Spinner size="sm" color="blue.500" />
+                  ) : (
+                    <UnorderedList>
+                      {cards && cards.length > 0 ? (
+                        cards.map((card) => (
+                          <ListItem key={card.id} display="flex">
+                            <Text
+                              as="span"
+                              fontWeight="bold"
+                              fontSize="sm"
+                              width="20%"
+                              mr={2}
+                            >
+                              {card.title}:
+                            </Text>
+                            <Text as="span" fontSize="sm">
+                              {card.content}
+                            </Text>
+                          </ListItem>
+                        ))
+                      ) : (
+                        <>명함이 등록되지 않은 사용자입니다.</>
+                      )}
+                    </UnorderedList>
+                  )}
                 </Box>
               </VStack>
             </Box>
           </Box>
         )}
       </Box>
-
       {selectedAncestor && (
         <SlideUpSmallModal
           isOpen={isOpen}
@@ -408,28 +447,38 @@ const AmtTree = () => {
             border="1px dashed black"
             borderRadius="xl"
             p={2}
+            minH={"150px"}
             h="120%"
             onClick={() => navigate(`/${selectedAncestor.nickname}`)}
           >
-            <UnorderedList>
-              {cards?.length !== 0 ? (
-                cards?.map((card) => (
-                  <ListItem key={card.id} display="flex" mb={2}>
-                    <Text as="span" fontWeight="bold" fontSize="sm" mr={2}>
-                      {card.title}:
-                    </Text>
-                    <Text as="span" fontSize="sm">
-                      {card.content}
-                    </Text>
-                  </ListItem>
-                ))
-              ) : (
-                <>명함이 등록되지 않은 사용자입니다.</>
-              )}
-            </UnorderedList>
+            {isLoading ? (
+              <Spinner size="sm" color="blue.500" />
+            ) : (
+              <UnorderedList>
+                {cards && cards.length > 0 ? (
+                  cards.map((card) => (
+                    <ListItem key={card.id} display="flex" mb={2}>
+                      <Text as="span" fontWeight="bold" fontSize="sm" mr={2}>
+                        {card.title}:
+                      </Text>
+                      <Text as="span" fontSize="sm">
+                        {card.content}
+                      </Text>
+                    </ListItem>
+                  ))
+                ) : (
+                  <Text mb={2}>명함이 등록되지 않은 사용자입니다.</Text>
+                )}
+              </UnorderedList>
+            )}
           </Box>
         </SlideUpSmallModal>
       )}
+      <UnblockUserModal
+        isOpen={isOpenBlock}
+        onClose={onCloseBlock}
+        onConfirm={handleUnblockUser}
+      />
     </VStack>
   );
 };

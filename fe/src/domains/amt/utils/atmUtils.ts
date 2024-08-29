@@ -1,8 +1,9 @@
 import { default_img } from "../../../common/utils/profile";
+import { ImageData } from "../../poi/hooks/usePOI";
 
 export interface DataNode {
   nickname: string;
-  imageUrl: string;
+  profileImage?: ImageData;
   isBlocked: boolean;
   top?: number;
   left?: number;
@@ -21,40 +22,6 @@ export interface Data {
 
 export const data: DataNode = {
   nickname: "nickname",
-  imageUrl: default_img,
+  profileImage: undefined,
   isBlocked: false,
 };
-
-export const datalist: DataNode[] = [
-  {
-    nickname: "nickname",
-    imageUrl: default_img,
-    isBlocked: false,
-  },
-  {
-    nickname: "nickname",
-    imageUrl: default_img,
-    isBlocked: false,
-  },
-  {
-    nickname: "nickname",
-    imageUrl: default_img,
-    isBlocked: false,
-  },
-  {
-    nickname: "nickname",
-    imageUrl: default_img,
-    isBlocked: false,
-  },
-  {
-    nickname: "nickname",
-    imageUrl: default_img,
-    isBlocked: false,
-  },
-  {
-    nickname: "nickname",
-    imageUrl: default_img,
-    isBlocked: false,
-  },
-];
-

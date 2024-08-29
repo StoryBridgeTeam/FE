@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   Box,
   Container,
@@ -23,6 +23,7 @@ import { useCommentStore } from "../Store/CommentStore";
 import { useLocation } from "react-router-dom";
 import axios from "axios";
 import { useToastMessage } from "../../../common/hooks/useToastMessage";
+import { getCardProfile } from "../api/SideBarAPI";
 
 interface CommentInputProps {
   id: number;
@@ -40,10 +41,26 @@ const CommentInput: React.FC<CommentInputProps> = ({ id }) => {
   const queryParams = new URLSearchParams(location.search);
   const token = queryParams.get("token");
   const { showToast } = useToastMessage();
+  const [image, setImage] = useState<string>();
 
   const handleCommentChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setComment(e.target.value);
   };
+
+  useEffect(() => {
+    const fetchCardData = async () => {
+      try {
+        if (!token) {
+          const image = await getCardProfile(nickname!);
+          setImage(image.path);
+        }
+      } catch (error) {
+        console.error("Card error:", error);
+      }
+    };
+
+    fetchCardData();
+  }, []);
 
   const handleCommentSubmit = async () => {
     if (!nickname) {
@@ -95,7 +112,7 @@ const CommentInput: React.FC<CommentInputProps> = ({ id }) => {
 
   const handleNicknameSubmit = () => {
     if (nickname.trim()) {
-      setNickname(nickname)
+      setNickname(nickname);
       handleCommentSubmit();
     }
   };
@@ -136,8 +153,11 @@ const CommentInput: React.FC<CommentInputProps> = ({ id }) => {
             {!isMobile && (
               <Avatar
                 size="md"
-                name={nickname || "User Name"}
-                src="https://image.idus.com/image/files/da17e0c53a4e480284c5d49932722e5a.jpg"
+                src={
+                  image
+                    ? `http://image.storyb.kr/${image}`
+                    : `images/profile.png`
+                }
                 mr={2}
               />
             )}

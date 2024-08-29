@@ -226,8 +226,11 @@ const CommentList: React.FC<CommentListProps> = ({
             <Flex align="center">
               <Avatar
                 size="sm"
-                name={comment.author.nickName}
-                src="https://image.idus.com/image/files/da17e0c53a4e480284c5d49932722e5a.jpg"
+                src={
+                  comment.author.profileImage !== null
+                    ? `http://image.storyb.kr/${comment.author.profileImage.path}`
+                    : `images/profile.png`
+                }
                 mr={3}
               />
               <Text fontWeight="bold">{comment.author.nickName}</Text>

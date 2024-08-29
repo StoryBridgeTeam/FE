@@ -1,4 +1,5 @@
 import create from "zustand";
+import { ImageData } from "../../poi/hooks/usePOI";
 
 interface Comment {
   id: number;
@@ -13,6 +14,7 @@ interface Author {
   name: string;
   nickName: string;
   role: string;
+  profileImage: ImageData;
 }
 
 interface TagInfo {

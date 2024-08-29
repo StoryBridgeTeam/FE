@@ -15,7 +15,7 @@ export const amtBlock = async (nickname: string) => {
 export const amtBlockReset = async (nickname: string) => {
   try {
     const response = await axiosInstance.delete(
-      `/members/atm/block?nickname=${nickname}`
+      `/members/amt/block?nickname=${nickname}`
     );
     return response.data.data;
   } catch (error) {

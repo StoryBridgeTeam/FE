@@ -115,7 +115,6 @@ const ProfileSidebar: FC = () => {
         console.error("Unexpected format for card:", card);
         setAboutMe([]);
       }
-      console.log(image.path);
       setImage(image.path);
     } catch (error) {
       console.error("Card error:", error);

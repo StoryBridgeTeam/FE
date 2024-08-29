@@ -36,8 +36,8 @@ const NetworkStatus: React.FC = () => {
       // descendants 설정
       if (data) {
         setDescendants([
-          { count: data.childCount || 0 }, 
-          { count: data.twoLevelChildCount || 0 }, 
+          { count: data.child.length || 0 },
+          { count: data.twoLevelChildCount || 0 },
         ]);
       }
     };
@@ -79,13 +79,21 @@ const NetworkStatus: React.FC = () => {
       >
         <HStack spacing={1}>
           <Avatar
-            src={amt?.parent?.imageUrl || "images/profile.png"}
+            src={
+              amt?.parent?.profileImage
+                ? `http://image.storyb.kr/${amt?.parent.profileImage.path}`
+                : "images/profile.png"
+            }
             size="sm"
           />
         </HStack>
         <HStack spacing={1}>
           <Avatar
-            src={amt?.target?.imageUrl || "images/profile.png"}
+            src={
+              amt?.target?.profileImage
+                ? `http://image.storyb.kr/${amt.target.profileImage.path}`
+                : "images/profile.png"
+            }
             size="sm"
           />
         </HStack>

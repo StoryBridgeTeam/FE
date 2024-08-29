@@ -39,17 +39,15 @@ const LoginAppBar: React.FC<LoginAppBarProps> = ({
   const token = queryParams.get("token");
 
   const handleNavigate = () => {
-    if (!nickName) {
-      nickName = getNicknameToken();
-    }
-    const url = `/${nickName}`;
-    const searchParams = new URLSearchParams();
-
     if (token) {
+      const url = `/${nickName}`;
+      const searchParams = new URLSearchParams();
       searchParams.append("token", token);
+      navigate(`${url}?${searchParams.toString()}`, { replace: true });
+    } else {
+      nickName = localStorage.getItem("nickName") || getNicknameToken();
+      navigate(`/${nickName}`);
     }
-
-    navigate(`${url}?${searchParams.toString()}`, { replace: true });
   };
 
   return (

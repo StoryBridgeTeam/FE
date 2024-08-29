@@ -20,10 +20,15 @@ export const ProfileAvatar = ({
   onLeave,
   onClick,
 }: ProfileAvatarProps) => {
+
   return (
     <Avatar
       cursor={ancestor.isBlocked ? "not-allowed" : "pointer"}
-      src={ancestor.isBlocked ? `images/profile.png` : ancestor.imageUrl}
+      src={
+        !ancestor.isBlocked && ancestor.profileImage
+          ? `http://image.storyb.kr/${ancestor.profileImage.path}`
+          : `images/profile.png`
+      }
       size="md"
       onMouseEnter={(event) => onHover(ancestor, event)}
       onMouseLeave={onLeave}
