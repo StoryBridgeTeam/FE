@@ -11,8 +11,13 @@ import {
   Image,
   IconButton,
   useDisclosure,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalCloseButton,
 } from "@chakra-ui/react";
 import { Edit, Check, File, X, Link } from "tabler-icons-react"; // X 아이콘 추가
+import Slider from "react-slick";
 import { useTranslation } from "react-i18next";
 import { useTextSelection } from "../hook/useTextSelection";
 import CommentInput from "./CommentInput";
@@ -25,6 +30,9 @@ import { getCoverLetters, putCoverLetters } from "../api/InfoAPI";
 import ProfileSidebar from "./ProfileSideBar";
 import { deleteImage, uploadImage } from "../../../common/api/imageAPI";
 import InviteModal from "../../../common/components/InviteModal";
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
+import { carouselSettings } from "../../amt/utils/carouselSetting";
 
 interface ImageData {
   id: number;
@@ -72,6 +80,12 @@ const DetailContent: FC = () => {
   const isHost = nickName === name;
   const navigate = useNavigate();
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const {
+    isOpen: isModalOpen,
+    onOpen: onModalOpen,
+    onClose: onModalClose,
+  } = useDisclosure();
+  const [selectedImage, setSelectedImage] = useState<ImageData | null>(null);
 
   const fetchCoverData = async () => {
     try {
@@ -212,6 +226,12 @@ const DetailContent: FC = () => {
     endIndex: comment.tagInfo?.lastIndex || 0,
   }));
 
+  const handleImageClick = (imgSrc: ImageData) => {
+    setSelectedImage(imgSrc);
+    onModalOpen();
+  };
+
+
   return (
     <>
       {!isMobile && <ProfileSidebar />}
@@ -306,71 +326,68 @@ const DetailContent: FC = () => {
               bg="#EEEEEE"
               mt={4}
               p={5}
-              borderTopRadius="30"
+              borderTopRadius="30px"
               userSelect="text"
+              justifyContent={"center"}
             >
-              {images.length !== 0 && (
-                <Flex
-                  overflowX="auto"
-                  mt={4}
-                  mb={4}
-                  p={2}
-                  sx={{
-                    "::-webkit-scrollbar": {
-                      height: "8px",
-                    },
-                    "::-webkit-scrollbar-thumb": {
-                      background: "#a0a0a0",
-                      borderRadius: "8px",
-                    },
-                  }}
-                >
-                  {images.map((imgSrc, index) => (
-                    <Box
-                      key={index}
-                      position="relative"
-                      display="inline-block"
-                      mr={2}
-                    >
-                      {isEdit && (
-                        <IconButton
-                          aria-label="Delete image"
-                          icon={<X size={18} />}
-                          position="absolute"
-                          colorScheme="red"
-                          top="2px"
-                          right="2px"
-                          size="xs"
-                          zIndex={1}
-                          onClick={() => handleDeleteImage(imgSrc.id)}
-                        />
-                      )}
-                      <Image
-                        src={`http://image.storyb.kr/${imgSrc.path}`}
-                        alt={imgSrc.name}
-                        display="block"
-                        maxH="500px"
-                        maxW="none"
-                        objectFit="contain"
-                      />
-                    </Box>
-                  ))}
-                </Flex>
+              {images.length > 0 && (
+                <Box w={"70%"} margin={"auto"} mb={5}>
+                  <Slider {...carouselSettings}>
+                    {images.map((imgSrc, index) => (
+                      <Box key={index} position="relative">
+                        {isEdit && (
+                          <IconButton
+                            aria-label="Delete image"
+                            icon={<X size={18} />}
+                            position="absolute"
+                            colorScheme="red"
+                            top="5px"
+                            right="5px"
+                            size="xs"
+                            zIndex={1}
+                            onClick={() => handleDeleteImage(imgSrc.id)}
+                          />
+                        )}
+                        <Flex
+                          h="30vh"
+                          justifyContent="center"
+                          alignItems="center"
+                        >
+                          <Image
+                            src={`http://image.storyb.kr/${imgSrc.path}`}
+                            alt={imgSrc.name}
+                            display="block"
+                            maxH="30vh"
+                            maxW="100%"
+                            objectFit="contain"
+                            borderRadius="10px"
+                            onClick={() => handleImageClick(imgSrc)}
+                          />
+                        </Flex>
+                      </Box>
+                    ))}
+                  </Slider>
+                </Box>
               )}
               {isEdit ? (
                 <Textarea
-                  minH={"30vh"}
+                  minH="30vh"
                   maxH="52vh"
                   value={editedContent}
                   onChange={(e) => setEditedContent(e.target.value)}
                   size="lg"
+                  mt={4}
+                  borderRadius="10px"
+                  p={4}
                 />
               ) : (
-                renderContentWithIcons(
-                  editedContent,
-                  processedComments,
-                  scrollToHighlightedComment
-                )
+                <Text>
+                  {renderContentWithIcons(
+                    editedContent,
+                    processedComments,
+                    scrollToHighlightedComment
+                  )}
+                </Text>
               )}
             </Box>
             <Box flex="1">
@@ -386,6 +403,21 @@ const DetailContent: FC = () => {
       </Container>
 
       <InviteModal isOpen={isOpen} onClose={onClose} />
+
+      {/* Image Modal */}
+      <Modal isOpen={isModalOpen} onClose={onModalClose}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalCloseButton />
+          {selectedImage && (
+            <Image
+              src={`http://image.storyb.kr/${selectedImage.path}`}
+              alt={selectedImage.name}
+              objectFit="contain"
+            />
+          )}
+        </ModalContent>
+      </Modal>
     </>
   );
 };

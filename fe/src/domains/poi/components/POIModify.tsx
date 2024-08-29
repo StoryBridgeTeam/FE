@@ -12,6 +12,11 @@ import {
   Image,
   IconButton,
   Flex,
+  useDisclosure,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalCloseButton,
 } from "@chakra-ui/react";
 import {
   Navigate,
@@ -21,8 +26,12 @@ import {
 } from "react-router-dom";
 import { useToastMessage } from "../../../common/hooks/useToastMessage";
 import { usePOI, POI, GETPOI, ImageData } from "../../poi/hooks/usePOI";
-import { Edit, Check, File, X } from "tabler-icons-react"; // X 아이콘 추가
+import { File, X } from "tabler-icons-react"; // X 아이콘 추가
 import { deleteImage, uploadImage } from "../../../common/api/imageAPI";
+import { carouselSettings } from "../../amt/utils/carouselSetting";
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
+import Slider from "react-slick";
 
 const POIModify: React.FC<{ poiId: string }> = ({ poiId }) => {
   const isMobile = useBreakpointValue({ base: true, md: false });
@@ -40,7 +49,13 @@ const POIModify: React.FC<{ poiId: string }> = ({ poiId }) => {
   const [content, setContent] = useState("");
   const MAX_TITLE_LENGTH = 50;
   const [images, setImages] = useState<ImageData[]>([]);
+  const {
+    isOpen: isModalOpen,
+    onOpen: onModalOpen,
+    onClose: onModalClose,
+  } = useDisclosure();
 
+  const [selectedImage, setSelectedImage] = useState<ImageData | null>(null);
   useEffect(() => {
     if (isHost && nickName && poiId) {
       fetchPOI(nickName, Number(poiId)).then((data) => setPoi(data));
@@ -90,6 +105,11 @@ const POIModify: React.FC<{ poiId: string }> = ({ poiId }) => {
     await deleteImage(imageId);
   };
 
+  const handleImageClick = (imgSrc: ImageData) => {
+    setSelectedImage(imgSrc);
+    onModalOpen();
+  };
+
   const handleUpload = async () => {
     try {
       const input = document.createElement("input");
@@ -128,90 +148,99 @@ const POIModify: React.FC<{ poiId: string }> = ({ poiId }) => {
   }
 
   return (
-    <VStack spacing={4} align="stretch" p={6}>
-      <Flex w="full" justifyContent="flex-end" alignItems="center" mb={5}>
-        <Button onClick={handleUpload} mr={2}>
-          <File size={24} color="black" />
-        </Button>
-      </Flex>
-      <Input
-        placeholder="제목"
-        size="lg"
-        variant="unstyled"
-        fontSize="2xl"
-        fontWeight="bold"
-        _placeholder={{ color: "#828282" }}
-        textAlign="center"
-        value={title}
-        onChange={handleTitleChange}
-        maxLength={MAX_TITLE_LENGTH}
-        isDisabled={loading}
-      />
-      <Text fontSize="sm" color="gray.500" textAlign="right" mt={-5}>
-        {title.length}/{MAX_TITLE_LENGTH}
-      </Text>
-      <Divider borderColor="#828282" borderWidth="1px" />
-      {images.length !== 0 && (
-        <Flex
-          overflowX="auto"
-          mt={4}
-          mb={4}
-          p={2}
-          sx={{
-            "::-webkit-scrollbar": {
-              height: "8px",
-            },
-            "::-webkit-scrollbar-thumb": {
-              background: "#a0a0a0",
-              borderRadius: "8px",
-            },
-          }}
-        >
-          {images.map((imgSrc, index) => (
-            <Box key={index} position="relative" display="inline-block" mr={2}>
-              <IconButton
-                aria-label="Delete image"
-                icon={<X size={18} />}
-                position="absolute"
-                colorScheme="red"
-                top="2px"
-                right="2px"
-                size="xs"
-                zIndex={1}
-                onClick={() => handleDeleteImage(imgSrc.id)}
-              />
-              <Image
-                src={`http://image.storyb.kr/${imgSrc.path}`}
-                alt={imgSrc.name}
-                display="block"
-                maxH="500px"
-                maxW="none"
-                objectFit="contain"
-              />
-            </Box>
-          ))}
+    <>
+      <VStack spacing={4} align="stretch" p={6}>
+        <Flex w="full" justifyContent="flex-end" alignItems="center" mb={5}>
+          <Button onClick={handleUpload} mr={2}>
+            <File size={24} color="black" />
+          </Button>
         </Flex>
-      )}
-      <Textarea
-        minHeight="550px"
-        placeholder="본문 내용을 작성해주세요"
-        variant="unstyled"
-        px={6}
-        value={content}
-        onChange={handleContentChange}
-        isDisabled={loading}
-      />
-      <Box textAlign="center">
-        <Button
-          isDisabled={isButtonDisabled}
-          colorScheme="blue"
-          onClick={handleModifyPOI}
-          leftIcon={loading ? <Spinner size="sm" /> : undefined}
-        >
-          {loading ? "수정 중..." : "POI 수정"}
-        </Button>
-      </Box>
-    </VStack>
+        <Input
+          placeholder="제목"
+          size="lg"
+          variant="unstyled"
+          fontSize="2xl"
+          fontWeight="bold"
+          _placeholder={{ color: "#828282" }}
+          textAlign="center"
+          value={title}
+          onChange={handleTitleChange}
+          maxLength={MAX_TITLE_LENGTH}
+          isDisabled={loading}
+        />
+        <Text fontSize="sm" color="gray.500" textAlign="right" mt={-5}>
+          {title.length}/{MAX_TITLE_LENGTH}
+        </Text>
+        <Divider borderColor="#828282" borderWidth="1px" />
+        {images.length !== 0 && (
+          <Box w={"80%"} margin={"auto"} minH={"30vh"}>
+            <Slider {...carouselSettings}>
+              {images.map((imgSrc, index) => (
+                <Box key={index} position="relative">
+                  <IconButton
+                    aria-label="Delete image"
+                    icon={<X size={18} />}
+                    position="absolute"
+                    colorScheme="red"
+                    top="5px"
+                    right="5px"
+                    size="xs"
+                    zIndex={1}
+                    onClick={() => handleDeleteImage(imgSrc.id)}
+                  />
+
+                  <Flex h="30vh" justifyContent="center" alignItems="center">
+                    <Image
+                      src={`http://image.storyb.kr/${imgSrc.path}`}
+                      alt={imgSrc.name}
+                      display="block"
+                      maxH="30vh"
+                      maxW="100%"
+                      objectFit="contain"
+                      borderRadius="10px"
+                      onClick={() => handleImageClick(imgSrc)}
+                    />
+                  </Flex>
+                </Box>
+              ))}
+            </Slider>
+          </Box>
+        )}
+        <Textarea
+          minHeight="550px"
+          placeholder="본문 내용을 작성해주세요"
+          variant="unstyled"
+          px={6}
+          value={content}
+          onChange={handleContentChange}
+          isDisabled={loading}
+        />
+        <Box textAlign="center">
+          <Button
+            isDisabled={isButtonDisabled}
+            colorScheme="blue"
+            onClick={handleModifyPOI}
+            leftIcon={loading ? <Spinner size="sm" /> : undefined}
+          >
+            {loading ? "수정 중..." : "POI 수정"}
+          </Button>
+        </Box>
+      </VStack>
+
+      <Modal isOpen={isModalOpen} onClose={onModalClose}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalCloseButton />
+          {selectedImage && (
+            <Image
+              src={`http://image.storyb.kr/${selectedImage.path}`}
+              alt={selectedImage.name}
+              objectFit="contain"
+            />
+          )}
+        </ModalContent>
+      </Modal>
+    </>
   );
 };
 
