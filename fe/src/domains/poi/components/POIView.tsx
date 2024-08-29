@@ -72,6 +72,7 @@ const POIView: React.FC<POIViewProps> = ({ poiId }) => {
   } = useDisclosure();
 
   const [selectedImage, setSelectedImage] = useState<ImageData | null>(null);
+
   useEffect(() => {
     if (nickName && poiId) {
       if (token)
@@ -229,7 +230,7 @@ const POIView: React.FC<POIViewProps> = ({ poiId }) => {
         )}
 
         {poi?.images.length !== 0 && (
-          <Box w={"80%"} margin={"auto"} minH={"30vh"}>
+          <Box w={"80%"} margin={"auto"} minH={"30vh"} mb={12}>
             <Slider {...carouselSettings}>
               {poi?.images.map((imgSrc, index) => (
                 <Box key={index} position="relative">

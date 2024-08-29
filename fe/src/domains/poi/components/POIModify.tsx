@@ -26,7 +26,7 @@ import {
 } from "react-router-dom";
 import { useToastMessage } from "../../../common/hooks/useToastMessage";
 import { usePOI, POI, GETPOI, ImageData } from "../../poi/hooks/usePOI";
-import { File, X } from "tabler-icons-react"; // X 아이콘 추가
+import { Plus, X } from "tabler-icons-react";
 import { deleteImage, uploadImage } from "../../../common/api/imageAPI";
 import { carouselSettings } from "../../amt/utils/carouselSetting";
 import "slick-carousel/slick/slick.css";
@@ -86,7 +86,7 @@ const POIModify: React.FC<{ poiId: string }> = ({ poiId }) => {
         id: Number(poiId),
         title,
         content,
-        images: images.map((image) => image.id), // 이미지 추가
+        images: images.map((image) => image.id),
         index: poi?.index as number,
       };
       await modifyPOI(Number(poiId), poiData);
@@ -149,11 +149,6 @@ const POIModify: React.FC<{ poiId: string }> = ({ poiId }) => {
 
   return (
     <VStack spacing={4} align="stretch" p={6}>
-      <Flex w="full" justifyContent="flex-end" alignItems="center" mb={5}>
-        <Button onClick={handleUpload} mr={2}>
-          <File size={24} color="black" />
-        </Button>
-      </Flex>
       <Input
         placeholder="제목"
         size="lg"
@@ -171,46 +166,43 @@ const POIModify: React.FC<{ poiId: string }> = ({ poiId }) => {
         {title.length}/{MAX_TITLE_LENGTH}
       </Text>
       <Divider borderColor="#828282" borderWidth="1px" />
+      <Flex w="full" justifyContent="flex-left" alignItems="center" mb={-10}>
+        <Button onClick={handleUpload} size="md" colorScheme="blue">
+          <Plus size={24} />
+        </Button>
+      </Flex>
       {images.length !== 0 && (
-        <Flex
-          overflowX="auto"
-          mt={4}
-          mb={4}
-          p={2}
-          sx={{
-            "::-webkit-scrollbar": {
-              height: "8px",
-            },
-            "::-webkit-scrollbar-thumb": {
-              background: "#a0a0a0",
-              borderRadius: "8px",
-            },
-          }}
-        >
-          {images.map((imgSrc, index) => (
-            <Box key={index} position="relative" display="inline-block" mr={2}>
-              <IconButton
-                aria-label="Delete image"
-                icon={<X size={18} />}
-                position="absolute"
-                colorScheme="red"
-                top="2px"
-                right="2px"
-                size="xs"
-                zIndex={1}
-                onClick={() => handleDeleteImage(imgSrc.id)}
-              />
-              <Image
-                src={`http://image.storyb.kr/${imgSrc.path}`}
-                alt={imgSrc.name}
-                display="block"
-                maxH="500px"
-                maxW="none"
-                objectFit="contain"
-              />
-            </Box>
-          ))}
-        </Flex>
+        <Box w={"80%"} margin={"auto"} minH={"30vh"} mb={5}>
+          <Slider {...carouselSettings}>
+            {images.map((imgSrc, index) => (
+              <Box key={index} position="relative">
+                <Flex h="30vh" justifyContent="center" alignItems="center">
+                  <IconButton
+                    aria-label="Delete image"
+                    icon={<X size={18} />}
+                    position="absolute"
+                    colorScheme="red"
+                    top="2px"
+                    right="2px"
+                    size="xs"
+                    zIndex={1}
+                    onClick={() => handleDeleteImage(imgSrc.id)}
+                  />
+                  <Image
+                    src={`http://image.storyb.kr/${imgSrc.path}`}
+                    alt={imgSrc.name}
+                    display="block"
+                    maxH="30vh"
+                    maxW="100%"
+                    objectFit="contain"
+                    borderRadius="10px"
+                    onClick={() => handleImageClick(imgSrc)}
+                  />
+                </Flex>
+              </Box>
+            ))}
+          </Slider>
+        </Box>
       )}
       <Textarea
         minHeight="550px"
@@ -231,6 +223,20 @@ const POIModify: React.FC<{ poiId: string }> = ({ poiId }) => {
           {loading ? "수정 중..." : "POI 수정"}
         </Button>
       </Box>
+      {selectedImage && (
+        <Modal isOpen={isModalOpen} onClose={onModalClose}>
+          <ModalOverlay />
+          <ModalContent>
+            <ModalCloseButton />
+            <Image
+              src={`http://image.storyb.kr/${selectedImage.path}`}
+              alt={selectedImage.name}
+              maxH="80vh"
+              objectFit="contain"
+            />
+          </ModalContent>
+        </Modal>
+      )}
     </VStack>
   );
 };

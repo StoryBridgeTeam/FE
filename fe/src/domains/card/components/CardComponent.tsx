@@ -6,6 +6,8 @@ import {
   useDisclosure,
   VStack,
   Text,
+  Flex,
+  Button,
 } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
 import { useLocation, useParams } from "react-router-dom";
@@ -15,6 +17,7 @@ import CardInfoBox from "./CardInfoBox";
 import CardModal from "./CardModal";
 import SelfIntroductionBox from "./SelfIntoductionBox";
 import FirstCardModal from "./FirstCardModal";
+import { Share } from "tabler-icons-react";
 
 //명함카드 영역 컴포넌트
 const CardComponent: React.FC = () => {
@@ -90,9 +93,21 @@ const CardComponent: React.FC = () => {
       >
         <VStack align="stretch" spacing={2} color="black" flex={1}>
           {hasCard && (
-            <Heading fontSize={isMobile ? "md" : "xl"} textAlign="center">
-              {name}
-            </Heading>
+            <Flex alignItems="center" justifyContent="space-between">
+              <Box flex="1" /> {/* 왼쪽 빈 공간 */}
+              <Heading
+                fontSize={isMobile ? "md" : "xl"}
+                textAlign="center"
+                flex="2"
+              >
+                {name}
+              </Heading>
+              <Box flex="1" textAlign="right">
+                <Button size="sm" bg="white">
+                  <Share size={20} color="black" />
+                </Button>
+              </Box>
+            </Flex>
           )}
           <CardInfoBox
             briefEntries={briefEntries}
