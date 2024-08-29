@@ -12,6 +12,11 @@ import {
   Image,
   IconButton,
   Flex,
+  useDisclosure,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalCloseButton,
 } from "@chakra-ui/react";
 import {
   Navigate,
@@ -21,8 +26,12 @@ import {
 } from "react-router-dom";
 import { useToastMessage } from "../../../common/hooks/useToastMessage";
 import { usePOI, POI, GETPOI, ImageData } from "../../poi/hooks/usePOI";
-import { Edit, Check, Photo, X } from "tabler-icons-react"; // X 아이콘 추가
+import { File, X } from "tabler-icons-react"; // X 아이콘 추가
 import { deleteImage, uploadImage } from "../../../common/api/imageAPI";
+import { carouselSettings } from "../../amt/utils/carouselSetting";
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
+import Slider from "react-slick";
 
 const POIModify: React.FC<{ poiId: string }> = ({ poiId }) => {
   const isMobile = useBreakpointValue({ base: true, md: false });
@@ -40,7 +49,13 @@ const POIModify: React.FC<{ poiId: string }> = ({ poiId }) => {
   const [content, setContent] = useState("");
   const MAX_TITLE_LENGTH = 50;
   const [images, setImages] = useState<ImageData[]>([]);
+  const {
+    isOpen: isModalOpen,
+    onOpen: onModalOpen,
+    onClose: onModalClose,
+  } = useDisclosure();
 
+  const [selectedImage, setSelectedImage] = useState<ImageData | null>(null);
   useEffect(() => {
     if (isHost && nickName && poiId) {
       fetchPOI(nickName, Number(poiId)).then((data) => setPoi(data));
@@ -90,6 +105,11 @@ const POIModify: React.FC<{ poiId: string }> = ({ poiId }) => {
     await deleteImage(imageId);
   };
 
+  const handleImageClick = (imgSrc: ImageData) => {
+    setSelectedImage(imgSrc);
+    onModalOpen();
+  };
+
   const handleUpload = async () => {
     try {
       const input = document.createElement("input");
@@ -129,6 +149,11 @@ const POIModify: React.FC<{ poiId: string }> = ({ poiId }) => {
 
   return (
     <VStack spacing={4} align="stretch" p={6}>
+      <Flex w="full" justifyContent="flex-end" alignItems="center" mb={5}>
+        <Button onClick={handleUpload} mr={2}>
+          <File size={24} color="black" />
+        </Button>
+      </Flex>
       <Input
         placeholder="제목"
         size="lg"
@@ -146,11 +171,6 @@ const POIModify: React.FC<{ poiId: string }> = ({ poiId }) => {
         {title.length}/{MAX_TITLE_LENGTH}
       </Text>
       <Divider borderColor="#828282" borderWidth="1px" />
-      <Flex w="full" justifyContent="flex-first" alignItems="center">
-        <Button onClick={handleUpload} ml={2} size="sm">
-          <Photo size={24} color="black" />
-        </Button>
-      </Flex>
       {images.length !== 0 && (
         <Flex
           overflowX="auto"

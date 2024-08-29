@@ -1,11 +1,10 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   VStack,
   HStack,
   Text,
   useBreakpointValue,
-  GridItem,
   Avatar,
   Heading,
   UnorderedList,
@@ -14,10 +13,12 @@ import {
   Icon,
   useDisclosure,
 } from "@chakra-ui/react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { SlideUpSmallModal } from "../../../common/components/SlideUpSmallModal";
 import { ancestors, cards } from "./data";
 import { ChevronRightIcon } from "@chakra-ui/icons";
+import { getAmt } from "../api/AmtAPI";
+import { Data } from "../utils/atmUtils";
 
 interface Ancestor {
   name: string;
@@ -70,11 +71,27 @@ const AmtTree = () => {
   const queryParams = new URLSearchParams(location.search);
   const token = queryParams.get("token");
   const a: Ancestor = { name: "Ancestor", img: "/path/to/image.jpg" };
+  const { nickName } = useParams<{ nickName: string }>();
+  const [amt, setAmt] = useState<Data>();
 
   const [descendants, setDescendants] = useState<Descendant[]>([
     { count: 17, profile: [] },
     { count: 31, profile: [] },
   ]);
+
+  useEffect(() => {
+    const getfetchAmt = async () => {
+      let data;
+      if (token) {
+        data = await getAmt(nickName!, token);
+      } else data = await getAmt(nickName!);
+
+      setAmt(data);
+      console.log(data);
+    };
+
+    getfetchAmt();
+  }, []);
 
   const maxCount = Math.max(...descendants.map((d) => d.count));
 
