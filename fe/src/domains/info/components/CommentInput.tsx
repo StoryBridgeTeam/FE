@@ -156,7 +156,7 @@ const CommentInput: React.FC<CommentInputProps> = ({ id }) => {
                 src={
                   image
                     ? `http://image.storyb.kr/${image}`
-                    : `images/profile.png`
+                    : `/images/profile.png`
                 }
                 mr={2}
               />

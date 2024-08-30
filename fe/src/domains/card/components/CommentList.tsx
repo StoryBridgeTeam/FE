@@ -224,7 +224,7 @@ const CommentList: React.FC<CommentListProps> = ({ cardId, nickName }) => {
                   src={
                     comment.img
                       ? `http://image.storyb.kr/${comment.img}`
-                      : `images/profile.png`
+                      : `/images/profile.png`
                   }
                 />
                 <Box>

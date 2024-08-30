@@ -1,5 +1,6 @@
 import { Avatar } from "@chakra-ui/react";
 import { DataNode } from "./atmUtils";
+import { milliseconds } from "date-fns";
 
 export interface Card {
   id: number;
@@ -20,6 +21,7 @@ export const ProfileAvatar = ({
   onLeave,
   onClick,
 }: ProfileAvatarProps) => {
+  console.log(ancestor.profileImage);
 
   return (
     <Avatar
@@ -27,7 +29,7 @@ export const ProfileAvatar = ({
       src={
         !ancestor.isBlocked && ancestor.profileImage
           ? `http://image.storyb.kr/${ancestor.profileImage.path}`
-          : `images/profile.png`
+          : `/images/profile.png`
       }
       size="md"
       onMouseEnter={(event) => onHover(ancestor, event)}

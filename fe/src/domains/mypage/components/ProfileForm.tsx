@@ -52,7 +52,7 @@ const ProfileForm: React.FC = () => {
                 />
               ) : (
                 <Image
-                  src={"images/profile.png"}
+                  src={"/images/profile.png"}
                   border={"1px solid"}
                   borderColor={"gray.200"}
                   boxSize="200px"

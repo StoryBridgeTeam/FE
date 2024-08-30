@@ -216,7 +216,7 @@ const ProfileSidebar: FC = () => {
     >
       <Avatar
         size="2xl"
-        src={image ? `http://image.storyb.kr/${image}` : `images/profile.png`}
+        src={image ? `http://image.storyb.kr/${image}` : `/images/profile.png`}
         mr={2}
       />
       <Heading size="md">{nickName}</Heading>

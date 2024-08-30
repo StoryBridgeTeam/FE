@@ -242,7 +242,7 @@ const CommentList: React.FC<CommentListProps> = ({
                 src={
                   comment.author.profileImage !== null
                     ? `http://image.storyb.kr/${comment.author.profileImage.path}`
-                    : `images/profile.png`
+                    : `/images/profile.png`
                 }
                 mr={3}
               />

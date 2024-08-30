@@ -82,7 +82,7 @@ const NetworkStatus: React.FC = () => {
             src={
               amt?.parent?.profileImage
                 ? `http://image.storyb.kr/${amt?.parent.profileImage.path}`
-                : "images/profile.png"
+                : "/images/profile.png"
             }
             size="sm"
           />
@@ -92,7 +92,7 @@ const NetworkStatus: React.FC = () => {
             src={
               amt?.target?.profileImage
                 ? `http://image.storyb.kr/${amt.target.profileImage.path}`
-                : "images/profile.png"
+                : "/images/profile.png"
             }
             size="sm"
           />
