@@ -74,7 +74,7 @@ const CommentList: React.FC<CommentListProps> = ({
     isOpen: isConnectOpen,
     onOpen: onConnectOpen,
     onClose: onConnectClose,
-  } = useDisclosure();
+} = useDisclosure();
   const {
     isOpen: isNicknameOpen,
     onOpen: onNicknameOpen,
@@ -308,106 +308,112 @@ const CommentList: React.FC<CommentListProps> = ({
             </Text>
           ) : (
             comments.map((comment) => (
-              <HStack
+              <VStack
                 key={comment.id}
                 alignItems="flex-start"
-                spacing={4}
+                spacing={1}
                 id={`comment-${comment.id}`}
+                w={"100%"}
               >
-                <Avatar name={comment.user} />
-                <Box>
-                  <HStack spacing={4}>
-                    <Text fontWeight="bold">{comment.user}</Text>
-                    <Text fontSize="xs" color="#B4BBC6">
-                      {formatTimestamp(comment.timestamp)}
-                    </Text>
-                    {(ishost || comment.user === name) && (
-                      <Menu>
-                        <MenuButton
-                          as={Button}
-                          variant="ghost"
-                          size="xs"
-                          aria-label="More options"
-                          rightIcon={<BiDotsVerticalRounded />}
-                          p={0}
-                          m={0}
-                          minW={0}
-                        />
-                        <MenuList>
-                          {ishost && (
-                            <MenuItem
-                              icon={<Link />}
-                              onClick={() =>
-                                handleConnect(comment.id, comment.content)
-                              }
-                            >
-                              Connect
-                            </MenuItem>
-                          )}
-                          <MenuItem
-                            icon={<Edit />}
-                            onClick={() =>
-                              handleEdit(comment.id, comment.content)
-                            }
-                          >
-                            Edit
-                          </MenuItem>
-                          <MenuItem
-                            icon={<Trash />}
-                            onClick={async () => {
-                              await deleteComment(comment.id);
-                              loadComments();
-                              showToast(
-                                t(`info.commentDelete`),
-                                t(`info.commentDeleteMessage`),
-                                "success"
-                              );
-                            }}
-                          >
-                            Delete
-                          </MenuItem>
-                        </MenuList>
-                      </Menu>
-                    )}
-                  </HStack>
-                  {comment.tagInfo &&
+                <HStack>
+                  <Avatar name={comment.user} size={"sm"} />
+                  <Box>
+                    <HStack spacing={4}>
+                      <Text fontWeight="bold">{comment.user}</Text>
+                      <Text fontSize="xs" color="#B4BBC6">
+                        {formatTimestamp(comment.timestamp)}
+                      </Text>
+                      {(ishost || comment.user === name) && (
+                          <Menu>
+                            <MenuButton
+                                as={Button}
+                                variant="ghost"
+                                size="xs"
+                                aria-label="More options"
+                                rightIcon={<BiDotsVerticalRounded />}
+                                p={0}
+                                m={0}
+                                minW={0}
+                            />
+                            <MenuList>
+                              {ishost && (
+                                  <MenuItem
+                                      icon={<Link />}
+                                      onClick={() =>
+                                          handleConnect(comment.id, comment.content)
+                                      }
+                                  >
+                                    Connect
+                                  </MenuItem>
+                              )}
+                              <MenuItem
+                                  icon={<Edit />}
+                                  onClick={() =>
+                                      handleEdit(comment.id, comment.content)
+                                  }
+                              >
+                                Edit
+                              </MenuItem>
+                              <MenuItem
+                                  icon={<Trash />}
+                                  onClick={async () => {
+                                    await deleteComment(comment.id);
+                                    loadComments();
+                                    showToast(
+                                        t(`info.commentDelete`),
+                                        t(`info.commentDeleteMessage`),
+                                        "success"
+                                    );
+                                  }}
+                              >
+                                Delete
+                              </MenuItem>
+                            </MenuList>
+                          </Menu>
+                      )}
+                    </HStack>
+                  </Box>
+                </HStack>
+                {comment.tagInfo &&
                     (comment.tagInfo.startIndex !== 0 ||
-                      comment.tagInfo.lastIndex !== 0) && (
-                      <Tag
-                        mt={1}
-                        size="md"
-                        fontSize="xs"
-                        colorScheme="gray"
-                        borderRadius="full"
-                        cursor="pointer"
-                        onClick={() =>
-                          handleTagClick(
-                            comment.tagInfo!.startIndex,
-                            comment.tagInfo!.lastIndex
-                          )
-                        }
-                      >
-                        <TagLabel color={"gray"}>
-                          {getHighlightedText(
-                            comment.tagInfo.startIndex,
-                            comment.tagInfo.lastIndex
-                          )}
-                        </TagLabel>
-                      </Tag>
+                        comment.tagInfo.lastIndex !== 0) && (
+                        <Tag
+                            ml={10}
+                            mt={1}
+                            size="md"
+                            fontSize="xs"
+                            colorScheme="gray"
+                            borderRadius="full"
+                            cursor="pointer"
+                            onClick={() =>
+                                handleTagClick(
+                                    comment.tagInfo!.startIndex,
+                                    comment.tagInfo!.lastIndex
+                                )
+                            }
+                        >
+                          <TagLabel color={"gray"}>
+                            {getHighlightedText(
+                                comment.tagInfo.startIndex,
+                                comment.tagInfo.lastIndex
+                            )}
+                          </TagLabel>
+                        </Tag>
                     )}
+                <Box paddingLeft={10} w={"100%"} boxSizing={"border-box"}>
                   {
                     comment.images.length> 0 ?
-                        <HStack w={"100%"}>
+                        <HStack  boxSizing={"border-box"} w={"100%"}>
                           <Box w={"50%"}>
-                            <ImagePresenter images={comment.images} />
+                            <ImagePresenter images={comment.images} arrowSize={12}/>
                           </Box>
-                          <Text mt={2}>{comment.content}</Text>
+                          <Text w={"50%"} mt={2}>{comment.content}</Text>
                         </HStack>
                         :
                         <Text mt={2}>{comment.content}</Text>
                   }
                 </Box>
-              </HStack>
+              </VStack>
             ))
           )}
           {totalCommentPages === 0 ? null : (

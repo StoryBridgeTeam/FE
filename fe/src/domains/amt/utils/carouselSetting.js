@@ -13,8 +13,8 @@ export const carouselSettings = {
   prevArrow: <SamplePrevArrow />, // 커스텀 버튼 사용
 };
 
-function SampleNextArrow(props) {
-  const { className, style, onClick } = props;
+export function SampleNextArrow(props) {
+  const { className, style, onClick, size=16 } = props;
   return (
     <div
       className={className}
@@ -33,13 +33,13 @@ function SampleNextArrow(props) {
       }}
       onClick={onClick}
     >
-      <FaChevronRight size={24} />
+      <FaChevronRight size={size} />
     </div>
   );
 }
 
-function SamplePrevArrow(props) {
-  const { className, style, onClick } = props;
+export function SamplePrevArrow(props) {
+  const { className, style, onClick, size=16 } = props;
   return (
     <div
       className={className}
@@ -58,7 +58,7 @@ function SamplePrevArrow(props) {
       }}
       onClick={onClick}
     >
-      <FaChevronLeft size={24} />
+      <FaChevronLeft size={size} />
     </div>
   );
 }

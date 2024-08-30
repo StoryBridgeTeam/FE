@@ -12,13 +12,14 @@ import {
     Stack
 } from "@chakra-ui/react";
 import Slider from "react-slick";
-import {carouselSettings} from "../../domains/amt/utils/carouselSetting";
+import {carouselSettings, SampleNextArrow, SamplePrevArrow} from "../../domains/amt/utils/carouselSetting";
 import {X} from "tabler-icons-react";
 import {AddIcon} from "@chakra-ui/icons";
 import {ImageRes} from "../hooks/useImage";
 
 interface ImagePresenterProps{
-    images:ImageRes[]
+    images:ImageRes[],
+    arrowSize?:number
 }
 
 interface ModalInfo{
@@ -26,7 +27,9 @@ interface ModalInfo{
     selectedImg : ImageRes | null
 }
 
-const ImagePresenter:React.FC<ImagePresenterProps> = ({images}) => {
+const ImagePresenter:React.FC<ImagePresenterProps> = (props) => {
+    const {images, arrowSize=16} = props;
+
     const [detailInfo, setDetailInfo] = useState<ModalInfo>({
         isModalOpen : false,
         selectedImg : null
@@ -50,7 +53,11 @@ const ImagePresenter:React.FC<ImagePresenterProps> = ({images}) => {
         {images.length > 0 && (
             <Stack direction={"row"} alignItems={"center"} justifyContent={"center"} gap={10}  mb={5} padding={3}>
                 <Box w={"100%"}>
-                    <Slider {...carouselSettings}>
+                    <Slider
+                        {...carouselSettings}
+                        nextArrow={<SampleNextArrow size={arrowSize}/>}
+                        prevArrow={<SamplePrevArrow size={arrowSize} />}
+                    >
                         {images.map((imgSrc, index) => (
                             <Box key={index} position="relative">
                                 <Flex
