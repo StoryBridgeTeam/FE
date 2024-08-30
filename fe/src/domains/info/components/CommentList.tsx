@@ -13,7 +13,7 @@ import {
   useDisclosure,
   Tag,
   TagLabel,
-  Spinner,
+  Spinner, useBreakpointValue, Stack,
 } from "@chakra-ui/react";
 import { BiDotsVerticalRounded } from "react-icons/bi";
 import { Trash, Edit, Link } from "tabler-icons-react";
@@ -32,6 +32,7 @@ import {
   tagComment,
 } from "../api/CommentAPI";
 import { useLocation, useParams } from "react-router-dom";
+import ImagePresenter from "../../../common/components/ImagePresenter";
 
 interface CommentListProps {
   id: number;
@@ -52,6 +53,7 @@ const CommentList: React.FC<CommentListProps> = ({
     updateCommentIndexes,
   } = useCommentStore();
 
+  const isMobile = useBreakpointValue({ base: true, md: false });
   const [editIndex, setEditIndex] = useState<number | null>(null);
   const [editText, setEditText] = useState<string>("");
   const [connectIndex, setConnectIndex] = useState<number | null>(null);
@@ -331,9 +333,24 @@ const CommentList: React.FC<CommentListProps> = ({
                   </TagLabel>
                 </Tag>
               )}
-            <Text marginLeft={10} pr={5}>
-              {comment.content}
-            </Text>
+            {
+              isMobile ?
+                  <>
+                    <ImagePresenter images={comment.images} />
+                    <Text marginLeft={10} pr={5}>
+                      {comment.content}
+                    </Text>
+                  </>
+                  :
+                  <Stack direction={"row"} padding={5}>
+                    <Text marginLeft={10} w={"50%"}>
+                      {comment.content}
+                    </Text>
+                    <Box w={"50%"}>
+                      <ImagePresenter images={comment.images} />
+                    </Box>
+                  </Stack>
+            }
           </Box>
         ))}
         {loading && (

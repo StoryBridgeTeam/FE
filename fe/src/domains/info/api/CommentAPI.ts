@@ -19,7 +19,7 @@ export const getComments = async (id: number, page: number, token?: string) => {
 
 export const postComment = async (
   id: number,
-  comment: { nickName: string; content: string },
+  comment: { nickName: string; content: string, imageIds?:number[] },
   token?: string
 ) => {
   try {

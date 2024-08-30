@@ -14,7 +14,7 @@ import {
   ModalFooter,
   ModalBody,
   ModalCloseButton,
-  useDisclosure,
+  useDisclosure, Menu, MenuButton, IconButton, Stack, MenuList, MenuItem,
 } from "@chakra-ui/react";
 import { Send } from "tabler-icons-react";
 import { useTranslation } from "react-i18next";
@@ -24,6 +24,9 @@ import { useLocation } from "react-router-dom";
 import axios from "axios";
 import { useToastMessage } from "../../../common/hooks/useToastMessage";
 import { getCardProfile } from "../api/SideBarAPI";
+import {AddIcon, LinkIcon} from "@chakra-ui/icons";
+import ImageUploader from "../../../common/components/ImageUploader";
+import {useImage} from "../../../common/hooks/useImage";
 
 interface CommentInputProps {
   id: number;
@@ -42,6 +45,7 @@ const CommentInput: React.FC<CommentInputProps> = ({ id }) => {
   const token = queryParams.get("token");
   const { showToast } = useToastMessage();
   const [image, setImage] = useState<string>();
+  const imageHook = useImage();
 
   const handleCommentChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setComment(e.target.value);
@@ -76,11 +80,16 @@ const CommentInput: React.FC<CommentInputProps> = ({ id }) => {
               { nickName: nickname, content: comment },
               token
             )
-          : await postComment(id, { nickName: nickname, content: comment });
+          : await postComment(id, {
+            nickName: nickname,
+              content: comment,
+              imageIds: imageHook.images.map(i => i.id)
+          });
 
         if (response) {
           addComments(response);
           setComment("");
+          imageHook.clearImage();
         }
       } catch (error) {
         if (
@@ -149,6 +158,9 @@ const CommentInput: React.FC<CommentInputProps> = ({ id }) => {
         p={isMobile ? 2 : 4}
       >
         <Container maxW="4xl">
+          <Flex>
+            <ImageUploader imageHook={imageHook} />
+          </Flex>
           <Flex alignItems="center">
             {!isMobile && (
               <Avatar
@@ -161,7 +173,6 @@ const CommentInput: React.FC<CommentInputProps> = ({ id }) => {
                 mr={2}
               />
             )}
-
             <Box flex="1" mr={3}>
               <Input
                 value={comment}
@@ -170,9 +181,24 @@ const CommentInput: React.FC<CommentInputProps> = ({ id }) => {
                 placeholder={t("info.commentPlaceHolder")}
               />
             </Box>
-            <Button onClick={handleCommentSubmit}>
-              <Send />
-            </Button>
+            <Stack gap={2} direction={"row"}>
+              <Menu>
+                <MenuButton
+                    as={IconButton}
+                    icon={<AddIcon />}
+                />
+                <MenuList>
+                  <MenuItem icon={<LinkIcon />}
+                            onClick={() => imageHook.handleUploadImage("COMMENT")}
+                  >
+                    {t("info.commentImageBtn")}
+                  </MenuItem>
+                </MenuList>
+              </Menu>
+              <Button onClick={handleCommentSubmit}>
+                <Send />
+              </Button>
+            </Stack>
           </Flex>
         </Container>
       </Box>

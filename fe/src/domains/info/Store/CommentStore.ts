@@ -1,5 +1,5 @@
 import create from "zustand";
-import { ImageData } from "../../poi/hooks/usePOI";
+import {ImageData} from "../../../common/hooks/useImage";
 
 interface Comment {
   id: number;
@@ -8,6 +8,7 @@ interface Comment {
   createdTime: string;
   modifiedTime: string | null;
   tagInfo: TagInfo | null;
+  images: ImageData[] | []
 }
 
 interface Author {
