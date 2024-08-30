@@ -220,7 +220,13 @@ const CommentList: React.FC<CommentListProps> = ({ cardId, nickName }) => {
                 spacing={4}
                 id={`comment-${comment.id}`}
               >
-                <Avatar name={comment.user} />
+                <Avatar
+                  src={
+                    comment.img
+                      ? `http://image.storyb.kr/${comment.img}`
+                      : `images/profile.png`
+                  }
+                />
                 <Box>
                   <HStack spacing={4}>
                     <Text fontWeight="bold">{comment.user}</Text>

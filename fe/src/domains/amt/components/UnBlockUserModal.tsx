@@ -27,7 +27,7 @@ const UnblockUserModal: React.FC<UnblockUserModalProps> = ({
     <Modal isOpen={isOpen} onClose={onClose} isCentered>
       <ModalOverlay />
       <ModalContent>
-        <ModalHeader>Unblock User</ModalHeader>
+        <ModalHeader>유저 차단 해제</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
           <Text>차단해제하시겠습니까?</Text>

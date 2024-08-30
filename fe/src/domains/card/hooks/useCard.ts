@@ -16,6 +16,7 @@ import { useToastMessage } from "../../../common/hooks/useToastMessage";
 export interface Comment {
   id: number;
   user: string;
+  img: string | null;
   content: string;
   timestamp: string;
   modifiedTime: string | null;
@@ -213,6 +214,7 @@ export const useCard = (): UseCardResult => {
         (comment: any) => ({
           id: comment.id,
           user: comment.author.nickName,
+          img: comment.author.profileImage.path,
           content: comment.content,
           timestamp: comment.createdTime,
           modifiedTime: comment.modifiedTime,
