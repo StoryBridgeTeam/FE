@@ -1,4 +1,3 @@
-import { default_img } from "../../../common/utils/profile";
 import { ImageData } from "../../poi/hooks/usePOI";
 
 export interface DataNode {

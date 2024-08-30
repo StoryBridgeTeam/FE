@@ -18,6 +18,7 @@ import {
   ModalCloseButton,
   ModalBody,
   ModalFooter,
+  Avatar,
 } from "@chakra-ui/react";
 import { FC, useEffect, useState, useCallback } from "react";
 import { FiPlus, FiMinus } from "react-icons/fi";
@@ -213,13 +214,10 @@ const ProfileSidebar: FC = () => {
       bg="#F6F6F6"
       spacing={4}
     >
-      <Box
-        w="150px"
-        h="150px"
-        borderRadius="full"
-        backgroundImage={`http://image.storyb.kr/${image}`}
-        backgroundSize="cover"
-        backgroundPosition="center"
+      <Avatar
+        size="2xl"
+        src={image ? `http://image.storyb.kr/${image}` : `images/profile.png`}
+        mr={2}
       />
       <Heading size="md">{nickName}</Heading>
       <Divider borderColor="#C5C5C5" />
