@@ -18,7 +18,7 @@ import { useCard } from "../hooks/useCard";
 import ModalActionButtons from "./ModalActionButton";
 import CardModalList from "./CardModalList";
 import { use } from "i18next";
-import { Navigate, useParams } from "react-router-dom";
+import { Navigate, useNavigate, useParams } from "react-router-dom";
 
 //첫번째 카드생성을 위한 모달창
 const FirstCardModal: React.FC<FirstCardModalProps> = ({ nickName }) => {
@@ -28,8 +28,10 @@ const FirstCardModal: React.FC<FirstCardModalProps> = ({ nickName }) => {
   const isMobile = useBreakpointValue({ base: true, md: false });
   const localNickname = localStorage.getItem("nickName");
   const isHost = localNickname === nickName;
+  const navigate = useNavigate();
   const handleSubmit = () => {
     createNewCard(nickName, newEntries);
+    navigate(`/${localNickname}`);
   };
 
   if (!isHost) {

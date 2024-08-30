@@ -7,6 +7,7 @@ import {
 } from "../types/cardTypes";
 import {
   Box,
+  Button,
   Flex,
   Modal,
   ModalBody,
@@ -17,14 +18,15 @@ import {
   Spinner,
   Text,
   useBreakpointValue,
+  useDisclosure,
 } from "@chakra-ui/react";
 import CardTypeToggle from "./CardTypeToggle";
 import ModalActionButtons from "./ModalActionButton";
 import CardModalList from "./CardModalList";
 import { useCard } from "../hooks/useCard";
 import { useLocation } from "react-router-dom";
-// import CardCommentToggle from "./CardCommentToggle";
-import CommentList from "./CommentList";
+import { Share } from "tabler-icons-react";
+import InviteModal from "../../../common/components/InviteModal";
 
 //명함카드 모달창
 const CardModalComponent: React.FC<CardViewProps> = ({
@@ -42,6 +44,11 @@ const CardModalComponent: React.FC<CardViewProps> = ({
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const token = queryParams.get("token");
+  const {
+    isOpen: isInviteModalOpen,
+    onOpen: onInviteModalOpen,
+    onClose: onInviteModalClose,
+  } = useDisclosure();
 
   const handleToggle = () => {
     setCardType((prev) => (prev === "PUBLIC" ? "ORIGINAL" : "PUBLIC"));
@@ -107,7 +114,11 @@ const CardModalComponent: React.FC<CardViewProps> = ({
             {name}
           </Text>
         </Box>
-        {isHost && <Box width="100px" />}
+        {isHost && (
+          <Box ml={14} mr={6}>
+            <Share onClick={onInviteModalOpen} cursor="pointer" />
+          </Box>
+        )}
       </Flex>
 
       <Box textAlign="center" mb={4} mt={4}>
@@ -151,6 +162,7 @@ const CardModalComponent: React.FC<CardViewProps> = ({
           setEntries={setEntries}
         />
       </Box>
+      <InviteModal isOpen={isInviteModalOpen} onClose={onInviteModalClose} />
     </Box>
   );
 };

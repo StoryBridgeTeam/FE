@@ -14,9 +14,7 @@ import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { useCard } from "../hooks/useCard";
 import { EntryState } from "../types/cardTypes";
 import CardInfoBox from "./CardInfoBox";
-import CardModal from "./CardModalComponent";
 import SelfIntroductionBox from "./SelfIntoductionBox";
-import FirstCardModal from "./FirstCardModal";
 import { Share } from "tabler-icons-react";
 import InviteModal from "../../../common/components/InviteModal";
 
@@ -82,11 +80,6 @@ const CardComponent: React.FC = () => {
     }
 
     navigate(`${url}?${searchParams.toString()}`, {
-      state: {
-        name: name,
-        hasCard: hasCard,
-        cardId: cardId,
-      },
       replace: true,
     });
   };
@@ -134,9 +127,11 @@ const CardComponent: React.FC = () => {
                 {name}
               </Heading>
               <Box flex="1" textAlign="right">
-                <Button size="sm" bg="white" onClick={onInviteModalOpen}>
-                  <Share size={20} color="black" />
-                </Button>
+                {isHost && (
+                  <Button size="sm" bg="white" onClick={onInviteModalOpen}>
+                    <Share size={20} color="black" />
+                  </Button>
+                )}
               </Box>
             </Flex>
           )}
