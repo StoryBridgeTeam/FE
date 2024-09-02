@@ -1,4 +1,4 @@
-import { FC, useState, useEffect } from "react";
+import {FC, useState, useEffect, JSX} from "react";
 import {
   Container,
   Button,
@@ -30,7 +30,11 @@ interface MockData {
   content: string;
 }
 
-const MainContent: FC = () => {
+interface MainContentProps{
+  children : JSX.Element
+}
+
+const MainContent = ({children}:MainContentProps) => {
   const { nickName } = useParams<{ nickName: string }>();
   const isMobile = useBreakpointValue({ base: true, md: false });
   const [mockData, setMockData] = useState<MockData[]>([]);
@@ -82,9 +86,9 @@ const MainContent: FC = () => {
     try {
       let response;
       if (token) {
-        response = await getComments(id, 0, token);
+        response = await getComments(id, 0, 10, token);
       } else {
-        response = await getComments(id, 0);
+        response = await getComments(id, 0, 10);
       }
       if (response) {
         setComments(response);
@@ -124,13 +128,13 @@ const MainContent: FC = () => {
       title: t(`info.newItem`),
       content: t(`info.newContent`),
     };
-    await postCoverLetters(nickName!, newMockData);
+    // await postCoverLetters(nickName!, newMockData);
     await fetchCoverData();
   };
 
   return (
     <>
-      {isMobile && selectedId ? undefined : <ProfileSidebar />}
+      {/*{isMobile && selectedId ? undefined : <ProfileSidebar />}*/}
       <Container maxW="4xl">
         {isLoading ? (
           <Flex justifyContent="center" alignItems="center" h="100vh">
@@ -170,23 +174,22 @@ const MainContent: FC = () => {
                 <Text>{t(`info.noInfo`)}</Text>
               )}
             </Flex>
-
-            {mockData.map((data) => (
-              <TextSection
-                key={data.id}
-                id={data.id}
-                title={data.title}
-                content={data.content}
-                isEditing={isEdit}
-                onClick={handleSectionClick}
-                onDelete={handleDelete}
-              />
-            ))}
-            {isEdit ? (
-              <Flex justifyContent="center" mt={3} mb={8}>
-                <Button onClick={handleAddNewClick}>{t(`info.add_new`)}</Button>
-              </Flex>
-            ) : undefined}
+            {/*{mockData.map((data) => (*/}
+            {/*  <TextSection*/}
+            {/*    key={data.id}*/}
+            {/*    id={data.id}*/}
+            {/*    title={data.title}*/}
+            {/*    content={data.content}*/}
+            {/*    isEditing={isEdit}*/}
+            {/*    onClick={handleSectionClick}*/}
+            {/*    onDelete={handleDelete}*/}
+            {/*  />*/}
+            {/*))}*/}
+            {/*{isEdit ? (*/}
+            {/*  <Flex justifyContent="center" mt={3} mb={8}>*/}
+            {/*    <Button onClick={handleAddNewClick}>{t(`info.add_new`)}</Button>*/}
+            {/*  </Flex>*/}
+            {/*) : undefined}*/}
           </>
         )}
       </Container>

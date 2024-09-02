@@ -20,7 +20,6 @@ import { Edit, Check, File, X, Link } from "tabler-icons-react"; // X 아이콘 
 import Slider from "react-slick";
 import { useTranslation } from "react-i18next";
 import { useTextSelection } from "../hook/useTextSelection";
-import CommentInput from "./CommentInput";
 import CommentList from "./CommentList";
 import { useCommentStore } from "../Store/CommentStore";
 import { renderContentWithIcons } from "./renderContentWithIcons";
@@ -33,6 +32,10 @@ import InviteModal from "../../../common/components/InviteModal";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { carouselSettings } from "../../amt/utils/carouselSetting";
+import CommentPresenter from "../../../common/components/comment/CommentPresenter";
+import useComment from "../../../common/hooks/useComment";
+import {deleteCommentServer, getComments, postComment, tagComment, updateComment} from "../api/CommentAPI";
+import CommentInput from "../../../common/components/comment/CommentInput";
 
 interface ImageData {
   id: number;
@@ -71,7 +74,7 @@ const DetailContent: FC = () => {
 
   const name = localStorage.getItem("nickName") || "";
   const nickName = nickNameParam || "";
-  const id = idParam ? parseInt(idParam, 10) : NaN;
+  const id :number = idParam ? parseInt(idParam, 10) : NaN;
   const location = useLocation();
 
   const queryParams = new URLSearchParams(location.search);
@@ -175,6 +178,15 @@ const DetailContent: FC = () => {
     fetchCoverData();
   };
 
+  const editModalDisclosure = useDisclosure();
+  const connectModalDisclosure = useDisclosure();
+
+  const commentHook = useComment(
+      {
+        targetId:id, fetchCommentAPI:getComments, editCommentAPI:updateComment, deleteCommentAPI:deleteCommentServer, tagCommentAPI:tagComment, createCommentAPI:postComment
+      })
+
+
   const scrollToHighlightedText = (startIndex?: number, endIndex?: number) => {
     if (startIndex === undefined || endIndex === undefined) return;
 
@@ -234,7 +246,7 @@ const DetailContent: FC = () => {
 
   return (
     <>
-      {!isMobile && <ProfileSidebar />}
+      {/*{!isMobile && <ProfileSidebar />}*/}
       <Container maxW="4xl">
         <Box
           minH={isMobile ? "calc(100vh - 80px)" : "calc(100vh - 85px)"}
@@ -391,14 +403,21 @@ const DetailContent: FC = () => {
               )}
             </Box>
             <Box flex="1">
-              <CommentList
-                id={id}
-                content={editedContent}
-                highlightComment={scrollToHighlightedText}
-              />
+              {/*<CommentList*/}
+              {/*  id={id}*/}
+              {/*  content={editedContent}*/}
+              {/*  highlightComment={scrollToHighlightedText}*/}
+              {/*/>*/}
+              <CommentPresenter targetId={id}
+                                targetContent={editedContent}
+                                isHost={isHost}
+                                highlightComment={scrollToHighlightedText}
+                                useCommentHook={commentHook}
+                                />
             </Box>
           </Flex>
-          {!isEdit && <CommentInput id={id} />}
+          {/*{!isEdit && <CommentInput id={id} />}*/}
+          {!isEdit && <CommentInput commentHook={commentHook} />}
         </Box>
       </Container>
 

@@ -1,6 +1,7 @@
 import axiosInstance from "../../../common/api/axiosInstance";
 import { EntryState } from "../types/cardTypes";
 import { prepareEntriesForAPI } from "../utils/apiUtils";
+import {CreateCommentAPI, DeleteCommentsAPI, FetchCommentsAPI, ModifyCommentsAPI} from "../../../common/api/ApiType";
 
 export const getIsCreatedCard = async (nickname: string, token?: string) => {
   const response = await axiosInstance.get(
@@ -70,15 +71,16 @@ export const updatePublicCardInfo = async (
   return response.data;
 };
 
-export const deleteComment = async (commentId: number) => {
+export const deleteComment: DeleteCommentsAPI = async (commentId: number) => {
   const response = await axiosInstance.delete(`/comments/${commentId}`);
   return response.data;
 };
 
-export const updateComment = async (
+export const updateComment :ModifyCommentsAPI = async (
   commentId: number,
   editText: string,
-  token?: string
+  imageIds?:number[],
+  token?: string|null
 ) => {
   try {
     const nickName = localStorage.getItem("nickName");
@@ -88,6 +90,7 @@ export const updateComment = async (
         nickName,
         commentId,
         content: editText,
+        imageIds:imageIds
       },
       {
         params: {
@@ -102,11 +105,12 @@ export const updateComment = async (
   }
 };
 
-export const createCardComment = async (
+export const createCardComment :CreateCommentAPI = async (
   cardId: number,
-  nickname: string,
   content: string,
-  token?: string
+  nickname?: string,
+  imageIds?:number[],
+  token?: string|null
 ) => {
   const params: Record<string, any> = {};
   if (token && token.trim() !== "") {
@@ -118,17 +122,18 @@ export const createCardComment = async (
     {
       nickName: nickname,
       content: content,
+      imageIds:imageIds
     },
     { params }
   );
   return response.data;
 };
 
-export const getCardComments = async (
+export const getCardComments:FetchCommentsAPI = async (
   cardId: number,
   page: number,
   size: number,
-  token?: string
+  token?: string|null
 ) => {
   const params: Record<string, any> = {
     page: page,
@@ -142,7 +147,7 @@ export const getCardComments = async (
   const response = await axiosInstance.get(`/profile-card/${cardId}/comments`, {
     params,
   });
-  return response.data;
+  return response.data.data.comments.content;
 };
 // // 명함 부가정보(학력 및 경력) 조회
 // export const getAdditionalInfo = async (nickname: string) => {

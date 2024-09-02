@@ -41,6 +41,10 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import Slider from "react-slick";
 import {ImageRes} from "../../../common/hooks/useImage";
+import CommentPresenter from "../../../common/components/comment/CommentPresenter";
+import useComment from "../../../common/hooks/useComment";
+import {createPOIComment, deleteComment, getPOIComments, linkPOICommentTag, updateComment} from "../api/poiAPI";
+import CommentInput from "../../../common/components/comment/CommentInput";
 
 interface POIViewProps {
   poiId: string | undefined;
@@ -73,6 +77,10 @@ const POIView: React.FC<POIViewProps> = ({ poiId }) => {
   } = useDisclosure();
 
   const [selectedImage, setSelectedImage] = useState<ImageRes | null>(null);
+
+  const useCommentHook = useComment({
+    targetId: Number(poiId), fetchCommentAPI:getPOIComments, editCommentAPI:updateComment, deleteCommentAPI:deleteComment,tagCommentAPI:linkPOICommentTag, createCommentAPI:createPOIComment, token
+  });
 
   useEffect(() => {
     if (nickName && poiId) {
@@ -260,13 +268,18 @@ const POIView: React.FC<POIViewProps> = ({ poiId }) => {
           )}
         </Box>
         <Divider borderColor="#828282" borderWidth="1px" mt={5} />
-        {poiId && nickName && (
-          <CommentList
-            poiId={Number(poiId)}
-            nickName={nickName}
-            highlightComment={scrollToHighlightedText}
-          />
-        )}
+        {/*{poiId && nickName && (*/}
+        {/*  <CommentList*/}
+        {/*    poiId={Number(poiId)}*/}
+        {/*    nickName={nickName}*/}
+        {/*    highlightComment={scrollToHighlightedText}*/}
+        {/*  />*/}
+        {/*)}*/}
+        <CommentInput commentHook={useCommentHook} />
+        {
+          poi &&
+            <CommentPresenter targetId={poi.id} targetContent={poi.content} isHost={isHost} highlightComment={scrollToHighlightedComment} useCommentHook={useCommentHook} />
+        }
 
         <AlertDialog
           isOpen={isAlertOpen}

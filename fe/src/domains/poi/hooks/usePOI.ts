@@ -24,7 +24,7 @@ import {ImageRes} from "../../../common/hooks/useImage";
 // }
 
 export interface GETPOI {
-  id: number | null;
+  id: number;
   title: string;
   content: string;
   images: ImageRes[];
@@ -89,26 +89,26 @@ interface UsePOIResult {
       id:number,
       index:number
   ) => Promise<POI[]>;
-  addComment: (
-    poiId: number,
-    nickname: string,
-    content: string,
-    token?: string,
-    imageIds? : number[]
-  ) => Promise<void>;
-  fetchComments: (
-    poiId: number,
-    page: number,
-    size: number,
-    token?: string
-  ) => Promise<any>;
-  linkCommentTag: (
-    poiId: number,
-    commentId: number,
-    startIndex: number,
-    lastIndex: number,
-    token?: string
-  ) => Promise<void>;
+  // addComment: (
+  //   poiId: number,
+  //   nickname: string,
+  //   content: string,
+  //   token?: string,
+  //   imageIds? : number[]
+  // ) => Promise<void>;
+  // fetchComments: (
+  //   poiId: number,
+  //   page: number,
+  //   size: number,
+  //   token?: string
+  // ) => Promise<any>;
+  // linkCommentTag: (
+  //   poiId: number,
+  //   commentId: number,
+  //   startIndex: number,
+  //   lastIndex: number,
+  //   token?: string
+  // ) => Promise<void>;
   formatTimestamp: (timestamp: string) => string;
 }
 
@@ -231,83 +231,83 @@ export const usePOI = (): UsePOIResult => {
     }
   };
 
-  const addComment = async (
-    poiId: number,
-    nickname: string,
-    content: string,
-    token?: string,
-    imageIds?: number[]
-  ) => {
-    setLoading(true);
-    setError(null);
-    try {
-      await createPOIComment(poiId, nickname, content, token, imageIds);
-    } catch (error) {
-      if (axios.isAxiosError(error) && error.response?.data?.code === 2260300) {
-        showToast(
-          "초대링크 제한",
-          "초대링크당 하나의 댓글만 달 수 있습니다",
-          "error"
-        );
-      } else {
-        showToast("Error", "댓글을 등록하는 중 오류가 발생했습니다.", "error");
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
+  // const addComment = async (
+  //   poiId: number,
+  //   nickname: string,
+  //   content: string,
+  //   token?: string,
+  //   imageIds?: number[]
+  // ) => {
+  //   setLoading(true);
+  //   setError(null);
+  //   try {
+  //     await createPOIComment(poiId, nickname, content, token, imageIds);
+  //   } catch (error) {
+  //     if (axios.isAxiosError(error) && error.response?.data?.code === 2260300) {
+  //       showToast(
+  //         "초대링크 제한",
+  //         "초대링크당 하나의 댓글만 달 수 있습니다",
+  //         "error"
+  //       );
+  //     } else {
+  //       showToast("Error", "댓글을 등록하는 중 오류가 발생했습니다.", "error");
+  //     }
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
-  const fetchComments = async (
-    poiId: number,
-    page: number,
-    size: number,
-    token?: string
-  ) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const data = await getPOIComments(poiId, page, size, token);
-      const comments: Comment[] = data.data.comments.content.map(
-        (comment: any) => ({
-          id: comment.id,
-          user: comment.author.nickName,
-          content: comment.content,
-          timestamp: comment.createdTime,
-          modifiedTime: comment.modifiedTime,
-          tagInfo: comment.tagInfo,
-          images:comment.images
-        })
-      );
-      setTotalCommentPages(data.data.comments.totalPages);
-      setCurrentCommentPage(page);
-      return comments;
-    } catch (error) {
-      setError("댓글을 가져오는 중 오류가 발생했습니다.");
-      console.log("fetchComments_error:", error);
-      throw error;
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const linkCommentTag = async (
-    poiId: number,
-    commentId: number,
-    startIndex: number,
-    lastIndex: number,
-    token?: string
-  ) => {
-    setLoading(true);
-    setError(null);
-    try {
-      await linkPOICommentTag(poiId, commentId, startIndex, lastIndex, token);
-    } catch (error) {
-      setError("댓글 태그 연결 중 오류가 발생했습니다.");
-      console.log("linkCommentTag_error:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  // const fetchComments = async (
+  //   poiId: number,
+  //   page: number,
+  //   size: number,
+  //   token?: string
+  // ) => {
+  //   setLoading(true);
+  //   setError(null);
+  //   try {
+  //     const data = await getPOIComments(poiId, page, size, token);
+  //     const comments: Comment[] = data.data.comments.content.map(
+  //       (comment: any) => ({
+  //         id: comment.id,
+  //         user: comment.author.nickName,
+  //         content: comment.content,
+  //         timestamp: comment.createdTime,
+  //         modifiedTime: comment.modifiedTime,
+  //         tagInfo: comment.tagInfo,
+  //         images:comment.images
+  //       })
+  //     );
+  //     setTotalCommentPages(data.data.comments.totalPages);
+  //     setCurrentCommentPage(page);
+  //     return comments;
+  //   } catch (error) {
+  //     setError("댓글을 가져오는 중 오류가 발생했습니다.");
+  //     console.log("fetchComments_error:", error);
+  //     throw error;
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+  //
+  // const linkCommentTag = async (
+  //   poiId: number,
+  //   commentId: number,
+  //   startIndex: number,
+  //   lastIndex: number,
+  //   token?: string
+  // ) => {
+  //   setLoading(true);
+  //   setError(null);
+  //   try {
+  //     await linkPOICommentTag(poiId, commentId, startIndex, lastIndex, token);
+  //   } catch (error) {
+  //     setError("댓글 태그 연결 중 오류가 발생했습니다.");
+  //     console.log("linkCommentTag_error:", error);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
   const formatTimestamp = (timestamp: string) => {
     const utcDate = new Date(timestamp + "Z"); //UTC 시간을 올바르게 파싱하기 위해 'Z'를 추가
@@ -351,9 +351,6 @@ export const usePOI = (): UsePOIResult => {
     modifyPOI,
     removePOI,
     reorderPOIs,
-    addComment,
-    fetchComments,
-    linkCommentTag,
     formatTimestamp,
   };
 };

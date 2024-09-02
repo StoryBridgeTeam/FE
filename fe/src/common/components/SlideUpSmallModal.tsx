@@ -37,6 +37,7 @@ export const SlideUpSmallModal: React.FC<SlideUpSmallModalProps> = ({
       size={isMobile ? "md" : "md"}
     >
       <ModalOverlay bg="blackAlpha.600" />
+      {/*<ModalOverlay />*/}
       <ModalContent
         bg="white"
         borderTopRadius="3xl"

@@ -1,12 +1,14 @@
 import { useState } from "react";
 import { useCommentStore } from "../Store/CommentStore";
 
+export interface HighlightedText {
+  text: string;
+  startIndex: number;
+  endIndex: number;
+}
+
 export const useTextSelection = () => {
-  const [selectedText, setSelectedText] = useState<{
-    text: string;
-    startIndex: number;
-    endIndex: number;
-  } | null>(null);
+  const [selectedText, setSelectedText] = useState<HighlightedText | null>(null);
 
   const comments = useCommentStore((state) => state.comments);
 

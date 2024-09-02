@@ -149,12 +149,13 @@ export const useLoginForm = () => {
 
       try {
         if (response && response.accessToken && response.refreshToken) {
-          const { accessToken, refreshToken, nickname } = response;
+          const { accessToken, refreshToken, nickname, profileImage } = response;
           await handleLogin(
             accessToken,
             refreshToken,
             values.rememberMe,
-            nickname
+            nickname,
+            profileImage
           );
         }
       } catch {

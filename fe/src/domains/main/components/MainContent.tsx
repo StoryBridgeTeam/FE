@@ -85,19 +85,21 @@ const MainContent: React.FC = () => {
       overflow={isMobile ? "auto" : "hidden"}
     >
       <Grid
+          maxW={"1400px"}
         templateAreas={gridTemplateAreas}
         templateRows={gridTemplateRows}
         templateColumns={gridTemplateColumns}
         gap={isMobile ? 4 : 8}
         pt={isMobile ? 0 : 2}
-        px={isMobile ? 0 : 28}
+        px={isMobile ? 0 : 12}
         pb={isMobile ? 4 : 8}
         h={isMobile ? "auto" : "100%"}
         bg={isMobile ? "#F6F6F6" : "white"}
+          m={"0 auto"}
       >
         {isMobile ? (
           mobileLayout.map((section) => (
-            <Section key={section.area} {...section} isMobile={true} />
+            <Section key={section.area} {...section} isMobile={true}/>
           ))
         ) : (
           <>

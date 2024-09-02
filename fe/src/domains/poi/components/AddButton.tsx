@@ -1,25 +1,20 @@
 import React from "react";
-import { Box } from "@chakra-ui/react";
+import {Box, IconButton} from "@chakra-ui/react";
+import {PlusSquareIcon} from "@chakra-ui/icons";
 
 const AddButton: React.FC<{ isMobile: boolean; onClick: () => void }> =
   React.memo(({ isMobile, onClick }) => (
     <Box
-      mt={2}
-      ml={4}
-      mr={4}
-      bg="white"
       color="black"
-      h="10%"
       onClick={onClick}
-      _hover={{ cursor: "pointer", bg: "gray.500" }}
+      _hover={{ cursor: "pointer", bgColor:"gray.300"}}
       borderRadius="xl"
       display="flex"
       alignItems="center"
       justifyContent="center"
-      border="2px solid #ababab"
-      p={isMobile ? 4 : 0}
+      p={isMobile ? 3 : 3}
     >
-      POI 작성하기
+        <PlusSquareIcon />
     </Box>
   ));
 

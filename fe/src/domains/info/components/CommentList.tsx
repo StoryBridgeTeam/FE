@@ -32,7 +32,7 @@ import {
   tagComment,
 } from "../api/CommentAPI";
 import { useLocation, useParams } from "react-router-dom";
-import ImagePresenter from "../../../common/components/ImagePresenter";
+import ImagePresenter from "../../../common/components/image/ImagePresenter";
 
 interface CommentListProps {
   id: number;
@@ -95,9 +95,9 @@ const CommentList: React.FC<CommentListProps> = ({
       setLoading(true);
       let response;
       if (token) {
-        response = await getComments(id, page, token);
+        response = await getComments(id, page, 10,token);
       } else {
-        response = await getComments(id, page);
+        response = await getComments(id, page, 10);
       }
       if (page > 0 && response && response.length > 0) {
         setComments([...comments, ...response]);
@@ -141,7 +141,7 @@ const CommentList: React.FC<CommentListProps> = ({
 
   const handleConnectReset = async () => {
     if (connectIndex !== null) {
-      await tagComment(id, connectIndex, { startIndex: 0, lastIndex: 0 });
+      await tagComment(id, connectIndex,  0, 0 );
       updateCommentIndexes(connectIndex, 0, 0);
       handleClearSelectedText();
       setConnectIndex(null);
@@ -156,10 +156,7 @@ const CommentList: React.FC<CommentListProps> = ({
 
   const handleConnectSave = async () => {
     if (connectIndex !== null && selectedText) {
-      await tagComment(id, connectIndex, {
-        startIndex: selectedText.startIndex,
-        lastIndex: selectedText.endIndex,
-      });
+      await tagComment(id, connectIndex, selectedText.startIndex, selectedText.endIndex );
       updateCommentIndexes(
         connectIndex,
         selectedText.startIndex,
@@ -430,7 +427,7 @@ const CommentList: React.FC<CommentListProps> = ({
         }
       >
         <Box onMouseUp={handleMouseUp} onTouchEnd={handleTouchEnd}>
-          {renderContentWithHighlights(content, processedComments)}
+          {/*{renderContentWithHighlights(content, processedComments)}*/}
         </Box>
         {selectedText && (
           <Tag

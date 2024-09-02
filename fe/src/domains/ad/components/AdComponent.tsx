@@ -15,6 +15,8 @@ const AdComponent: React.FC = () => {
       bg="#F6F6F6"
       borderRadius="3xl"
       w="100%"
+      minWidth={"200px"}
+      maxWidth={"330px"}
       h="100%"
       p={6}
       color="#CDCDCD"

@@ -40,15 +40,12 @@ export const putCoverLetters = async (
 
 export const postCoverLetters = async (
   nickname: string,
-  entries: { title: string; content: string }
+  entries: { title: string; content: string, imageIds:number[] }
 ) => {
   try {
     const response = await axiosInstance.post(
       `/members/${nickname}/cover-letter`,
-      {
-        title: entries.title,
-        content: entries.content,
-      }
+        entries
     );
     return response.data.data;
   } catch (error) {

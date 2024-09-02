@@ -15,7 +15,7 @@ interface Author {
   name: string;
   nickName: string;
   role: string;
-  profileImage: ImageData;
+  profileImage: ImageRes;
 }
 
 interface TagInfo {

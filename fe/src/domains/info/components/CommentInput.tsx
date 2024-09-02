@@ -25,7 +25,7 @@ import axios from "axios";
 import { useToastMessage } from "../../../common/hooks/useToastMessage";
 import { getCardProfile } from "../api/SideBarAPI";
 import {AddIcon, LinkIcon} from "@chakra-ui/icons";
-import ImageUploader from "../../../common/components/ImageUploader";
+import ImageUploader from "../../../common/components/image/ImageUploader";
 import {useImage} from "../../../common/hooks/useImage";
 
 interface CommentInputProps {
@@ -67,50 +67,50 @@ const CommentInput: React.FC<CommentInputProps> = ({ id }) => {
   }, []);
 
   const handleCommentSubmit = async () => {
-    if (!nickname) {
-      onOpen();
-      return;
-    }
-
-    if (comment.trim()) {
-      try {
-        const response = token
-          ? await postComment(
-              id,
-              { nickName: nickname, content: comment },
-              token
-            )
-          : await postComment(id, {
-            nickName: nickname,
-              content: comment,
-              imageIds: imageHook.images.map(i => i.id)
-          });
-
-        if (response) {
-          addComments(response);
-          setComment("");
-          imageHook.clearImage();
-        }
-      } catch (error) {
-        if (
-          axios.isAxiosError(error) &&
-          error.response?.data?.code === 2260300
-        ) {
-          showToast(
-            "초대링크 제한",
-            "초대링크당 하나의 댓글만 달 수 있습니다",
-            "error"
-          );
-        } else {
-          showToast(
-            "Error",
-            "댓글을 등록하는 중 오류가 발생했습니다.",
-            "error"
-          );
-        }
-      }
-    }
-    onClose(); // Close the modal if it was open
+    // if (!nickname) {
+    //   onOpen();
+    //   return;
+    // }
+    //
+    // if (comment.trim()) {
+    //   try {
+    //     const response = token
+    //       ? await postComment(
+    //           id,
+    //           { nickName: nickname, content: comment },
+    //           token
+    //         )
+    //       : await postComment(id, {
+    //         nickName: nickname,
+    //           content: comment,
+    //           imageIds: imageHook.images.map(i => i.id)
+    //       });
+    //
+    //     if (response) {
+    //       addComments(response);
+    //       setComment("");
+    //       imageHook.clearImage();
+    //     }
+    //   } catch (error) {
+    //     if (
+    //       axios.isAxiosError(error) &&
+    //       error.response?.data?.code === 2260300
+    //     ) {
+    //       showToast(
+    //         "초대링크 제한",
+    //         "초대링크당 하나의 댓글만 달 수 있습니다",
+    //         "error"
+    //       );
+    //     } else {
+    //       showToast(
+    //         "Error",
+    //         "댓글을 등록하는 중 오류가 발생했습니다.",
+    //         "error"
+    //       );
+    //     }
+    //   }
+    // }
+    // onClose(); // Close the modal if it was open
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {

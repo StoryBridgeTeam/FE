@@ -5,13 +5,15 @@ import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
 import { useAuthStore } from "./common/stores/AuthStore";
 import { useEffect, useState } from "react";
 import PrivateRoute from "./domains/login/utils/PrivateRoute";
-import InfoPage from "./domains/info/InfoPage";
+import InfoPageLayout from "./domains/info/InfoPageLayout";
 import MainPage from "./domains/main/MainPage";
 import MyPage from "./domains/mypage/MyPage";
 import AmtPage from "./domains/amt/AmtPage";
 import POIPage from "./domains/poi/POIPage";
 import DetailPage from "./domains/info/components/DetailPage";
 import CardPage from "./domains/card/CardPage";
+import CoverLetterCreatePage from "./domains/info/page/CoverLetterCreatePage";
+import InfoMainPage from "./domains/info/page/InfoMainPage";
 
 const theme = extendTheme({
   fonts: {
@@ -46,7 +48,11 @@ function App() {
           />
           <Route
             path="/:nickName/info"
-            element={<PrivateRoute element={<InfoPage />} />}
+            element={<PrivateRoute element={<InfoMainPage />} />}
+          />
+          <Route
+              path="/info/create"
+              element={<PrivateRoute element={<CoverLetterCreatePage />} />}
           />
           <Route
             path="/:nickName/info/:id"

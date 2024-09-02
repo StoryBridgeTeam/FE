@@ -12,7 +12,7 @@ const ModalActionButtons: React.FC<ModalElementProps> = ({
   setIsEditing,
   setEntries,
 }) => {
-  const { editOriginalCard, editPublicCard } = useCard();
+  const { editOriginalCard, editPublicCard } = useCard({nickname:nickName});
   const savedNickName = localStorage.getItem("nickName");
   const isHost = nickName === savedNickName;
 

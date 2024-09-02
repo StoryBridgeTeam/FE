@@ -1,8 +1,8 @@
-import { ImageData } from "../../poi/hooks/usePOI";
+import {ImageRes} from "../../../common/hooks/useImage";
 
 export interface DataNode {
   nickname: string;
-  profileImage?: ImageData;
+  profileImage?: ImageRes;
   isBlocked: boolean;
   top?: number;
   left?: number;

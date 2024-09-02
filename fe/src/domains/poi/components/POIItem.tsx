@@ -15,18 +15,16 @@ const POIItem: React.FC<POIItemProps> = ({ id, title, isMobile, onClick }) => (
     color="black"
     h="7%"
     shadow="md"
-    borderRadius="3xl"
+    borderRadius="5"
     onClick={() => onClick(id)}
     _hover={{ cursor: "pointer", bg: "gray.300" }}
     display="flex"
     alignItems="center"
-    justifyContent="center"
     border="1px solid #CDCDCD"
-    fontSize="sm"
     overflow="hidden"
-    p={isMobile ? 4 : 0}
+    p={isMobile ? 4 : 2.5}
   >
-    <Text isTruncated maxWidth="90%" fontSize={15}>
+    <Text isTruncated textAlign={"left"} fontSize={12}>
       {title}
     </Text>
   </Box>

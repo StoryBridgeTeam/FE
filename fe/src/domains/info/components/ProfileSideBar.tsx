@@ -41,14 +41,18 @@ type EducationItem = {
   content: string;
 };
 
-const ProfileSidebar: FC = () => {
-  const { nickName } = useParams<{ nickName: string }>();
+interface ProfileSidebarProps{
+  nickname:string
+}
+
+const ProfileSidebar = ({nickname}:ProfileSidebarProps) => {
+  // const { nickName } = useParams<{ nickName: string }>();
   const isMobile = useBreakpointValue({ base: true, md: false });
   const name = localStorage.getItem("nickName");
   const { t } = useTranslation();
   const [aboutMe, setAboutMe] = useState<AboutMeItem[]>([]);
   const [education, setEducation] = useState<EducationItem[]>([]);
-  const ishost = nickName === name;
+  const ishost = nickname === name;
   const [image, setImage] = useState<string>();
 
   const {
@@ -82,9 +86,9 @@ const ProfileSidebar: FC = () => {
     try {
       let additionalInfo;
       if (token) {
-        additionalInfo = await getAdditionalInfo(nickName!, token);
+        additionalInfo = await getAdditionalInfo(nickname!, token);
       } else {
-        additionalInfo = await getAdditionalInfo(nickName!);
+        additionalInfo = await getAdditionalInfo(nickname!);
       }
 
       if (Array.isArray(additionalInfo)) {
@@ -104,11 +108,11 @@ const ProfileSidebar: FC = () => {
       let image;
       let card;
       if (token) {
-        card = await getCard(nickName!, token);
-        image = await getCardProfile(nickName!, token);
+        card = await getCard(nickname!, token);
+        image = await getCardProfile(nickname!, token);
       } else {
-        card = await getCard(nickName!);
-        image = await getCardProfile(nickName!);
+        card = await getCard(nickname!);
+        image = await getCardProfile(nickname!);
       }
       if (Array.isArray(card)) {
         setAboutMe(card);
@@ -120,16 +124,21 @@ const ProfileSidebar: FC = () => {
     } catch (error) {
       console.error("Card error:", error);
     }
-  }, [nickName]);
+  }, [nickname]);
 
   useEffect(() => {
     fetchCardData();
     fetchAdditionalInfo();
   }, [fetchCardData, fetchAdditionalInfo]);
 
+  useEffect(() => {
+    fetchCardData();
+    fetchAdditionalInfo();
+  }, []);
+
   const addEducation = async () => {
     if (newStartDate && newEndDate && newItem) {
-      await createAdditionalInfo(nickName!, newStartDate, newEndDate, newItem);
+      await createAdditionalInfo(nickname!, newStartDate, newEndDate, newItem);
       await fetchAdditionalInfo();
       setNewStartDate("");
       setNewEndDate("");
@@ -140,7 +149,7 @@ const ProfileSidebar: FC = () => {
 
   const handleEducationDelete = async () => {
     if (selectedEducationId !== null) {
-      await deleteAdditionalInfo(nickName!, selectedEducationId);
+      await deleteAdditionalInfo(nickname!, selectedEducationId);
       await fetchAdditionalInfo();
       setSelectedEducationId(null);
       setSelectedEducation(null);
@@ -208,7 +217,9 @@ const ProfileSidebar: FC = () => {
 
   return (
     <VStack
-      w={isMobile ? "full" : "280px"}
+      w={"280px"}
+      minWidth={"280px"}
+        // w={"100%"}
       p={5}
       alignItems="center"
       bg="#F6F6F6"
@@ -219,7 +230,7 @@ const ProfileSidebar: FC = () => {
         src={image ? `http://image.storyb.kr/${image}` : `/images/profile.png`}
         mr={2}
       />
-      <Heading size="md">{nickName}</Heading>
+      <Heading size="md">{nickname}</Heading>
       <Divider borderColor="#C5C5C5" />
       <InfoSection
         title={t(`info.personal`)}

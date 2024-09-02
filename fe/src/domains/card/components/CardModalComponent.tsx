@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, {useEffect, useState} from "react";
 import {
   CardViewProps,
   CardType,
@@ -27,20 +27,21 @@ import { useCard } from "../hooks/useCard";
 import { useLocation } from "react-router-dom";
 import { Share } from "tabler-icons-react";
 import InviteModal from "../../../common/components/InviteModal";
+import {Simulate} from "react-dom/test-utils";
+import error = Simulate.error;
 
 //명함카드 모달창
 const CardModalComponent: React.FC<CardViewProps> = ({
-  name,
   nickName,
-  cardId,
+    useCardHook
 }) => {
   const isMobile = useBreakpointValue({ base: true, md: false });
   const [isEditing, setIsEditing] = React.useState(false);
   const [cardType, setCardType] = React.useState("PUBLIC" as CardType);
   const [entries, setEntries] = React.useState<EntryState[]>([]);
+  const [name, setName]= useState<string>("");
   const savedNickName = localStorage.getItem("nickName");
   const isHost = nickName === savedNickName;
-  const { loading, error, fetchPublicCard, fetchOriginalCard } = useCard();
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const token = queryParams.get("token");
@@ -49,6 +50,8 @@ const CardModalComponent: React.FC<CardViewProps> = ({
     onOpen: onInviteModalOpen,
     onClose: onInviteModalClose,
   } = useDisclosure();
+
+  const {loading, error, fetchPublicCard, fetchOriginalCard} = useCardHook;
 
   const handleToggle = () => {
     setCardType((prev) => (prev === "PUBLIC" ? "ORIGINAL" : "PUBLIC"));
@@ -63,6 +66,7 @@ const CardModalComponent: React.FC<CardViewProps> = ({
         data = await fetchPublicCard(nickName!, "DETAIL");
       }
       setEntries(data.entries);
+      setName(data.name);
     } catch (err) {
       console.error("Failed to fetch PublicEntries", err);
     }
@@ -77,6 +81,7 @@ const CardModalComponent: React.FC<CardViewProps> = ({
         data = await fetchOriginalCard(nickName!, "DETAIL");
       }
       setEntries(data.entries);
+      setName(data.name);
       console.log("loadOriginalEntries_data:", data);
     } catch (err) {
       console.error("Failed to fetch OriginalEntries", err);

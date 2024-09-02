@@ -14,7 +14,13 @@ axiosInstance.interceptors.request.use(
     const accessToken = localStorage.getItem("accessToken");
     if (accessToken) {
       config.headers["Authorization"] = `Bearer ${accessToken}`;
+
+      if(config.params && config.params.hasOwnProperty("token")){
+          delete config.params.token;
+      }
     }
+
+
     return config;
   },
   (error) => {

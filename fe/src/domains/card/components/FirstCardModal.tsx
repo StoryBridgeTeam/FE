@@ -19,18 +19,20 @@ import ModalActionButtons from "./ModalActionButton";
 import CardModalList from "./CardModalList";
 import { use } from "i18next";
 import { Navigate, useNavigate, useParams } from "react-router-dom";
+import {useAuthStore} from "../../../common/stores/AuthStore";
+import {Simulate} from "react-dom/test-utils";
+import error = Simulate.error;
 
 //첫번째 카드생성을 위한 모달창
-const FirstCardModal: React.FC<FirstCardModalProps> = ({ nickName }) => {
-  const { loading, error, createNewCard } = useCard();
+const FirstCardModal: React.FC<FirstCardModalProps> = ({ nickName, useCardHook }) => {
   const [isEditing, setIsEditing] = React.useState<boolean>(true);
   const [newEntries, setNewEntries] = React.useState<EntryState[]>([]);
   const isMobile = useBreakpointValue({ base: true, md: false });
-  const localNickname = localStorage.getItem("nickName");
+  const {nickName:localNickname} = useAuthStore();
   const isHost = localNickname === nickName;
   const navigate = useNavigate();
   const handleSubmit = () => {
-    createNewCard(nickName, newEntries);
+    useCardHook.createNewCard(nickName, newEntries);
     navigate(`/${localNickname}`);
   };
 
@@ -38,8 +40,8 @@ const FirstCardModal: React.FC<FirstCardModalProps> = ({ nickName }) => {
     return <Navigate to={`/${nickName}`} replace />;
   }
 
-  if (error) {
-    return <Text color="red.500">{error}</Text>;
+  if (useCardHook.error) {
+    return <Text color="red.500">{useCardHook.error}</Text>;
   }
 
   return (

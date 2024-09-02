@@ -36,7 +36,8 @@ export const SlideUpModal: React.FC<SlideUpModalProps> = ({
       motionPreset="slideInBottom"
       size={isMobile ? "xl" : "md"}
     >
-      <ModalOverlay bg="blackAlpha.600" />
+      {/*<ModalOverlay bg="blackAlpha.600" />*/}
+      <ModalOverlay />
       <ModalContent
         bg="white"
         borderTopRadius="3xl"

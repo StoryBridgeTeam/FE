@@ -6,46 +6,46 @@ interface TextSectionProps {
   title: string;
   content: string;
   id: number;
-  isEditing: boolean;
+  // isEditing: boolean;
   onClick: (id: number) => void;
-  onDelete: (id: number) => void;
+  // onDelete: (id: number) => void;
 }
 
 const TextSection: FC<TextSectionProps> = ({
   title,
   content,
   id,
-  isEditing,
+  // isEditing,
   onClick,
-  onDelete,
+  // onDelete,
 }) => {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  useEffect(() => {
-    if (isEditing && textareaRef.current) {
-      textareaRef.current.focus();
-      textareaRef.current.selectionStart = textareaRef.current.value.length;
-      textareaRef.current.selectionEnd = textareaRef.current.value.length;
-    }
-  }, [isEditing]);
+  // useEffect(() => {
+  //   if (isEditing && textareaRef.current) {
+  //     textareaRef.current.focus();
+  //     textareaRef.current.selectionStart = textareaRef.current.value.length;
+  //     textareaRef.current.selectionEnd = textareaRef.current.value.length;
+  //   }
+  // }, [isEditing]);
 
   return (
-    <Box p={5} w="full" cursor={isEditing ? "default" : "pointer"}>
+    <Box p={5} w="full" cursor={"pointer"}>
       <Flex alignItems="center">
         <Text fontWeight="bold" fontSize={"lg"} onClick={() => onClick(id)}>
           {title}
         </Text>
         <Box flex="1" borderBottom="2px" ml={2} />
-        {isEditing ? (
-          <IconButton
-            aria-label="Delete"
-            icon={<Trash />}
-            onClick={() => onDelete(id)}
-            variant="outline"
-            colorScheme="red"
-            ml={2}
-          />
-        ) : undefined}
+        {/*{isEditing ? (*/}
+        {/*  <IconButton*/}
+        {/*    aria-label="Delete"*/}
+        {/*    icon={<Trash />}*/}
+        {/*    onClick={() => onDelete(id)}*/}
+        {/*    variant="outline"*/}
+        {/*    colorScheme="red"*/}
+        {/*    ml={2}*/}
+        {/*  />*/}
+        {/*) : undefined}*/}
       </Flex>
       <Box
         bg="#EEEEEE"

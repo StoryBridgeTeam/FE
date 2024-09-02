@@ -1,15 +1,19 @@
 import { create } from "zustand";
+import {ImageRes} from "../hooks/useImage";
 
 interface AuthState {
   isAuthenticated: boolean;
+  isTokenUser:boolean;
   accessToken: string | null;
   refreshToken: string | null;
   nickName: string;
+  profileImage : ImageRes|null,
   login: (
     accessToken: string,
     refreshToken: string,
     rememberMe: boolean,
-    nickName: string
+    nickName: string,
+    profileImage: ImageRes
   ) => void;
   logout: () => void;
   checkAuth: () => Promise<void>;
@@ -17,19 +21,22 @@ interface AuthState {
 
 export const useAuthStore = create<AuthState>((set) => ({
   isAuthenticated: false,
+  isTokenUser:false,
   accessToken: null,
   refreshToken: null,
   nickName: "",
+  profileImage:null,
   login: (
     accessToken: string,
     refreshToken: string,
     rememberMe: boolean,
-    nickName: string
+    nickName: string,
+    profileImage:ImageRes
   ) => {
     localStorage.setItem("accessToken", accessToken);
     localStorage.setItem("refreshToken", refreshToken);
     localStorage.setItem("nickName", nickName);
-    set({ isAuthenticated: true, accessToken, refreshToken, nickName });
+    set({ isAuthenticated: true, accessToken, refreshToken, nickName,profileImage });
   },
   logout: () => {
     localStorage.removeItem("accessToken");
@@ -47,7 +54,7 @@ export const useAuthStore = create<AuthState>((set) => ({
     const nickName = localStorage.getItem("nickName");
 
     if (accessToken && refreshToken && nickName) {
-      set({ isAuthenticated: true, accessToken, refreshToken });
+      set({ isAuthenticated: true, isTokenUser:false, accessToken, refreshToken });
     } else {
       const queryParams = new URLSearchParams(window.location.search);
       const token = queryParams.get("token");
@@ -55,12 +62,14 @@ export const useAuthStore = create<AuthState>((set) => ({
       if (token) {
         set({
           isAuthenticated: true,
+          isTokenUser:true,
           accessToken: null,
           refreshToken: null,
         });
       } else {
         set({
           isAuthenticated: false,
+          isTokenUser:false,
           accessToken: null,
           refreshToken: null,
         });

@@ -17,11 +17,14 @@ export interface useImageResponse{
     ) => Promise<ImageRes[]>;
     handleDeleteImage:(
         imageId: number
-    ) => Promise<ImageRes>;
+    ) => void
+    loading:boolean
 }
 
-export const useImage = () : useImageResponse => {
-    const [images, setImages] = useState<ImageRes[]>([]);
+export const useImage = (initImages?:ImageRes[]) : useImageResponse => {
+    const [images, setImages] = useState<ImageRes[]>(initImages!=null ? initImages : []);
+
+    const [loading, setLoading] = useState<boolean>(false);
 
     const clearImage = () => {
         setImages([])
@@ -34,6 +37,8 @@ export const useImage = () : useImageResponse => {
             input.accept = "image/*";
             input.onchange = async (event: any) => {
                 const file = event.target.files[0];
+
+                setLoading(true);
                 if (file) {
                     const formData = new FormData();
                     formData.append("file", file);
@@ -41,6 +46,8 @@ export const useImage = () : useImageResponse => {
                     const uploadedImage = await uploadImage(uploadType, formData);
                     setImages((prevImages) => [...prevImages, uploadedImage]);
                 }
+
+                setLoading(false);
             };
 
             input.click();
@@ -48,20 +55,26 @@ export const useImage = () : useImageResponse => {
             console.error("Image upload failed:", error);
         }
 
+
         return images;
     };
 
     const handleDeleteImage = async (imageId: number) => {
+        setLoading(true);
         setImages((prevImages) =>
             prevImages.filter((image) => image.id !== imageId)
         );
-        return await deleteImage(imageId);
+
+        await deleteImage(imageId);
+
+        setLoading(false);
     };
 
     return {
         images,
         clearImage,
         handleUploadImage,
-        handleDeleteImage
+        handleDeleteImage,
+        loading
     };
 }

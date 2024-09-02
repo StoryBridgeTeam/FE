@@ -11,7 +11,7 @@ const CardInfoItem: React.FC<EntryState> = ({ title, content }) => {
 
   return (
     <>
-      <Text as="span" fontWeight="bold" fontSize="md" mr={2}>
+      <Text as="span" fontWeight="bold" fontSize="sm" mr={2}>
         {title}:
       </Text>
       {isUrl ? (
@@ -24,7 +24,7 @@ const CardInfoItem: React.FC<EntryState> = ({ title, content }) => {
           {content}
         </Link>
       ) : (
-        <Text as="span" fontSize="md">
+        <Text as="span" fontSize="sm">
           {content}
         </Text>
       )}

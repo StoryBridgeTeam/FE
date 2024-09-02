@@ -1,3 +1,10 @@
+import {UseCardResult} from "../hooks/useCard";
+
+export interface CardInfo{
+  id:number,
+  name:string,
+  entries:EntryState[]
+}
 export interface EntryState {
   id: number;
   title: string;
@@ -19,13 +26,13 @@ export type CardType = "ORIGINAL" | "PUBLIC";
 export type ModalTabType = "명함" | "댓글";
 
 export interface CardViewProps {
-  name: string;
   nickName: string;
-  cardId: number;
+  useCardHook:UseCardResult
 }
 
 export interface FirstCardModalProps {
   nickName: string;
+  useCardHook : UseCardResult
 }
 
 export interface ModalElementProps {

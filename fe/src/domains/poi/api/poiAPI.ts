@@ -1,4 +1,11 @@
 import axiosInstance from "../../../common/api/axiosInstance";
+import {
+  CreateCommentAPI,
+  DeleteCommentsAPI,
+  FetchCommentsAPI,
+  ModifyCommentsAPI,
+  TagCommentAPI
+} from "../../../common/api/ApiType";
 
 interface POI {
   id: number | null;
@@ -89,12 +96,12 @@ export const updatePOIIndexes = async (
   return response.data;
 };
 
-export const createPOIComment = async (
+export const createPOIComment : CreateCommentAPI = async (
   poiId: number,
-  nickname: string,
   content: string,
-  token?: string,
-  imageIds?:number[]
+  nickname?: string,
+  imageIds?:number[],
+  token?: string|null
 ) => {
   const params: Record<string, any> = {};
   if (token && token.trim() !== "") {
@@ -113,11 +120,11 @@ export const createPOIComment = async (
   return response.data;
 };
 
-export const getPOIComments = async (
+export const getPOIComments :FetchCommentsAPI = async (
   poiId: number,
   page: number,
   size: number,
-  token?: string
+  token?: string|null
 ) => {
   const params: Record<string, any> = {
     page: page,
@@ -131,18 +138,19 @@ export const getPOIComments = async (
   const response = await axiosInstance.get(`/poies/${poiId}/comments`, {
     params,
   });
-  return response.data;
+  return response.data.data.comments.content;
 };
 
-export const deleteComment = async (commentId: number) => {
+export const deleteComment: DeleteCommentsAPI = async (commentId: number, token?:string|null) => {
   const response = await axiosInstance.delete(`/comments/${commentId}`);
   return response.data;
 };
 
-export const updateComment = async (
+export const updateComment : ModifyCommentsAPI = async (
   commentId: number,
   editText: string,
-  token?: string
+  imageIds?:number[],
+  token?: string|null
 ) => {
   try {
     const nickName = localStorage.getItem("nickName");
@@ -152,6 +160,7 @@ export const updateComment = async (
         nickName,
         commentId,
         content: editText,
+        imageIds:imageIds
       },
       {
         params: {
@@ -166,17 +175,16 @@ export const updateComment = async (
   }
 };
 
-export const linkPOICommentTag = async (
+export const linkPOICommentTag : TagCommentAPI = async (
   poiId: number,
   commentId: number,
   startIndex: number,
   lastIndex: number,
-  token?: string
 ) => {
   const params: Record<string, any> = {};
-  if (token && token.trim() !== "") {
-    params.token = token;
-  }
+  // if (token && token.trim() !== "") {
+  //   params.token = token;
+  // }
 
   const response = await axiosInstance.post(
     `/poies/${poiId}/comments/${commentId}/tag-link`,

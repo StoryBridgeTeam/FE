@@ -33,6 +33,13 @@
     "successTitle": "로그아웃 성공",
     "successDescription": "성공적으로 로그아웃되었습니다"
   },
+  "comment": {
+    "anonymousNicknameInput" : "닉네임",
+    "error": {
+      "alreadyUsedToken" : "이미 사용된 초대링크",
+      "alreadyUsedTokenMsg" : "해당 초대링크로 이미 댓글을 작성하셨습니다."
+    }
+  },
   "info": {
     "info": "자기소개서",
     "list": "목록보기",

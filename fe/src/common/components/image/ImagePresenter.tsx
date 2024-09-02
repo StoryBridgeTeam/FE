@@ -12,13 +12,13 @@ import {
     Stack
 } from "@chakra-ui/react";
 import Slider from "react-slick";
-import {carouselSettings, SampleNextArrow, SamplePrevArrow} from "../../domains/amt/utils/carouselSetting";
+import {carouselSettings, SampleNextArrow, SamplePrevArrow} from "../../../domains/amt/utils/carouselSetting";
 import {X} from "tabler-icons-react";
 import {AddIcon} from "@chakra-ui/icons";
-import {ImageRes} from "../hooks/useImage";
+import {ImageRes} from "../../hooks/useImage";
 
 interface ImagePresenterProps{
-    images:ImageRes[],
+    images:ImageRes[] | [],
     arrowSize?:number
 }
 

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import {useEffect, useLayoutEffect, useState} from "react";
 import {
   getIsCreatedCard,
   createCardInfo,
@@ -12,6 +12,7 @@ import {
 import { EntryState, FetchType } from "../types/cardTypes";
 import axios from "axios";
 import { useToastMessage } from "../../../common/hooks/useToastMessage";
+import {data} from "../../amt/utils/atmUtils";
 
 export interface Comment {
   id: number;
@@ -22,12 +23,16 @@ export interface Comment {
   modifiedTime: string | null;
 }
 
-interface UseCardResult {
+interface UseCardProps{
+  nickname:string,
+  // token?:string|null
+}
+
+export interface UseCardResult {
   loading: boolean;
   error: string | null;
   totalCommentPages: number;
   currentCommentPage: number;
-  checkCard: (nickname: string, token?: string) => Promise<boolean>;
   createNewCard: (nickname: string, entries: EntryState[]) => Promise<void>;
   fetchOriginalCard: (
     nickname: string,
@@ -41,35 +46,50 @@ interface UseCardResult {
   ) => Promise<{ id: number; name: string; entries: EntryState[] }>;
   editOriginalCard: (nickname: string, entries: EntryState[]) => Promise<void>;
   editPublicCard: (nickname: string, entries: EntryState[]) => Promise<void>;
-  addComment: (
-    poiId: number,
-    nickname: string,
-    content: string,
-    token?: string
-  ) => Promise<void>;
-  fetchComments: (
-    poiId: number,
-    page: number,
-    size: number,
-    token?: string
-  ) => Promise<any>;
+  // addComment: (
+  //   poiId: number,
+  //   nickname: string,
+  //   content: string,
+  //   token?: string
+  // ) => Promise<void>;
+  // fetchComments: (
+  //   poiId: number,
+  //   page: number,
+  //   size: number,
+  //   token?: string
+  // ) => Promise<any>;
   formatTimestamp: (timestamp: string) => string;
+  checkCard:(nickname:string, token?:string)=>Promise<boolean>;
+  isExists : boolean|null,
+  cardId : number
 }
 
-export const useCard = (): UseCardResult => {
+interface CommonCardInfo{
+  isExist:boolean|null,
+  cardId:number
+}
+
+export const useCard = ({nickname}:UseCardProps): UseCardResult => {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [totalCommentPages, setTotalCommentPages] = useState<number>(1);
   const [currentCommentPage, setCurrentCommentPage] = useState<number>(0);
   const { showToast } = useToastMessage();
+  const [commonCardInfo, setCommonCardInfo] = useState<CommonCardInfo>({
+    isExist : null,
+    cardId: -1
+  });
+
 
   const checkCard = async (nickname: string, token?: string) => {
     setLoading(true);
     setError(null);
     try {
       const data = await getIsCreatedCard(nickname, token);
-      console.log("checkCard_data:", data);
-      console.log("checkCard_data.isCreated:", data.data.isCreated);
+      setCommonCardInfo(prevState => ({
+        isExist : data.data.isCreated,
+        cardId: data.data.cardId
+      }))
       return data.data.isCreated;
     } catch (error) {
       setError("카드를 확인하는 중 오류가 발생했습니다.");
@@ -175,63 +195,63 @@ export const useCard = (): UseCardResult => {
     }
   };
 
-  const addComment = async (
-    poiId: number,
-    nickname: string,
-    content: string,
-    token?: string
-  ) => {
-    setLoading(true);
-    setError(null);
-    try {
-      await createCardComment(poiId, nickname, content, token);
-    } catch (error) {
-      if (axios.isAxiosError(error) && error.response?.data?.code === 2260300) {
-        showToast(
-          "초대링크 제한",
-          "초대링크당 하나의 댓글만 달 수 있습니다",
-          "error"
-        );
-      } else {
-        showToast("Error", "댓글을 등록하는 중 오류가 발생했습니다.", "error");
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const fetchComments = async (
-    poiId: number,
-    page: number,
-    size: number,
-    token?: string
-  ) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const data = await getCardComments(poiId, page, size, token);
-      const comments: Comment[] = data.data.comments.content.map(
-        (comment: any) => ({
-          id: comment.id,
-          user: comment.author.nickName,
-          img: comment.author.profileImage.path,
-          content: comment.content,
-          timestamp: comment.createdTime,
-          modifiedTime: comment.modifiedTime,
-          tagInfo: comment.tagInfo,
-        })
-      );
-      setTotalCommentPages(data.data.comments.totalPages);
-      setCurrentCommentPage(page);
-      return comments;
-    } catch (error) {
-      setError("댓글을 가져오는 중 오류가 발생했습니다.");
-      console.log("fetchComments_error:", error);
-      throw error;
-    } finally {
-      setLoading(false);
-    }
-  };
+  // const addComment = async (
+  //   poiId: number,
+  //   nickname: string,
+  //   content: string,
+  //   token?: string
+  // ) => {
+  //   setLoading(true);
+  //   setError(null);
+  //   try {
+  //     await createCardComment(poiId, nickname, content, token);
+  //   } catch (error) {
+  //     if (axios.isAxiosError(error) && error.response?.data?.code === 2260300) {
+  //       showToast(
+  //         "초대링크 제한",
+  //         "초대링크당 하나의 댓글만 달 수 있습니다",
+  //         "error"
+  //       );
+  //     } else {
+  //       showToast("Error", "댓글을 등록하는 중 오류가 발생했습니다.", "error");
+  //     }
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+  //
+  // const fetchComments = async (
+  //   poiId: number,
+  //   page: number,
+  //   size: number,
+  //   token?: string
+  // ) => {
+  //   setLoading(true);
+  //   setError(null);
+  //   try {
+  //     const data = await getCardComments(poiId, page, size, token);
+  //     const comments: Comment[] = data.data.comments.content.map(
+  //       (comment: any) => ({
+  //         id: comment.id,
+  //         user: comment.author.nickName,
+  //         img: comment.author.profileImage.path,
+  //         content: comment.content,
+  //         timestamp: comment.createdTime,
+  //         modifiedTime: comment.modifiedTime,
+  //         tagInfo: comment.tagInfo,
+  //       })
+  //     );
+  //     setTotalCommentPages(data.data.comments.totalPages);
+  //     setCurrentCommentPage(page);
+  //     return comments;
+  //   } catch (error) {
+  //     setError("댓글을 가져오는 중 오류가 발생했습니다.");
+  //     console.log("fetchComments_error:", error);
+  //     throw error;
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
   const formatTimestamp = (timestamp: string) => {
     const utcDate = new Date(timestamp + "Z"); //UTC 시간을 올바르게 파싱하기 위해 'Z'를 추가
@@ -251,14 +271,14 @@ export const useCard = (): UseCardResult => {
     error,
     totalCommentPages,
     currentCommentPage,
-    checkCard,
     createNewCard,
     fetchOriginalCard,
     fetchPublicCard,
     editOriginalCard,
     editPublicCard,
-    addComment,
-    fetchComments,
     formatTimestamp,
+    checkCard,
+    isExists : commonCardInfo.isExist,
+    cardId: commonCardInfo.cardId
   };
 };

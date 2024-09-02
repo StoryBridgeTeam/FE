@@ -140,6 +140,8 @@ const POIList: React.FC = () => {
             borderRadius="3xl"
             h="100%"
             w="100%"
+            minWidth={"200px"}
+            maxWidth={"330px"}
             overflow="hidden"
             p={2}
             color="#CDCDCD"
