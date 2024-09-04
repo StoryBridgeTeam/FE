@@ -1,4 +1,26 @@
 import axiosInstance from "../../../common/api/axiosInstance";
+import {data} from "../../amt/utils/atmUtils";
+
+export const getCoverLetterEntry = async (id:number, token?:string|null) => {
+    try{
+        const params: Record<string, any> = {};
+        if (token && token.trim() !== "") {
+            params.token = token;
+        }
+
+        const response = await axiosInstance.get(
+            `/cover-letter/entries/${id}`,
+            {
+                params
+            }
+        );
+
+        return response.data.data;
+    } catch (error) {
+        console.error("Failed to fetch cover letters:", error);
+        throw error;
+    }
+};
 
 export const getCoverLetters = async (nickname: string, token?: string) => {
   try {
@@ -28,7 +50,7 @@ export const putCoverLetters = async (
       {
         title: entries.title,
         content: entries.content,
-        imageIds,
+        imageIds:imageIds,
       }
     );
     return response.data.data;
@@ -45,7 +67,11 @@ export const postCoverLetters = async (
   try {
     const response = await axiosInstance.post(
       `/members/${nickname}/cover-letter`,
-        entries
+        {
+          title:entries.title,
+          content:entries.content,
+          imageIds:entries.imageIds
+        }
     );
     return response.data.data;
   } catch (error) {

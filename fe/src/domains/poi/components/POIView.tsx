@@ -309,7 +309,10 @@ const POIView: React.FC<POIViewProps> = ({ poiId }) => {
           </AlertDialogOverlay>
         </AlertDialog>
 
-        <InviteModal isOpen={isInviteModalOpen} onClose={onInviteModalClose} />
+        {
+          isInviteModalOpen &&
+            <InviteModal isOpen={isInviteModalOpen} onClose={onInviteModalClose} />
+        }
       </VStack>
 
       <Modal isOpen={isModalOpen} onClose={onModalClose}>

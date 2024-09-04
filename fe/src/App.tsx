@@ -3,7 +3,7 @@ import LoginPage from "./domains/login/LoginPage";
 import SignupPage from "./domains/signup/SignupPage";
 import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
 import { useAuthStore } from "./common/stores/AuthStore";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import PrivateRoute from "./domains/login/utils/PrivateRoute";
 import InfoPageLayout from "./domains/info/InfoPageLayout";
 import MainPage from "./domains/main/MainPage";
@@ -15,6 +15,8 @@ import CardPage from "./domains/card/CardPage";
 import CoverLetterCreatePage from "./domains/info/page/CoverLetterCreatePage";
 import InfoMainPage from "./domains/info/page/InfoMainPage";
 import PolicyPage from "./domains/policy/PolicyPage";
+import CoverLetterDetailPage from "./domains/info/page/CoverLetterDetailPage";
+import CoverLetterEditPage from "./domains/info/page/CoverLetterEditPage";
 
 const theme = extendTheme({
   fonts: {
@@ -57,7 +59,11 @@ function App() {
           />
           <Route
             path="/:nickName/info/:id"
-            element={<PrivateRoute element={<DetailPage />} />}
+            element={<PrivateRoute element={<CoverLetterDetailPage />} />}
+          />
+          <Route
+              path="/:nickName/info/:id/edit"
+              element={<PrivateRoute element={<CoverLetterEditPage />} />}
           />
           <Route
             path="/:nickName/amt"

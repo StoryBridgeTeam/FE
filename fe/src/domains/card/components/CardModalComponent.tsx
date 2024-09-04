@@ -167,7 +167,10 @@ const CardModalComponent: React.FC<CardViewProps> = ({
           setEntries={setEntries}
         />
       </Box>
-      <InviteModal isOpen={isInviteModalOpen} onClose={onInviteModalClose} />
+      {
+        isInviteModalOpen &&
+          <InviteModal isOpen={isInviteModalOpen} onClose={onInviteModalClose} />
+      }
     </Box>
   );
 };

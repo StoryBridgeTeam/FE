@@ -159,7 +159,7 @@ const CommentInput: React.FC<CommentInputProps> = ({ id }) => {
       >
         <Container maxW="4xl">
           <Flex>
-            <ImageUploader imageHook={imageHook} />
+            <ImageUploader imageHook={imageHook} imageType={"COMMENT"} />
           </Flex>
           <Flex alignItems="center">
             {!isMobile && (

@@ -46,6 +46,11 @@ const CommentInput = ({commentHook}:CommentInputProps) =>{
 
     const handleCommentSubmit = () => {
         if(commentText.trim()){
+            if(isTokenUser && !nickname.trim()){
+                showToast("닉네임 입력", "닉네임을 입력해주세요", "error");
+                return;
+            }
+
             commentHook.handleCreateComment(
                 commentText, () => showToast(
                     t(`info.commentRegister`),
@@ -56,6 +61,9 @@ const CommentInput = ({commentHook}:CommentInputProps) =>{
             setCommentText("")
             setNickname("");
             imageHook.clearImage();
+        }else{
+            showToast("댓글 입력", "댓글을 입력해주세요", "error");
+            return;
         }
     }
 
@@ -75,7 +83,7 @@ const CommentInput = ({commentHook}:CommentInputProps) =>{
                         <Stack alignItems={"center"} justifyContent={"center"} padding={4} w={"100%"}>
                             <Spinner/>
                         </Stack> :
-                        <ImageUploader imageHook={imageHook} />
+                        <ImageUploader imageHook={imageHook} imageType={"COMMENT"} />
                 }
             </Flex>
             <Flex alignItems="center">

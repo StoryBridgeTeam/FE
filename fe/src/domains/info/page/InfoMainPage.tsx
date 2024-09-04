@@ -1,4 +1,4 @@
-import {Box, Button, Container, Flex, Heading, Spinner, Text, useDisclosure} from "@chakra-ui/react";
+import {Box, Button, Container, Flex, Heading, Spinner, Text, useDisclosure, VStack} from "@chakra-ui/react";
 import InfoPageLayout from "../InfoPageLayout";
 import {Check, Edit, Link} from "tabler-icons-react";
 import InviteModal from "../../../common/components/InviteModal";
@@ -63,57 +63,59 @@ const InfoMainPage = () => {
     }, []);
 
     const handleEditClick = () => {
-        navigate(`/info/create`)
+        const searchParams = new URLSearchParams();
+
+        if (token) {
+            searchParams.append("token", token);
+        }
+
+        navigate(`/info/create?${searchParams}`)
     }
 
     return <InfoPageLayout nickname={nickName}>
-        <Container maxW="4xl">
+        <Container maxW="3xl" paddingX={10} paddingY={5}>
             {isLoading ? (
                 <Flex justifyContent="center" alignItems="center" h="100vh">
                     <Spinner />
                 </Flex>
             ) : (
                 <>
-                    {ishost && (
-                        <Flex
-                            w="full"
-                            justifyContent="flex-end"
-                            alignItems="center"
-                            mt={5}
-                        >
-                            <Button onClick={handleEditClick} mr={2}>
-                                <Edit size={24} color="black" />
-                            </Button>
-                            <Button onClick={onOpen}>
-                                <Link />
-                                초대링크
-                            </Button>
-                        </Flex>
-                    )}
-                    <Flex justifyContent="center" mb={5} mt={12}>
-                        <Heading size="lg">{t(`info.info`)}</Heading>
+                    <Flex direction={"row"} justifyContent="space-between" alignItems={"center"}>
+                        <Box textAlign={"left"}>
+                            <Heading size="md" >{t(`info.info`)}</Heading>
+                        </Box>
+                        {ishost && (
+                            <Flex
+                                justifyContent="flex-end"
+                                alignItems="center"
+                            >
+                                <Button onClick={handleEditClick} mr={2} size={"sm"}>
+                                    <Edit size={16} color="black" />
+                                </Button>
+                                <Button
+                                    leftIcon={<Link size={16} />}
+                                    onClick={onOpen} fontSize={14} size={"sm"}>
+                                    초대링크
+                                </Button>
+                            </Flex>
+                        )}
                     </Flex>
                     <Flex justifyContent="center">
                         {mockData.length === 0 && !isLoading && (
                             <Text>{t(`info.noInfo`)}</Text>
                         )}
                     </Flex>
-                    {mockData.map((data) => (
-                      <TextSection
-                        key={data.id}
-                        id={data.id}
-                        title={data.title}
-                        content={data.content}
-                        // isEditing={isEdit}
-                        onClick={() => {}}
-                        // onDelete={handleDelete}
-                      />
-                    ))}
-                    {/*{isEdit ? (*/}
-                    {/*  <Flex justifyContent="center" mt={3} mb={8}>*/}
-                    {/*    <Button onClick={handleAddNewClick}>{t(`info.add_new`)}</Button>*/}
-                    {/*  </Flex>*/}
-                    {/*) : undefined}*/}
+                    <VStack gap={4} mt={3}>
+                        {mockData.map((data) => (
+                            <TextSection
+                                key={data.id}
+                                id={data.id}
+                                title={data.title}
+                                content={data.content}
+                                onClick={() => token ? navigate(`/${nickName}/info/${data.id}?token=${token}`) : navigate(`/${nickName}/info/${data.id}`)}
+                            />
+                        ))}
+                    </VStack>
                 </>
             )}
         </Container>

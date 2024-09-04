@@ -10,14 +10,15 @@ interface POIItemProps {
 
 const POIItem: React.FC<POIItemProps> = ({ id, title, isMobile, onClick }) => (
   <Box
-    m={4}
+    mx={4}
+    my={3}
     bg="white"
     color="black"
     h="7%"
     shadow="md"
     borderRadius="5"
     onClick={() => onClick(id)}
-    _hover={{ cursor: "pointer", bg: "gray.300" }}
+    _hover={{ cursor: "pointer", bg: "gray.200" }}
     display="flex"
     alignItems="center"
     border="1px solid #CDCDCD"

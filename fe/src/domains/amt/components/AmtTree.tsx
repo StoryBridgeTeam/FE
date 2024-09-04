@@ -54,6 +54,17 @@ const AmtTree = () => {
   const name = localStorage.getItem("nickName");
   const ishost = name === nickName;
 
+  const MAXIMUM_LIST = [10, 100, 500, 1000, 5000, 10000, 100000];
+  const LIMIT = () => {
+    if(amt){
+      const maxCount = Math.max((amt.child.length, amt.twoLevelChildCount));
+      const limit = Math.min(...MAXIMUM_LIST.filter(num => num>maxCount));
+      return limit;
+    }
+
+    return 10;
+  }
+
   const getfetchAmt = async () => {
     let data;
     if (token) {
@@ -92,7 +103,7 @@ const AmtTree = () => {
   }, [selectedAncestor, hoveredAncestor, isHoveringCard]);
 
   const handleMouseEnter = (ancestor: DataNode, event: React.MouseEvent) => {
-    if (ancestor.isBlocked) return;
+    if (!ishost && ancestor.isBlocked) return;
 
     const rect = event.currentTarget.getBoundingClientRect();
     setHoveredAncestor({
@@ -102,12 +113,13 @@ const AmtTree = () => {
     });
   };
 
-  const handleUnblockUser = async () => {
-    if (blockAncestor) {
-      await amtBlockReset(blockAncestor.nickname);
-      setBlockAncestor(null);
-      onCloseBlock();
+  const handleUnblockUser = async (nickname : string) => {
+    try {
+      await amtBlockReset(nickname);
       getfetchAmt();
+      showToast("유저 보이기 성공", "다른사람은 AMT에서 해당 유저를 다시 볼 수 있습니다.", "success");
+    } catch {
+      showToast("유저 보이기 실패", "보이기에 실패했습니다", "error");
     }
   };
 
@@ -118,13 +130,7 @@ const AmtTree = () => {
   };
 
   const handleAvatarClick = (ancestor: DataNode) => {
-    if (ishost && ancestor.isBlocked) {
-      setBlockAncestor(ancestor);
-      onOpenBlock();
-      return;
-    }
-
-    if (ancestor.isBlocked) return;
+    if (!ishost && ancestor.isBlocked) return;
 
     if (isMobile) {
       setSelectedAncestor(ancestor);
@@ -145,9 +151,9 @@ const AmtTree = () => {
     try {
       await amtBlock(nickname);
       getfetchAmt();
-      showToast("유저 차단 성공", "차단에 성공했습니다", "success");
+      showToast("유저 가리기 성공", "다른사람은 AMT에서 해당 유저를 볼 수 없습니다.", "success");
     } catch {
-      showToast("유저 차단 실패", "차단에 실패했습니다", "error");
+      showToast("유저 가리기 실패", "가리기에 실패했습니다", "error");
     }
   };
 
@@ -157,19 +163,23 @@ const AmtTree = () => {
       width={isMobile ? "100%" : "70%"}
       align="center"
       px={isMobile ? 5 : undefined}
-      ml={isMobile ? undefined : 10}
       position="relative"
     >
-      <Box
-        alignSelf="flex-start"
-        marginRight="auto"
+      <Flex
+          direction={"column"}
+          gap={2}
+        // alignSelf="flex-start"
+        // marginRight="auto"
         mt={10}
         position="relative"
         width={"100%"}
       >
-        {amt?.root && (
+        {(amt?.root && amt?.root.nickname!==amt?.target.nickname && amt?.root.nickname!==amt?.parent.nickname ) && (
           <HStack spacing={1} mb={5}>
             <ProfileAvatar
+                unHideUser={handleUnblockUser}
+                isHost={ishost}
+              hideUser={blockUser}
               ancestor={amt?.root}
               onHover={handleMouseEnter}
               onLeave={handleMouseLeave}
@@ -178,9 +188,12 @@ const AmtTree = () => {
           </HStack>
         )}
 
-        {amt?.levelOneNode && (
+        {(amt?.levelOneNode && amt?.levelOneNode.nickname!==amt?.target.nickname && amt?.levelOneNode.nickname!==amt?.parent.nickname) && (
           <HStack spacing={1} mb={5}>
             <ProfileAvatar
+                unHideUser={handleUnblockUser}
+                isHost={ishost}
+                hideUser={blockUser}
               ancestor={amt?.levelOneNode}
               onHover={handleMouseEnter}
               onLeave={handleMouseLeave}
@@ -189,13 +202,23 @@ const AmtTree = () => {
           </HStack>
         )}
 
-        <Text fontSize="md" fontWeight={"bold"} mt={-2} mb={2} ml={5}>
-          ⋮
-        </Text>
 
-        {amt?.parent && (
+        {
+            ((amt?.root && amt?.root.nickname!==amt?.target.nickname && amt?.root.nickname!==amt?.parent.nickname) && amt?.levelOneNode
+                && amt.levelOneNode.nickname!==amt?.target.nickname
+            )&& (
+                <Text fontSize="md" fontWeight={"bold"} mt={-2} mb={2} ml={5}>
+                  ⋮
+                </Text>
+            )
+        }
+
+        {(amt?.parent) && (
           <HStack spacing={1} mb={5}>
             <ProfileAvatar
+                unHideUser={handleUnblockUser}
+                isHost={ishost}
+                hideUser={blockUser}
               ancestor={amt?.parent}
               onHover={handleMouseEnter}
               onLeave={handleMouseLeave}
@@ -206,6 +229,10 @@ const AmtTree = () => {
 
         <HStack spacing={1} mb={5}>
           <ProfileAvatar
+              unHideUser={handleUnblockUser}
+              isHost={ishost}
+              hideUser={blockUser}
+              isAmtOwner={true}
             ancestor={amt?.target || data}
             onHover={handleMouseEnter}
             onLeave={handleMouseLeave}
@@ -225,11 +252,15 @@ const AmtTree = () => {
                 scrollbarWidth: "none",
               }}
               pr={"30px"}
+              paddingY={1.5}
             >
               {amt?.child.map((ancestor, index) => (
                 <Box key={index} mr={5}>
                   <HStack spacing={1}>
                     <ProfileAvatar
+                        unHideUser={handleUnblockUser}
+                        isHost={ishost}
+                        hideUser={blockUser}
                       ancestor={ancestor}
                       onHover={handleMouseEnter}
                       onLeave={handleMouseLeave}
@@ -244,7 +275,6 @@ const AmtTree = () => {
                 </Box>
               ))}
             </Flex>
-
             <Box
               position="absolute"
               top={0}
@@ -268,12 +298,12 @@ const AmtTree = () => {
           </Box>
         )}
 
-        {isbar ? (
+        {isbar && amt?.twoLevelChildCount ? (
           <HStack spacing={4} onClick={() => setbar(false)} mb={5}>
             <Box
               bg="blackAlpha.800"
               height="30px"
-              width={`70%`}
+              width={`${(amt.twoLevelChildCount / LIMIT()) * 100}%`}
               borderRightRadius="3xl"
               position="relative"
             ></Box>
@@ -293,11 +323,15 @@ const AmtTree = () => {
                 scrollbarWidth: "none",
               }}
               pr={"30px"}
+              paddingY={1.5}
             >
               {amt?.twoLevelChild.map((ancestor, index) => (
                 <Box key={index} mr={5}>
                   <HStack spacing={1}>
                     <ProfileAvatar
+                        unHideUser={handleUnblockUser}
+                        isHost={ishost}
+                        hideUser={blockUser}
                       ancestor={ancestor}
                       onHover={handleMouseEnter}
                       onLeave={handleMouseLeave}
@@ -359,6 +393,7 @@ const AmtTree = () => {
             zIndex={10}
             width="400px"
             shadow="3xl"
+            onMouseLeave={() => setHoveredAncestor(null)}
           >
             <Box
               width="100%"
@@ -371,20 +406,6 @@ const AmtTree = () => {
               onMouseEnter={() => setIsHoveringCard(true)}
               onMouseLeave={() => setIsHoveringCard(false)}
             >
-              {ishost && (
-                <IconButton
-                  aria-label="Block user"
-                  icon={<MdBlock />}
-                  position="absolute"
-                  top={2}
-                  right={2}
-                  size="sm"
-                  fontSize={"lg"}
-                  color={"red"}
-                  bg={"white"}
-                  onClick={() => blockUser(hoveredAncestor.nickname)}
-                />
-              )}
               <VStack align="stretch" spacing={2} color="black">
                 <Heading size="sm" textAlign="center">
                   {hoveredAncestor.nickname}
@@ -421,27 +442,13 @@ const AmtTree = () => {
             </Box>
           </Box>
         )}
-      </Box>
+      </Flex>
       {selectedAncestor && (
         <SlideUpSmallModal
           isOpen={isOpen}
           onClose={onClose}
           title={selectedAncestor.nickname}
         >
-          {ishost && (
-            <IconButton
-              aria-label="Block user"
-              icon={<MdBlock />}
-              position="absolute"
-              top={4}
-              right={50}
-              size="sm"
-              fontSize={"lg"}
-              color={"red"}
-              bg={"white"}
-              onClick={() => blockUser(selectedAncestor.nickname)}
-            />
-          )}
           <Box
             mt={-5}
             border="1px dashed black"
@@ -474,11 +481,11 @@ const AmtTree = () => {
           </Box>
         </SlideUpSmallModal>
       )}
-      <UnblockUserModal
-        isOpen={isOpenBlock}
-        onClose={onCloseBlock}
-        onConfirm={handleUnblockUser}
-      />
+      {/*<UnblockUserModal*/}
+      {/*  isOpen={isOpenBlock}*/}
+      {/*  onClose={onCloseBlock}*/}
+      {/*  onConfirm={handleUnblockUser}*/}
+      {/*/>*/}
     </VStack>
   );
 };

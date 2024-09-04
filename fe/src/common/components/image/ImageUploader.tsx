@@ -7,10 +7,11 @@ import {AddIcon} from "@chakra-ui/icons";
 import {ImageRes, useImageResponse} from "../../hooks/useImage";
 
 interface ImageUploaderProps{
-    imageHook : useImageResponse
+    imageHook : useImageResponse,
+    imageType : string
 }
 
-const ImageUploader: React.FC<ImageUploaderProps> = ({imageHook}) => {
+const ImageUploader: React.FC<ImageUploaderProps> = ({imageHook, imageType}) => {
     const {images, handleUploadImage, handleDeleteImage} = imageHook;
 
     return <Box w={"100%"}>
@@ -56,7 +57,7 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({imageHook}) => {
                                     aria-label={"Add image"}
                                     icon={<AddIcon boxSize={2}/>}
                                     size={"sm"}
-                                    onClick={() => handleUploadImage("COMMENT")}
+                                    onClick={() => handleUploadImage(imageType)}
                                 />
                             </Box>
                         </Stack>

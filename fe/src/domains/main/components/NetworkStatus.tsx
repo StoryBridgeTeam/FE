@@ -46,9 +46,12 @@ const NetworkStatus: React.FC = () => {
   }, [nickName, token]);
 
   const maxCount = Math.max(...descendants.map((d) => d.count));
+  const MAXIMUM_LIST = [10, 100, 500, 1000, 5000, 10000, 100000];
+  const LIMIT = Math.min(...MAXIMUM_LIST.filter(num => num>maxCount));
 
   return (
     <Box
+      _hover={{cursor:"pointer", bgColor:"gray.200"}}
       bg="#F6F6F6"
       borderRadius="3xl"
       h="100%"
@@ -67,7 +70,7 @@ const NetworkStatus: React.FC = () => {
           searchParams.append("token", token);
         }
 
-        navigate(`${url}?${searchParams.toString()}`, { replace: true });
+        navigate(`${url}?${searchParams.toString()}`);
       }}
     >
       <VStack
@@ -103,7 +106,7 @@ const NetworkStatus: React.FC = () => {
               <Box
                 bg="blackAlpha.800"
                 height="15px"
-                width={`${(descendant.count / maxCount) * 100}%`}
+                width={`${((descendant.count / LIMIT) * 100)==0 ? 1 : (descendant.count/LIMIT) *100}%`}
                 borderRightRadius="3xl"
                 position="relative"
               ></Box>

@@ -58,7 +58,7 @@ const CommentItem = ({targetId, content, comment, ishost, highlightComment, useC
         }
     };
 
-    return <Box key={comment.id} id={`comment-${comment.id}`} bgColor={"white"} padding={2}>
+    return <Box key={comment.id} id={`comment-${comment.id}`} bgColor={"white"} paddingX={2} paddingY={3}>
         <Flex align="center">
             <Avatar
                 size="sm"
@@ -229,7 +229,7 @@ const EditModal  = ({editDisclosure, useComment}:EditModalProps) => {
                     </Flex>
                     :
                     <>
-                        <ImageUploader imageHook={imageHook} />
+                        <ImageUploader imageHook={imageHook} imageType={"COMMENT"}/>
                         {
                             imageHook.images.length==0 &&
                             <Flex w={"100%"} alignItems={"center"} justifyContent={"center"} padding={3}>

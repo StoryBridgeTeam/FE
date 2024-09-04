@@ -1,19 +1,34 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import {Box, Button, Divider, Flex, HStack, IconButton, Input, Spinner, Text, Textarea, VStack} from "@chakra-ui/react";
 import InfoPageLayout from "../InfoPageLayout";
 import {AddIcon, CheckIcon, EditIcon} from "@chakra-ui/icons";
-import {useImage} from "../../../common/hooks/useImage";
+import {ImageRes, useImage} from "../../../common/hooks/useImage";
 import ImageUploader from "../../../common/components/image/ImageUploader";
 import {useAuthStore} from "../../../common/stores/AuthStore";
-import {postCoverLetters} from "../api/InfoAPI";
+import {postCoverLetters, putCoverLetters} from "../api/InfoAPI";
 import {useToastMessage} from "../../../common/hooks/useToastMessage";
-import {useNavigate} from "react-router-dom";
+import {useLocation, useNavigate} from "react-router-dom";
 import {useTranslation} from "react-i18next";
 
 const MAX_TITLE_LENGTH = 50;
 
+interface CoverLetter {
+    id: number;
+    title: string;
+    content: string;
+    images?: ImageRes[];
+}
+
+interface CoverLetterCreatePageProps{
+    entry : CoverLetter
+}
+
 const CoverLetterCreatePage = () => {
     const {nickName} = useAuthStore();
+    const location = useLocation();
+    const queryParams = new URLSearchParams(location.search);
+    const token = queryParams.get("token");
+    const {entry} = location.state;
 
     const [title, setTitle] = useState<string>("");
     const [content, setContent] = useState<string>("");
@@ -23,18 +38,26 @@ const CoverLetterCreatePage = () => {
     const { showToast } = useToastMessage();
 
     const [loading, setLoading] = useState<boolean>(false);
-    const imageHook = useImage();
+    const imageHook = useImage(entry.images);
+
+    useEffect(() => {
+        if(entry){
+            setTitle(entry.title);
+            setContent(entry.content);
+        }
+
+    }, [entry]);
 
     const handleClickCreate = async () => {
         setLoading(true);
-        await postCoverLetters(nickName, {title:title, content:content, imageIds:imageHook.images.map(i => i.id)})
+        await putCoverLetters(nickName, {id:entry.id, title:title, content:content}, imageHook.images.map(i => i.id));
         setLoading(false);
         showToast(
-            t("info.successAddCoverLetter"),
-        t("info.successAddCoverLetterMsg"),
+            t("info.successEditCoverLetter"),
+        t("info.successEditCoverLetterMsg"),
             "success"
         )
-        navigate(`/${nickName}/info`,{replace:true})
+        navigate(`/${nickName}/info/${entry.id}`,{replace:true})
     };
 
     return <InfoPageLayout nickname={nickName}>
@@ -75,7 +98,7 @@ const CoverLetterCreatePage = () => {
                                     </Button>
                                 </Flex>
                                 :
-                                <ImageUploader imageHook={imageHook} imageType={"COVER"} />
+                                <ImageUploader imageHook={imageHook} imageType={"COVER"}/>
                         }
                     </HStack>
                     <Textarea

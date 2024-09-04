@@ -106,7 +106,7 @@ const CardComponent: React.FC = () => {
         >
             <Box
                 w={"100%"} bg={"white"}
-                aspectRatio={"16/9"} height={"auto"} borderRadius={"3xl"} shadow={"md"}
+                 height={"auto"} borderRadius={"3xl"} shadow={"md"}
                  p={4} boxSizing={"border-box"}
             >
                 <VStack align="stretch" spacing={2} color="black" flex={1} h={"100%"}>
@@ -137,7 +137,10 @@ const CardComponent: React.FC = () => {
                 </VStack>
             </Box>
             <SelfIntroductionBox/>
-            <InviteModal isOpen={isInviteModalOpen} onClose={onInviteModalClose}/>
+            {
+                isInviteModalOpen &&
+                <InviteModal isOpen={isInviteModalOpen} onClose={onInviteModalClose}/>
+            }
         </VStack>
     );
 };

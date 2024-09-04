@@ -7,12 +7,13 @@ const AddButton: React.FC<{ isMobile: boolean; onClick: () => void }> =
     <Box
       color="black"
       onClick={onClick}
-      _hover={{ cursor: "pointer", bgColor:"gray.300"}}
-      borderRadius="xl"
+      _hover={{ cursor: "pointer", bgColor:"gray.200"}}
+      borderRadius="5"
       display="flex"
       alignItems="center"
       justifyContent="center"
-      p={isMobile ? 3 : 3}
+      p={isMobile ? 4 : 2.5}
+      mx={4}
     >
         <PlusSquareIcon />
     </Box>

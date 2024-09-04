@@ -421,7 +421,10 @@ const DetailContent: FC = () => {
         </Box>
       </Container>
 
-      <InviteModal isOpen={isOpen} onClose={onClose} />
+      {
+        isOpen &&
+        <InviteModal isOpen={isOpen} onClose={onClose} />
+      }
 
       {/* Image Modal */}
       <Modal isOpen={isModalOpen} onClose={onModalClose}>

@@ -41,6 +41,10 @@
     }
   },
   "info": {
+    "successAddCoverLetter" : "자기소개서 추가 완료",
+    "successAddCoverLetterMsg" : "자기소개서 추가 완료했습니다.",
+    "successEditCoverLetter" : "자기소개서 수정 완료",
+    "successEditCoverLetterMsg" : "자기소개서 수정 완료했습니다.",
     "info": "자기소개서",
     "list": "목록보기",
     "commentPlaceHolder": "댓글을 입력하세요...",

@@ -20,7 +20,7 @@ const SelfIntroductionBox: React.FC = () => {
       searchParams.append("token", token);
     }
 
-    navigate(`${url}?${searchParams.toString()}`, { replace: true });
+    navigate(`${url}?${searchParams.toString()}`);
   };
 
   return (
