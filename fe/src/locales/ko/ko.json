@@ -34,10 +34,10 @@
     "successDescription": "성공적으로 로그아웃되었습니다"
   },
   "comment": {
-    "anonymousNicknameInput" : "닉네임",
+    "anonymousNicknameInput": "닉네임",
     "error": {
-      "alreadyUsedToken" : "이미 사용된 초대링크",
-      "alreadyUsedTokenMsg" : "해당 초대링크로 이미 댓글을 작성하셨습니다."
+      "alreadyUsedToken": "이미 사용된 초대링크",
+      "alreadyUsedTokenMsg": "해당 초대링크로 이미 댓글을 작성하셨습니다."
     }
   },
   "info": {
@@ -152,6 +152,32 @@
     },
     "CardComponent": {
       "self-introduction": "자기소개서"
+    }
+  },
+  "policy": {
+    "PolicyList": {
+      "INFO_ACCESS_LIMIT_DAYS": {
+        "name": "정보 접근 제한일 (일수)",
+        "description": "미가입자가 서비스에 접근할 수 있는 일수"
+      },
+      "LONG_COMMENT_POINT": {
+        "name": "긴 댓글 작성 포인트",
+        "description": "긴 댓글 작성시 획득할 수 있는 포인트"
+      },
+      "MIDDLE_COMMENT_POINT": {
+        "name": "중간 댓글 작성 포인트",
+        "description": "중간 댓글 작성시 획득할 수 있는 포인트"
+      },
+      "SHORT_COMMENT_POINT": {
+        "name": "짧은 댓글 작성 포인트",
+        "description": "짧은 댓글 작성시 획득할 수 있는 포인트"
+      },
+      "LIKE_POINT": {
+        "name": "좋아요 포인트",
+        "description": "게시글에 '좋아요' 클릭시 획득할 수 있는 포인트"
+      },
+      "pageTitle": "관리자 정책 수정 페이지",
+      "wrongAccess": "잘못된 접근입니다"
     }
   }
 }

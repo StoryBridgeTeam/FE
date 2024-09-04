@@ -82,5 +82,31 @@
     "CardComponent": {
       "self-introduction": "self-introduction"
     }
+  },
+  "policy": {
+    "PolicyList": {
+      "INFO_ACCESS_LIMIT_DAYS": {
+        "name": "Information Access Limit (Days)",
+        "description": "The number of days non-registered users can access the service."
+      },
+      "LONG_COMMENT_POINT": {
+        "name": "Long Comment Points",
+        "description": "Points awarded for writing long comments."
+      },
+      "MIDDLE_COMMENT_POINT": {
+        "name": "Medium Comment Points",
+        "description": "Points awarded for writing medium-length comments."
+      },
+      "SHORT_COMMENT_POINT": {
+        "name": "Short Comment Points",
+        "description": "Points awarded for writing short comments."
+      },
+      "LIKE_POINT": {
+        "name": "Like Points",
+        "description": "Points awarded for clicking 'Like' on a post."
+      },
+      "pageTitle": "Admin Policy Edit Page",
+      "wrongAccess": "Unauthorized access"
+    }
   }
 }

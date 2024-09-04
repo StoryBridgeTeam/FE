@@ -14,6 +14,7 @@ import DetailPage from "./domains/info/components/DetailPage";
 import CardPage from "./domains/card/CardPage";
 import CoverLetterCreatePage from "./domains/info/page/CoverLetterCreatePage";
 import InfoMainPage from "./domains/info/page/InfoMainPage";
+import PolicyPage from "./domains/policy/PolicyPage";
 
 const theme = extendTheme({
   fonts: {
@@ -51,8 +52,8 @@ function App() {
             element={<PrivateRoute element={<InfoMainPage />} />}
           />
           <Route
-              path="/info/create"
-              element={<PrivateRoute element={<CoverLetterCreatePage />} />}
+            path="/info/create"
+            element={<PrivateRoute element={<CoverLetterCreatePage />} />}
           />
           <Route
             path="/:nickName/info/:id"
@@ -81,6 +82,10 @@ function App() {
           <Route
             path="/:nickName/card"
             element={<PrivateRoute element={<CardPage />} />}
+          />
+          <Route
+            path="/admin/policy"
+            element={<PrivateRoute element={<PolicyPage />} />}
           />
           <Route
             path="*"

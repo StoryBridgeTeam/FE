@@ -41,13 +41,6 @@ export const useSignUpComplete = () => {
       });
 
       console.log("Signup successful:", response);
-      toast({
-        // title: t("signup.success.title"),
-        // description: t("signup.success.description"),
-        // status: "success",
-        // duration: 3000,
-        // isClosable: true,
-      });
       nextStep(); // 성공 후 다음 단계로 이동
     } catch (error) {
       console.error("Signup failed:", error);
