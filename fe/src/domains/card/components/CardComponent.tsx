@@ -102,7 +102,6 @@ const CardComponent: React.FC = () => {
             border={isMobile ? "none" : "1px solid"}
             spacing={5}
             minWidth={"300px"}
-            maxWidth={"500px"}
         >
             <Box
                 w={"100%"} bg={"white"}

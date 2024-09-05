@@ -1,5 +1,25 @@
 import axiosInstance from "../../../common/api/axiosInstance";
 
+export const userBlock = async (nickname:string)=> {
+  try {
+    const response = await axiosInstance.post(
+        `/members/block?nickname=${nickname}`
+    );
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+export const userUnBlock = async (nickname:string)=> {
+  try {
+    const response = await axiosInstance.delete(
+        `/members/block?nickname=${nickname}`
+    );
+  } catch (error) {
+    console.error(error);
+  }
+}
+
 export const amtBlock = async (nickname: string) => {
   try {
     const response = await axiosInstance.post(

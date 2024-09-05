@@ -14,30 +14,22 @@ const AmtPage: FC = () => {
   const navigate = useNavigate();
   return (
     <Flex minH="100vh" direction="column">
-      <LoginAppBar
-        field1="header.mypage"
-        field1OnClick={() => {
-          navigate("/mypage");
-        }}
-        field2="header.logout"
-        field2OnClick={() => {
-          logout();
-          showToast(
-            "logout.successTitle",
-            "logout.successDescription",
-            "success"
-          );
-        }}
-      />
+      <LoginAppBar />
       <Flex
+          maxW={"1440px"}
+          mx={isMobile ? "none" : "auto"}
         mt={isMobile ? "30px" : "60px"}
         minH={isMobile ? "calc(100vh - 50px)" : "calc(100vh - 60px)"}
         direction={isMobile ? "column-reverse" : "row"}
         justifyContent={"start"}
-        paddingX={6}
+        paddingX={10}
+        paddingY={10}
+          gap={2}
       >
-        <AmtTree />
-        <NetWork />
+          <AmtTree />
+          <Box flex={2}>
+              <NetWork />
+          </Box>
       </Flex>
     </Flex>
   );

@@ -12,18 +12,19 @@ import {
   Icon,
   useDisclosure,
   IconButton,
-  Spinner,
+  Spinner, Avatar,
 } from "@chakra-ui/react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { SlideUpSmallModal } from "../../../common/components/SlideUpSmallModal";
 import { Card, ProfileAvatar } from "../utils/data";
 import { ChevronRightIcon } from "@chakra-ui/icons";
-import { amtBlock, amtBlockReset, getAmt } from "../api/AmtAPI";
+import {amtBlock, amtBlockReset, getAmt, userBlock, userUnBlock} from "../api/AmtAPI";
 import { data, Data, DataNode } from "../utils/atmUtils";
 import { getCard } from "../../info/api/SideBarAPI";
 import { MdBlock } from "react-icons/md";
 import { useToastMessage } from "../../../common/hooks/useToastMessage";
 import UnblockUserModal from "./UnBlockUserModal";
+import {randomUUID} from "crypto";
 
 const AmtTree = () => {
   const {
@@ -41,7 +42,7 @@ const AmtTree = () => {
   const [selectedAncestor, setSelectedAncestor] = useState<DataNode | null>(
     null
   );
-  const [isbar, setbar] = useState<boolean>(true);
+  const [isbar, setbar] = useState<boolean>(false);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -73,6 +74,26 @@ const AmtTree = () => {
 
     setAmt(data);
   };
+
+  const handleUserBlock = async (nickname:string) => {
+    try {
+      await userBlock(nickname);
+      getfetchAmt();
+      showToast("유저 차단 성공", "해당 유저는 본인의 정보를 조회할 수 없습니다.", "success");
+    } catch {
+      showToast("유저 차단 실패", "차단에 실패했습니다", "error");
+    }
+  }
+
+  const handleUserUnBlock = async (nickname:string) => {
+    try {
+      await userUnBlock(nickname);
+      getfetchAmt();
+      showToast("유저 차단 해제 성공", "해당 유저는 본인의 정보를 조회할 수 있습니다.", "success");
+    } catch {
+      showToast("유저 차단 해제 실패", "차단 해제에 실패했습니다", "error");
+    }
+  }
 
   useEffect(() => {
     getfetchAmt();
@@ -108,12 +129,12 @@ const AmtTree = () => {
     const rect = event.currentTarget.getBoundingClientRect();
     setHoveredAncestor({
       ...ancestor,
-      top: rect.top + window.scrollY - 10,
-      left: rect.left + window.scrollX - 50,
+      top: rect.top + window.scrollY + 80 ,
+      left: rect.left + window.scrollX ,
     });
   };
 
-  const handleUnblockUser = async (nickname : string) => {
+  const handleUnhideUser = async (nickname : string) => {
     try {
       await amtBlockReset(nickname);
       getfetchAmt();
@@ -130,7 +151,8 @@ const AmtTree = () => {
   };
 
   const handleAvatarClick = (ancestor: DataNode) => {
-    if (!ishost && ancestor.isBlocked) return;
+    if (ancestor.nickname==null) return;
+    // if (!ishost && ancestor.isBlocked) return;
 
     if (isMobile) {
       setSelectedAncestor(ancestor);
@@ -143,11 +165,13 @@ const AmtTree = () => {
         searchParams.append("token", token);
       }
 
-      navigate(`${url}?${searchParams.toString()}`, { replace: true });
+      navigate(`${url}?${searchParams.toString()}`);
     }
   };
 
-  const blockUser = async (nickname: string) => {
+  const getRandom = (min:number, max:number) => Math.floor(Math.random() * (max - min) + min);
+
+  const hideUser = async (nickname: string) => {
     try {
       await amtBlock(nickname);
       getfetchAmt();
@@ -159,27 +183,31 @@ const AmtTree = () => {
 
   return (
     <VStack
+        flex={4}
       spacing={3}
-      width={isMobile ? "100%" : "70%"}
+      // width={isMobile ? "100%" : "85%"}
+      maxW={"1000px"}
+      minW={"380px"}
       align="center"
-      px={isMobile ? 5 : undefined}
-      position="relative"
+      // px={isMobile ? 5 : undefined}
+      // position="relative"
     >
       <Flex
           direction={"column"}
           gap={2}
         // alignSelf="flex-start"
         // marginRight="auto"
-        mt={10}
-        position="relative"
+        // position="relative"
         width={"100%"}
       >
         {(amt?.root && amt?.root.nickname!==amt?.target.nickname && amt?.root.nickname!==amt?.parent.nickname ) && (
           <HStack spacing={1} mb={5}>
             <ProfileAvatar
-                unHideUser={handleUnblockUser}
+                blockUser={handleUserBlock}
+                unblockUser={handleUserUnBlock}
+                unHideUser={handleUnhideUser}
                 isHost={ishost}
-              hideUser={blockUser}
+              hideUser={hideUser}
               ancestor={amt?.root}
               onHover={handleMouseEnter}
               onLeave={handleMouseLeave}
@@ -191,9 +219,11 @@ const AmtTree = () => {
         {(amt?.levelOneNode && amt?.levelOneNode.nickname!==amt?.target.nickname && amt?.levelOneNode.nickname!==amt?.parent.nickname) && (
           <HStack spacing={1} mb={5}>
             <ProfileAvatar
-                unHideUser={handleUnblockUser}
+                blockUser={handleUserBlock}
+                unblockUser={handleUserUnBlock}
+                unHideUser={handleUnhideUser}
                 isHost={ishost}
-                hideUser={blockUser}
+                hideUser={hideUser}
               ancestor={amt?.levelOneNode}
               onHover={handleMouseEnter}
               onLeave={handleMouseLeave}
@@ -216,9 +246,12 @@ const AmtTree = () => {
         {(amt?.parent) && (
           <HStack spacing={1} mb={5}>
             <ProfileAvatar
-                unHideUser={handleUnblockUser}
+                blockUser={handleUserBlock}
+                unblockUser={handleUserUnBlock}
+                isHidable={true}
+                unHideUser={handleUnhideUser}
                 isHost={ishost}
-                hideUser={blockUser}
+                hideUser={hideUser}
               ancestor={amt?.parent}
               onHover={handleMouseEnter}
               onLeave={handleMouseLeave}
@@ -229,9 +262,11 @@ const AmtTree = () => {
 
         <HStack spacing={1} mb={5}>
           <ProfileAvatar
-              unHideUser={handleUnblockUser}
+              blockUser={handleUserBlock}
+              unblockUser={handleUserUnBlock}
+              unHideUser={handleUnhideUser}
               isHost={ishost}
-              hideUser={blockUser}
+              hideUser={hideUser}
               isAmtOwner={true}
             ancestor={amt?.target || data}
             onHover={handleMouseEnter}
@@ -241,7 +276,9 @@ const AmtTree = () => {
         </HStack>
 
         {amt?.child.length !== 0 && (
-          <Box position="relative" mb={5} pr={isMobile ? 5 : 20}>
+          <Box
+              // position="relative"
+              mb={5} pr={isMobile ? 5 : 0}>
             <Flex
               overflowX="auto"
               whiteSpace="nowrap"
@@ -251,139 +288,176 @@ const AmtTree = () => {
                 },
                 scrollbarWidth: "none",
               }}
-              pr={"30px"}
+              // pr={"30px"}
               paddingY={1.5}
             >
               {amt?.child.map((ancestor, index) => (
                 <Box key={index} mr={5}>
                   <HStack spacing={1}>
                     <ProfileAvatar
-                        unHideUser={handleUnblockUser}
+                        blockUser={handleUserBlock}
+                        unblockUser={handleUserUnBlock}
+                        isHidable={true}
+                        unHideUser={handleUnhideUser}
                         isHost={ishost}
-                        hideUser={blockUser}
+                        hideUser={hideUser}
                       ancestor={ancestor}
                       onHover={handleMouseEnter}
                       onLeave={handleMouseLeave}
                       onClick={() => handleAvatarClick(ancestor)}
                     />
-                    {index === amt?.child.length - 1 && (
-                      <Text fontSize="md" fontWeight="bold" ml={3}>
-                        ...
-                      </Text>
-                    )}
+                    {/*{index === amt?.child.length - 1 && (*/}
+                    {/*  <Text fontSize="md" fontWeight="bold" ml={3}>*/}
+                    {/*    ...*/}
+                    {/*  </Text>*/}
+                    {/*)}*/}
                   </HStack>
                 </Box>
               ))}
             </Flex>
-            <Box
-              position="absolute"
-              top={0}
-              right={isMobile ? 0 : 20}
-              height="100%"
-              width="40px"
-              bgGradient="linear(to-l, rgba(255,255,255,0.7), transparent)"
-              display="flex"
-              alignItems="center"
-              justifyContent="center"
-              pointerEvents="none"
-              zIndex={1}
-            >
-              <Icon
-                ml={isMobile ? 5 : 20}
-                as={ChevronRightIcon}
-                boxSize={6}
-                color="gray.600"
-              />
-            </Box>
+            {/*<Box*/}
+            {/*  position="absolute"*/}
+            {/*  top={0}*/}
+            {/*  right={isMobile ? 0 : 20}*/}
+            {/*  height="100%"*/}
+            {/*  width="40px"*/}
+            {/*  bgGradient="linear(to-l, rgba(255,255,255,0.7), transparent)"*/}
+            {/*  display="flex"*/}
+            {/*  alignItems="center"*/}
+            {/*  justifyContent="center"*/}
+            {/*  pointerEvents="none"*/}
+            {/*  zIndex={1}*/}
+            {/*>*/}
+            {/*  <Icon*/}
+            {/*    ml={isMobile ? 5 : 20}*/}
+            {/*    as={ChevronRightIcon}*/}
+            {/*    boxSize={6}*/}
+            {/*    color="gray.600"*/}
+            {/*  />*/}
+            {/*</Box>*/}
           </Box>
         )}
 
-        {isbar && amt?.twoLevelChildCount ? (
-          <HStack spacing={4} onClick={() => setbar(false)} mb={5}>
+        {/*{isbar && amt?.twoLevelChildCount ? (*/}
+        {/*  <HStack spacing={4} onClick={() => setbar(false)} mb={5}>*/}
+        {/*    <Box*/}
+        {/*      bg="blackAlpha.800"*/}
+        {/*      height="30px"*/}
+        {/*      width={`${(amt.twoLevelChildCount / LIMIT()) * 100}%`}*/}
+        {/*      borderRightRadius="3xl"*/}
+        {/*      // position="relative"*/}
+        {/*    ></Box>*/}
+        {/*    <Text fontSize="sm" pr="1px">*/}
+        {/*      {amt?.twoLevelChildCount}*/}
+        {/*    </Text>*/}
+        {/*  </HStack>*/}
+        {/*) : (*/}
+        {
+          amt && amt?.totalChildCount>0 &&
             <Box
-              bg="blackAlpha.800"
-              height="30px"
-              width={`${(amt.twoLevelChildCount / LIMIT()) * 100}%`}
-              borderRightRadius="3xl"
-              position="relative"
-            ></Box>
-            <Text fontSize="sm" pr="1px">
-              {amt?.twoLevelChildCount}
-            </Text>
-          </HStack>
-        ) : (
-          <Box position="relative" mb={5} pr={isMobile ? 5 : 20}>
-            <Flex
-              overflowX="auto"
-              whiteSpace="nowrap"
-              sx={{
-                "::-webkit-scrollbar": {
-                  display: "none",
-                },
-                scrollbarWidth: "none",
-              }}
-              pr={"30px"}
-              paddingY={1.5}
-            >
-              {amt?.twoLevelChild.map((ancestor, index) => (
-                <Box key={index} mr={5}>
-                  <HStack spacing={1}>
-                    <ProfileAvatar
-                        unHideUser={handleUnblockUser}
-                        isHost={ishost}
-                        hideUser={blockUser}
-                      ancestor={ancestor}
-                      onHover={handleMouseEnter}
-                      onLeave={handleMouseLeave}
-                      onClick={() => handleAvatarClick(ancestor)}
-                    />
-                    {index === amt?.twoLevelChild.length - 1 && (
-                      <Text fontSize="md" fontWeight="bold" ml={3}>
-                        ...
-                      </Text>
-                    )}
-                  </HStack>
-                </Box>
-              ))}
-            </Flex>
+                // position="relative"
+                mb={5} pr={isMobile ? 5 : 0}>
+              <Flex
+                  overflowX="auto"
+                  whiteSpace="nowrap"
+                  sx={{
+                    "::-webkit-scrollbar": {
+                      display: "none",
+                    },
+                    scrollbarWidth: "none",
+                  }}
+                  // pr={"30px"}
+                  paddingY={1.5}
+              >
+                {amt?.twoLevelChild.map((ancestor, index) => (
+                    <Box key={index} mr={5}>
+                      <HStack spacing={1}>
+                        <ProfileAvatar
+                            blockUser={handleUserBlock}
+                            unblockUser={handleUserUnBlock}
+                            unHideUser={handleUnhideUser}
+                            isHost={ishost}
+                            hideUser={hideUser}
+                            ancestor={ancestor}
+                            onHover={handleMouseEnter}
+                            onLeave={handleMouseLeave}
+                            onClick={() => handleAvatarClick(ancestor)}
+                        />
+                        {/*{index === amt?.twoLevelChild.length - 1 && (*/}
+                        {/*  <Text fontSize="md" fontWeight="bold" ml={3}>*/}
+                        {/*    ...*/}
+                        {/*  </Text>*/}
+                        {/*)}*/}
+                      </HStack>
+                    </Box>
+                ))}
+              </Flex>
 
-            <Box
-              position="absolute"
-              top={0}
-              right={isMobile ? 0 : 20}
-              height="100%"
-              width="40px"
-              bgGradient="linear(to-l, rgba(255,255,255,0.7), transparent)"
-              display="flex"
-              alignItems="center"
-              justifyContent="center"
-              pointerEvents="none"
-              zIndex={1}
-            >
-              <Icon
-                ml={isMobile ? 5 : 20}
-                as={ChevronRightIcon}
-                boxSize={6}
-                color="gray.600"
-              />
+              {/*<Box*/}
+              {/*  position="absolute"*/}
+              {/*  top={0}*/}
+              {/*  right={isMobile ? 0 : 20}*/}
+              {/*  height="100%"*/}
+              {/*  width="40px"*/}
+              {/*  bgGradient="linear(to-l, rgba(255,255,255,0.7), transparent)"*/}
+              {/*  display="flex"*/}
+              {/*  alignItems="center"*/}
+              {/*  justifyContent="center"*/}
+              {/*  pointerEvents="none"*/}
+              {/*  zIndex={1}*/}
+              {/*>*/}
+              {/*  <Icon*/}
+              {/*    ml={isMobile ? 5 : 20}*/}
+              {/*    as={ChevronRightIcon}*/}
+              {/*    boxSize={6}*/}
+              {/*    color="gray.600"*/}
+              {/*  />*/}
+              {/*</Box>*/}
             </Box>
-          </Box>
-        )}
+        }
+        {/*)}*/}
 
         <Box
-          border={"1px solid"}
           borderColor={"gray.300"}
-          shadow="lg"
-          height={"150px"}
-          w={isMobile ? "100%" : "90%"}
+          height={"250px"}
+          // w={isMobile ? "100%" : "500px"}
           textAlign={"center"}
-          lineHeight={"150px"}
           borderRadius={"30px"}
+          position={"relative"}
+          padding={2}
+          overflow={"hidden"}
         >
-          {amt?.totalChildCount} 명이 초대받아 사용 중입니다.
+          <HStack flexWrap={"wrap"}>
+            {
+              [...new Array(65)].map(_ =>
+                  <Avatar
+                      border={"0.5px solid grey"}
+                      src={ `/images/profile.png` }
+                      size="md"
+                  />
+              )
+            }
+          </HStack>
+          <Flex
+              background={"linear-gradient(to bottom, rgba(255,255,255, 0.5) 50%, rgba(255,255,255, 0.9) 75%, rgba(255,255,255, 0.9) 90%, white 100% )"}
+              position={"absolute"}
+              left={0}
+              bottom={0}
+              w={"100%"}
+              h={"100%"}
+              alignItems={"end"}
+              justifyContent={"center"}
+          >
+            <Text
+                fontSize={20}
+                fontWeight={"bold"}
+                padding={5}
+            >
+              {amt?.totalChildCount} 명이 초대받아 사용 중입니다.
+            </Text>
+          </Flex>
         </Box>
 
-        {/* Hover Card */}
         {hoveredAncestor && !isMobile && (
           <Box
             position="absolute"
@@ -407,37 +481,46 @@ const AmtTree = () => {
               onMouseLeave={() => setIsHoveringCard(false)}
             >
               <VStack align="stretch" spacing={2} color="black">
-                <Heading size="sm" textAlign="center">
-                  {hoveredAncestor.nickname}
-                </Heading>
-                <Box border="1px dashed black" borderRadius="xl" p={4} h="100%">
-                  {isLoading ? (
-                    <Spinner size="sm" color="blue.500" />
-                  ) : (
-                    <UnorderedList>
-                      {cards && cards.length > 0 ? (
-                        cards.map((card) => (
-                          <ListItem key={card.id} display="flex">
-                            <Text
-                              as="span"
-                              fontWeight="bold"
-                              fontSize="sm"
-                              width="20%"
-                              mr={2}
-                            >
-                              {card.title}:
-                            </Text>
-                            <Text as="span" fontSize="sm">
-                              {card.content}
-                            </Text>
-                          </ListItem>
-                        ))
-                      ) : (
-                        <>명함이 등록되지 않은 사용자입니다.</>
-                      )}
-                    </UnorderedList>
-                  )}
-                </Box>
+                {
+                  hoveredAncestor.nickname==null ?
+                      <Box border="1px dashed black" borderRadius="xl" p={4} h="100%">
+                        조회할 수 없는 사용자 입니다.
+                      </Box> :
+                      <>
+                        <Heading size="sm" textAlign="center">
+                          {hoveredAncestor.nickname}
+                        </Heading>
+                        <Box border="1px dashed black" borderRadius="xl" p={4} h="100%">
+                          {isLoading ? (
+                              <Spinner size="sm" color="blue.500" />
+                          ) : (
+                              <UnorderedList>
+                                {cards && cards.length > 0 ? (
+                                    cards.map((card) => (
+                                        <ListItem key={card.id} display="flex">
+                                          <Text
+                                              as="span"
+                                              fontWeight="bold"
+                                              fontSize="sm"
+                                              width="20%"
+                                              mr={2}
+                                          >
+                                            {card.title}:
+                                          </Text>
+                                          <Text as="span" fontSize="sm">
+                                            {card.content}
+                                          </Text>
+                                        </ListItem>
+                                    ))
+                                ) : (
+                                    <>명함이 등록되지 않은 사용자입니다.</>
+                                )}
+                              </UnorderedList>
+                          )}
+                        </Box>
+                      </>
+
+                }
               </VStack>
             </Box>
           </Box>
@@ -484,7 +567,7 @@ const AmtTree = () => {
       {/*<UnblockUserModal*/}
       {/*  isOpen={isOpenBlock}*/}
       {/*  onClose={onCloseBlock}*/}
-      {/*  onConfirm={handleUnblockUser}*/}
+      {/*  onConfirm={handleUnhideUser}*/}
       {/*/>*/}
     </VStack>
   );

@@ -95,6 +95,7 @@ const MainContent: React.FC = () => {
         pb={isMobile ? 4 : 8}
         h={isMobile ? "auto" : "100%"}
         bg={isMobile ? "#F6F6F6" : "white"}
+          boxSizing={"content-box"}
           m={"0 auto"}
       >
         {isMobile ? (

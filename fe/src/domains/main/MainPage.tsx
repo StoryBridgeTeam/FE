@@ -14,22 +14,7 @@ const MainPage: React.FC = () => {
 
   return (
     <Flex minH="100vh" direction="column">
-      <LoginAppBar
-        field1="header.mypage"
-        field1OnClick={() => {
-          navigate("/mypage");
-        }}
-        field2="header.logout"
-        field2OnClick={() => {
-          logout();
-          showToast(
-            "logout.successTitle",
-            "logout.successDescription",
-            "success"
-          );
-        }}
-        isShowSearch={true}
-      />
+      <LoginAppBar isShowSearch={true} />
       <Flex
         mt={isMobile ? "50px" : "70px"}
         minH={isMobile ? "calc(100vh - 50px)" : "calc(100vh - 80px)"}

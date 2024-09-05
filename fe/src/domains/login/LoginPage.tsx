@@ -7,7 +7,7 @@ const LoginPage = () => {
 
   return (
     <Flex minH="100vh" align="center" direction="column">
-      <LoginAppBar field2="login.login" />
+      <LoginAppBar />
       <VStack
         mt={isMobile ? "50px" : "60px"}
         minH={isMobile ? "calc(100vh - 50px)" : "calc(100vh - 60px)"}
