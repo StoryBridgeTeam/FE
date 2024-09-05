@@ -6,23 +6,25 @@ import {
   Input,
   useBreakpointValue,
   InputGroup,
-  InputLeftElement, Avatar, IconButton, HStack,
+  InputLeftElement,
+  Avatar,
+  IconButton,
+  HStack,
 } from "@chakra-ui/react";
 import { FaRegBell, FaSearch } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { getNicknameToken } from "../utils/nickname";
 import { IoIosLogOut } from "react-icons/io";
-import {useAuthStore} from "../stores/AuthStore";
-import {useToastMessage} from "../hooks/useToastMessage";
+import { useAuthStore } from "../stores/AuthStore";
+import { useToastMessage } from "../hooks/useToastMessage";
+import SearchBar from "./search/SearchBar";
 
 interface LoginAppBarProps {
   isShowSearch?: boolean;
 }
 
-const LoginAppBar: React.FC<LoginAppBarProps> = ({
-  isShowSearch,
-}) => {
+const LoginAppBar: React.FC<LoginAppBarProps> = ({ isShowSearch }) => {
   const { t } = useTranslation();
   const isMobile = useBreakpointValue({ base: true, md: false });
   const appBarHeight = isMobile ? "50px" : "60px";
@@ -32,7 +34,7 @@ const LoginAppBar: React.FC<LoginAppBarProps> = ({
 
   const { showToast } = useToastMessage();
 
-  const {isAuthenticated, isTokenUser, profileImage, logout} = useAuthStore();
+  const { isAuthenticated, isTokenUser, profileImage, logout } = useAuthStore();
 
   const queryParams = new URLSearchParams(location.search);
   const token = queryParams.get("token");
@@ -63,99 +65,93 @@ const LoginAppBar: React.FC<LoginAppBarProps> = ({
       zIndex="1000"
       alignItems="center"
     >
-      <HStack alignItems={"center"} justifyContent={"space-between"} w={"100%"} maxW={"1400px"} m={"0 auto"}
-              boxSizing={"content-box"}
+      <HStack
+        alignItems={"center"}
+        justifyContent={"space-between"}
+        w={"100%"}
+        maxW={"1400px"}
+        m={"0 auto"}
+        boxSizing={"content-box"}
       >
         <Text
-            fontSize={isMobile ? "md" : "2xl"}
-            fontWeight="900"
-            align={"center"}
-            paddingLeft={isMobile ? "15px" : "20px"}
-            cursor={"pointer"}
-            onClick={handleNavigate}
+          fontSize={isMobile ? "md" : "2xl"}
+          fontWeight="900"
+          align={"center"}
+          paddingLeft={isMobile ? "15px" : "20px"}
+          cursor={"pointer"}
+          onClick={handleNavigate}
         >
           StoryBridge
         </Text>
         {isShowSearch && !isMobile && (
-            <Flex flex="1" justify="center" alignItems="center">
-              <InputGroup maxW="md">
-                <InputLeftElement
-                    height="100%"
-                    display="flex"
-                    alignItems="center"
-                    pointerEvents="none"
-                >
-                  <Box as={FaSearch} color="gray.600" />
-                </InputLeftElement>
-                <Input
-                    size="sm"
-                    bg="white"
-                    border="2px"
-                    borderColor="#CDCDCD"
-                    w="full"
-                    borderRadius="3xl"
-                />
-              </InputGroup>
-            </Flex>
+          <Flex flex="1" justify="center" alignItems="center" mr={20}>
+            <SearchBar isShowSearch={isShowSearch} />
+          </Flex>
         )}
         <Flex direction="row" alignItems="center" gap={3}>
           {isShowSearch && isMobile && (
-              <Text
-                  marginLeft={3}
-                  fontSize={isMobile ? "xs" : "md"}
-                  lineHeight={appBarHeight}
-                  fontWeight="400"
-                  cursor="pointer"
-                  onClick={() => {}}
-                  as={FaSearch}
-              ></Text>
+            <Text
+              marginLeft={3}
+              fontSize={isMobile ? "xs" : "md"}
+              lineHeight={appBarHeight}
+              fontWeight="400"
+              cursor="pointer"
+              onClick={() => {}}
+              as={FaSearch}
+            ></Text>
           )}
-          {!token && isAuthenticated && !isTokenUser &&(
-              <Avatar
-                  showBorder={true}
-                  border={"0.5px solid gray"}
-                  _hover={{cursor:"pointer"}}
-                  onClick={() => navigate(`/mypage`)}
-                  size={"sm"}
-                  src={
-                    profileImage
-                        ? `http://image.storyb.kr/${profileImage.path}`
-                        : `/images/profile.png`
-                  }
-              />
+          {!token && isAuthenticated && !isTokenUser && (
+            <Avatar
+              showBorder={true}
+              border={"0.5px solid gray"}
+              _hover={{ cursor: "pointer" }}
+              onClick={() => navigate(`/mypage`)}
+              size={"sm"}
+              src={
+                profileImage
+                  ? `http://image.storyb.kr/${profileImage.path}`
+                  : `/images/profile.png`
+              }
+            />
           )}
-          {!token && isAuthenticated && !isTokenUser &&(
-              <IconButton aria-label={"logout"} bgColor={"white"}  onClick={() => {
+          {!token && isAuthenticated && !isTokenUser && (
+            <IconButton
+              aria-label={"logout"}
+              bgColor={"white"}
+              onClick={() => {
                 logout();
                 showToast(
-                    "logout.successTitle",
-                    "logout.successDescription",
-                    "success"
+                  "logout.successTitle",
+                  "logout.successDescription",
+                  "success"
                 );
-              }}>
-                <IoIosLogOut fontSize={"24px"}/>
-              </IconButton>
+              }}
+            >
+              <IoIosLogOut fontSize={"24px"} />
+            </IconButton>
           )}
           {token && (
-              <Text
-                  marginLeft={3}
-                  fontSize={isMobile ? "xs" : "md"}
-                  lineHeight={appBarHeight}
-                  fontWeight="400"
-                  cursor="pointer"
-                  onClick={() => {
-                    const url = `/signup`;
-                    const searchParams = new URLSearchParams();
+            <Text
+              marginLeft={3}
+              fontSize={isMobile ? "xs" : "md"}
+              lineHeight={appBarHeight}
+              fontWeight="400"
+              cursor="pointer"
+              onClick={() => {
+                const url = `/signup`;
+                const searchParams = new URLSearchParams();
 
-                    if (token) {
-                      searchParams.append("token", token);
-                    }
+                if (token) {
+                  searchParams.append("token", token);
+                }
 
-                    navigate(`${url}?${searchParams.toString()}`, { replace: true });
-                  }}
-              >
-                {"회원가입"}
-              </Text>
+                navigate(`${url}?${searchParams.toString()}`, {
+                  replace: true,
+                });
+              }}
+            >
+              {"회원가입"}
+            </Text>
           )}
         </Flex>
       </HStack>
