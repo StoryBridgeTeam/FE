@@ -17,6 +17,7 @@ const CardInfoBox: React.FC<{
     onClick={onClick}
     cursor="pointer"
     h="100%"
+    minHeight="200px"
     _hover={{ bg: "gray.200" }}
   >
     {hasCard ? (

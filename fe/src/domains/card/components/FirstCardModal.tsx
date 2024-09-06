@@ -19,21 +19,28 @@ import ModalActionButtons from "./ModalActionButton";
 import CardModalList from "./CardModalList";
 import { use } from "i18next";
 import { Navigate, useNavigate, useParams } from "react-router-dom";
-import {useAuthStore} from "../../../common/stores/AuthStore";
-import {Simulate} from "react-dom/test-utils";
+import { useAuthStore } from "../../../common/stores/AuthStore";
+import { Simulate } from "react-dom/test-utils";
 import error = Simulate.error;
 
 //첫번째 카드생성을 위한 모달창
-const FirstCardModal: React.FC<FirstCardModalProps> = ({ nickName, useCardHook }) => {
+const FirstCardModal: React.FC<FirstCardModalProps> = ({
+  nickName,
+  useCardHook,
+}) => {
   const [isEditing, setIsEditing] = React.useState<boolean>(true);
   const [newEntries, setNewEntries] = React.useState<EntryState[]>([]);
   const isMobile = useBreakpointValue({ base: true, md: false });
-  const {nickName:localNickname} = useAuthStore();
+  const { nickName: localNickname } = useAuthStore();
   const isHost = localNickname === nickName;
   const navigate = useNavigate();
-  const handleSubmit = () => {
-    useCardHook.createNewCard(nickName, newEntries);
-    navigate(`/${localNickname}`);
+  const handleSubmit = async () => {
+    try {
+      await useCardHook.createNewCard(nickName, newEntries);
+      navigate(`/${localNickname}`);
+    } catch (error) {
+      console.error("카드 생성 중 오류가 발생했습니다:", error);
+    }
   };
 
   if (!isHost) {
@@ -88,7 +95,7 @@ const FirstCardModal: React.FC<FirstCardModalProps> = ({ nickName, useCardHook }
           color="white"
           width="30%"
           borderRadius="xl"
-          isDisabled={newEntries.length === 0}
+          isDisabled={newEntries.length === 0 || isEditing}
         >
           생성하기
         </Button>
