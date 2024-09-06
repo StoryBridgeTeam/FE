@@ -74,7 +74,7 @@ const SignupPage: React.FC = () => {
       <Box
         bg="white"
         p={8}
-        shadow={isMobile ? undefined : "xl"}
+        // shadow={isMobile ? undefined : "xl"}
         border={isMobile ? undefined : "1px"}
         borderColor={isMobile ? undefined : "#CDCDCD"}
         maxW="lg"

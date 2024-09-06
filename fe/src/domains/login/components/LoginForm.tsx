@@ -10,11 +10,13 @@ import { useLoginForm } from "../hooks/useLoginForm";
 import { useTranslation } from "react-i18next";
 import IdInput from "./IdInput";
 import PasswordInput from "./PasswordInput";
-import { SocialLogin } from "./SocailLogin";
+import {GoogleLoginButton, KaKaoLoginButton, NaverLoginButton, SocialLogin} from "./SocailLogin";
+import {useSocialLogin} from "../hooks/useSocialLogin";
 
 const LoginForm = () => {
   const isMobile = useBreakpointValue({ base: true, md: false });
   const { t } = useTranslation();
+  const useSocialHook = useSocialLogin();
 
   const {
     id,
@@ -68,7 +70,9 @@ const LoginForm = () => {
             {t(`login.rememberMe`)}
           </Checkbox>
           <hr />
-          <SocialLogin />
+          <KaKaoLoginButton/>
+          <NaverLoginButton/>
+          <GoogleLoginButton/>
         </Stack>
         <Text fontSize="xs" color="gray.500" mt={4} textAlign="center">
           By clicking continue, you agree to our Terms of Service and Privacy

@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import {useEffect, useState} from "react";
 import { useSignUpStore } from "../stores/SignUpStore";
 import { useStepsStore } from "../stores/StepsStore";
 import { useTranslation } from "react-i18next";
@@ -13,9 +13,18 @@ export const useNicknameForm = () => {
   const toast = useToast();
   const { handleSignUpComplete } = useSignUpComplete();
 
+  const [duplicated, setDuplicated] = useState(false);
+  const [validLength, setValidLength] = useState(false);
+
   const handleNicknameChange = (value: string) => {
     setNickname(value);
+    setValidLength(3<=value.length && value.length<=10);
   };
+
+  const checkDuplicated = async () => {
+    const duplicated = await isDuplicated();
+    setDuplicated(duplicated);
+  }
 
   const isDuplicated = async (): Promise<boolean> => {
     try {
@@ -53,9 +62,12 @@ export const useNicknameForm = () => {
 
   return {
     nickname,
+    duplicated,
+    validLength,
     handleNicknameChange,
     isDuplicated,
     isValidLength,
     checkNickname,
+    checkDuplicated,
   };
 };

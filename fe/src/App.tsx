@@ -17,6 +17,10 @@ import InfoMainPage from "./domains/info/page/InfoMainPage";
 import PolicyPage from "./domains/policy/PolicyPage";
 import CoverLetterDetailPage from "./domains/info/page/CoverLetterDetailPage";
 import CoverLetterEditPage from "./domains/info/page/CoverLetterEditPage";
+import OauthSignupPage from "./domains/signup/page/OauthSignupPage";
+import SignupInitialPage from "./domains/signup/page/SignupInitialPage";
+import OauthProcessingPage from "./domains/signup/page/OauthProcessingPage";
+import OauthSelectAccountPage from "./domains/signup/page/OauthSelectAccountPage";
 
 const theme = extendTheme({
   fonts: {
@@ -43,7 +47,11 @@ function App() {
     <ChakraProvider theme={theme}>
       <BrowserRouter>
         <Routes>
-          <Route path="/signup" element={<SignupPage />} />
+          <Route path="/oauth/processing" element={<OauthProcessingPage />}/>
+          <Route path="/signup/oauth/select" element={<OauthSelectAccountPage/> }/>
+          <Route path="/signup/oauth" element={<OauthSignupPage/> }/>
+          <Route path="/signup/storybridge" element={<SignupPage />} />
+          <Route path="/signup" element={<SignupInitialPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route
             path="/:nickName"

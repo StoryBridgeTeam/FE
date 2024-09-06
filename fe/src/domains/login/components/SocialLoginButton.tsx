@@ -1,27 +1,32 @@
-import { Box, Button, ButtonProps } from "@chakra-ui/react";
+import {Box, Button, ButtonProps, Heading, Link} from "@chakra-ui/react";
+import React from "react";
 
 interface SocialLoginButtonProps extends ButtonProps {
   icon: React.ElementType;
   text: string;
-  onClick?: () => void;
+  href:string
 }
 
 const SocialLoginButton = ({
   icon,
   text,
-  onClick,
+    href,
   ...props
 }: SocialLoginButtonProps) => (
-  <Button position="relative" onClick={onClick} {...props}>
-    <Box
-      as={icon}
-      position="absolute"
-      left="20px"
-      top="50%"
-      transform="translateY(-50%)"
-    />
-    {text}
-  </Button>
+    <Link w={"100%"} _hover={{}} href={href}>
+        <Box w={"100%"} padding={2.5} _hover={{cursor:"pointer"}} textAlign={"center"} position="relative" {...props} borderRadius={8}>
+            <Box
+                as={icon}
+                position="absolute"
+                left="20px"
+                top="50%"
+                transform="translateY(-50%)"
+            />
+            <Heading size={"sm"}>
+                {text}
+            </Heading>
+        </Box>
+    </Link>
 );
 
 export default SocialLoginButton;

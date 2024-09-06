@@ -84,6 +84,9 @@
     "submit": "확인"
   },
   "signup": {
+    "InitialPage": {
+      "title" : "회원가입 선택"
+    },
     "NextStepsButton": {
       "agree": "동의",
       "VerificationRequest": "인증요청",
