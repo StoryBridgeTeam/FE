@@ -8,7 +8,8 @@ const CardInfoBox: React.FC<{
   briefEntries: EntryState[];
   onClick: () => void;
   hasCard: boolean;
-}> = ({ briefEntries = [], onClick, hasCard }) => (
+  isHost: boolean;
+}> = ({ briefEntries = [], onClick, hasCard, isHost }) => (
   <Box
     border="1px dashed black"
     borderRadius="xl"
@@ -36,7 +37,9 @@ const CardInfoBox: React.FC<{
       )
     ) : (
       <Center w="100%" fontSize="2xl" color="gray.700">
-        명함카드를 만들어보세요!
+        {isHost
+          ? "명함카드를 만들어보세요!"
+          : "명함카드를 만들지 않은 사용자입니다"}
       </Center>
     )}
   </Box>
