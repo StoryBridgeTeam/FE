@@ -72,7 +72,6 @@ const OauthSignupPage = () => {
 
     const fetchInfo = async () => {
         const data = await fetchTempInfo(Number(oid), otoken);
-        console.log("============", data)
         setTempInfo(data);
     }
 
@@ -95,32 +94,35 @@ const OauthSignupPage = () => {
             borderRadius="3xl"
         >
             {token ? (
-                <VStack w={"100%"} justifyContent={"center"} alignItems={"center"} >
-                    <Heading size={"md"} mb={6}>{t("signup.InitialPage.title")}</Heading>
+                <VStack w={"100%"} justifyContent={"center"} alignItems={"center"}>
+                    <Heading size={"md"} mb={6}>회원정보입력</Heading>
+                    <HStack justifyContent={"start"} w={"100%"} >
+                        <Heading size={"sm"} mb={6}>*는 필수입력 항목입니다.</Heading>
+                    </HStack>
                     <VStack w={"100%"} gap={2}>
                         <HStack w={"100%"} gap={10}>
-                            <Heading width={"100%"} size={"sm"}>이름</Heading>
+                            <Heading width={"100%"} size={"sm"}>이름 *</Heading>
                             <FormControl>
                                 <Input width={"100%"} value={tempInfo?.name} size={"sm"} disabled={true}/>
                             </FormControl>
                         </HStack>
                         <HStack w={"100%"} gap={10}>
-                            <Heading width={"100%"} size={"sm"}>성별</Heading>
+                            <Heading width={"100%"} size={"sm"}>성별 *</Heading>
                             <Select placeholder='성별' w={"100%"} value={tempInfo?.gender} size={"sm"} disabled={true}>
                                 <option value='MALE'>남</option>
                                 <option value='FEMALE'>여</option>
                             </Select>
-                            <Heading width={"100%"} size={"sm"}>생년월일</Heading>
+                            <Heading width={"100%"} size={"sm"}>생년월일 *</Heading>
                             <Input width={"100%"} size={"sm"} value={tempInfo?.birthDate} disabled={true}/>
                         </HStack>
                         <HStack w={"100%"} gap={10}>
-                            <Heading width={"100%"} size={"sm"}>이메일</Heading>
+                            <Heading width={"100%"} size={"sm"}>이메일 *</Heading>
                             <FormControl>
                                 <Input width={"100%"} size={"sm"} value={tempInfo?.email} disabled={true}/>
                             </FormControl>
                         </HStack>
                         <HStack w={"100%"} gap={10}>
-                            <Heading width={"100%"} size={"sm"}>휴대폰번호</Heading>
+                            <Heading width={"100%"} size={"sm"}>휴대폰번호 *</Heading>
                             <FormControl>
                                 <Input width={"100%"} size={"sm"} value={tempInfo?.phoneNumber} disabled={true}/>
                             </FormControl>

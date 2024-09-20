@@ -31,7 +31,8 @@ const POIPage: React.FC = () => {
         <Box flex={1} />
         <Flex
           direction="column"
-          width={{ base: "100%", md: "60%" }}
+          // width={{ base: "100%", md: "60%" }}
+            w={"100%"}
           bg="white"
           p={4}
         >

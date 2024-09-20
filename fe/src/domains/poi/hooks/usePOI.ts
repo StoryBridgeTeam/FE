@@ -14,6 +14,7 @@ import axios from "axios";
 import { useToastMessage } from "../../../common/hooks/useToastMessage";
 import { set } from "date-fns";
 import {ImageRes} from "../../../common/hooks/useImage";
+import {VideoType} from "../../../common/api/videoAPI";
 
 // export interface ImageData {
 //   id: number;
@@ -28,6 +29,7 @@ export interface GETPOI {
   title: string;
   content: string;
   images: ImageRes[];
+  videos:VideoType[];
   index: number;
   createdAt?: string;
   updatedAt?: string | null;
@@ -38,6 +40,7 @@ export interface POI {
   title: string;
   content: string;
   images: number[];
+  videos:number[];
   index: number;
   createdAt?: string;
   updatedAt?: string | null;
@@ -81,7 +84,8 @@ interface UsePOIResult {
   addPOI: (
     title: string,
     content: string,
-    images: number[]
+    images: number[],
+    videos: number[]
   ) => Promise<void>;
   modifyPOI: (poiId: number, poiData: POI) => Promise<void>;
   removePOI: (poiId: number) => Promise<void>;
@@ -163,7 +167,8 @@ export const usePOI = (): UsePOIResult => {
   const addPOI = async (
     title: string,
     content: string,
-    images: number[]
+    images: number[],
+    videos:number[]
   ) => {
     setLoading(true);
     setError(null);
@@ -172,6 +177,7 @@ export const usePOI = (): UsePOIResult => {
         title,
         content,
         imageIds: images,
+        videoIds:videos
       });
     } catch (error) {
       setError("POI를 생성하는 중 오류가 발생했습니다.");

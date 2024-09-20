@@ -23,7 +23,6 @@ export interface useImageResponse{
 
 export const useImage = (initImages?:ImageRes[]) : useImageResponse => {
     const [images, setImages] = useState<ImageRes[]>(initImages!=null ? initImages : []);
-
     const [loading, setLoading] = useState<boolean>(false);
 
     const clearImage = () => {

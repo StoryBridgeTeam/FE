@@ -83,6 +83,7 @@ const MainContent: React.FC = () => {
       w="100%"
       h={isMobile ? "auto" : "90vh"}
       overflow={isMobile ? "auto" : "hidden"}
+      p={isMobile? 0 :10}
     >
       <Grid
           maxW={"1400px"}

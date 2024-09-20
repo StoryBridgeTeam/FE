@@ -222,7 +222,7 @@ const ProfileSidebar = ({nickname}:ProfileSidebarProps) => {
         // w={"100%"}
       p={5}
       alignItems="center"
-      bg="#F6F6F6"
+      // bg="#F6F6F6"
       spacing={4}
     >
       <Avatar

@@ -2,6 +2,61 @@ import axios from "axios";
 
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
+export const videoServerAxiosInstance = axios.create({
+    baseURL: process.env.REACT_APP_VIDEO_SERVER,
+    headers: {
+        "Content-Type": "application/json",
+    },
+})
+
+// videoServerAxiosInstance.interceptors.request.use(
+//     (config) => {
+//         const accessToken = localStorage.getItem("accessToken");
+//         if (accessToken) {
+//             config.headers["Authorization"] = `Bearer ${accessToken}`;
+//
+//             if(config.params && config.params.hasOwnProperty("token")){
+//                 delete config.params.token;
+//             }
+//         }
+//
+//
+//         return config;
+//     },
+//     (error) => {
+//         return Promise.reject(error);
+//     }
+// );
+
+export const llmAxiosInstance = axios.create({
+    baseURL: process.env.REACT_APP_LLM_SERVER,
+    headers: {
+        "Content-Type": "application/json",
+    },
+});
+
+llmAxiosInstance.interceptors.request.use(
+    (config) => {
+        const accessToken = localStorage.getItem("accessToken");
+        if (accessToken) {
+            config.headers["Authorization"] = `Bearer ${accessToken}`;
+
+            if(config.params && config.params.hasOwnProperty("token")){
+                delete config.params.token;
+            }
+        }
+
+        config.timeout = 100000;
+
+
+        return config;
+    },
+    (error) => {
+        return Promise.reject(error);
+    }
+);
+
+
 const axiosInstance = axios.create({
   baseURL: API_BASE_URL,
   headers: {

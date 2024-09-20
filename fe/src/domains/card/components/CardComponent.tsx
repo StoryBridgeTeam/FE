@@ -96,7 +96,7 @@ const CardComponent: React.FC = () => {
     <VStack
       bg="#F6F6F6"
       borderRadius="3xl"
-      h="100%"
+      h="auto"
       w="100%"
       overflow="hidden"
       p={5}

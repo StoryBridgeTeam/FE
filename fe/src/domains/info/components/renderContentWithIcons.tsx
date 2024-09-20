@@ -1,5 +1,8 @@
 import React from "react";
 import { BiMessageDetail } from "react-icons/bi";
+import ReactDOM from "react-dom/client";
+import {renderToStaticMarkup, renderToString} from "react-dom/server";
+import {textDecoration} from "@chakra-ui/react";
 
 export const renderContentWithIcons = (
   content: string,
@@ -43,6 +46,12 @@ export const renderContentWithIcons = (
           style={{
             cursor: "pointer",
             position: "relative",
+              background:"rgba(230,184,0,0.3)",
+              borderRadius:"3px"
+          }}
+          onClick={(e) => {
+              e.stopPropagation();
+              scrollToHighlightedText(comment.startIndex, comment.endIndex);
           }}
         >
           {content.substring(comment.startIndex, comment.endIndex)}
@@ -54,10 +63,6 @@ export const renderContentWithIcons = (
               top: "8%",
               transform: "translateY(-50%)",
               fontSize: "0.8em",
-            }}
-            onClick={(e) => {
-              e.stopPropagation();
-              scrollToHighlightedText(comment.startIndex, comment.endIndex);
             }}
           >
             <BiMessageDetail />
@@ -74,6 +79,7 @@ export const renderContentWithIcons = (
       <React.Fragment key="last">{content.substring(lastIndex)}</React.Fragment>
     );
   }
+
 
   return segments;
 };

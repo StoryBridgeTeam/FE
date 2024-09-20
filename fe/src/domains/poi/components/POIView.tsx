@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, {useEffect, useLayoutEffect, useRef, useState} from "react";
 import {
   Box,
   Text,
@@ -26,7 +26,7 @@ import {
   Modal,
   ModalOverlay,
   ModalContent,
-  ModalCloseButton,
+  ModalCloseButton, HStack,
 } from "@chakra-ui/react";
 import { FiMoreHorizontal, FiEdit, FiTrash2, FiLink } from "react-icons/fi";
 import { GETPOI, POI, usePOI } from "../hooks/usePOI";
@@ -42,9 +42,14 @@ import "slick-carousel/slick/slick-theme.css";
 import Slider from "react-slick";
 import {ImageRes} from "../../../common/hooks/useImage";
 import CommentPresenter from "../../../common/components/comment/CommentPresenter";
-import useComment from "../../../common/hooks/useComment";
+import useComment, {Comment} from "../../../common/hooks/useComment";
 import {createPOIComment, deleteComment, getPOIComments, linkPOICommentTag, updateComment} from "../api/poiAPI";
 import CommentInput from "../../../common/components/comment/CommentInput";
+import {VideoType} from "../../../common/api/videoAPI";
+import videojs from "video.js";
+import {use} from "i18next";
+import VideoPlayerEditor from "../../../common/components/video/VideoPlayerEditor";
+import VideoPlayer from "../../../common/components/video/VideoPlayer";
 
 interface POIViewProps {
   poiId: string | undefined;
@@ -82,11 +87,66 @@ const POIView: React.FC<POIViewProps> = ({ poiId }) => {
     targetId: Number(poiId), fetchCommentAPI:getPOIComments, editCommentAPI:updateComment, deleteCommentAPI:deleteComment,tagCommentAPI:linkPOICommentTag, createCommentAPI:createPOIComment, token
   });
 
+  const [video, setVideos] = useState<VideoType>();
+  const playerRef = useRef<any>(null);
+
+  useLayoutEffect(() => {
+    if (video) {
+      if (playerRef.current) {
+        const videoOptions = {
+          autoplay: false,
+          controls: true,
+          responsive: false,
+          playbackRates: [0.5, 0.75, 1, 1.25, 1.5],
+          controlBar: {
+            playToggle: true,
+            pictureInPictureToggle: false,
+            remainingTimeDisplay: true,
+            progressControl: true,
+            qualitySelector: true,
+
+            volumePanel: { inline: true },
+          },
+        };
+
+        const player = videojs(
+            playerRef.current,
+            videoOptions,
+            function onPlayerReady() {
+              console.log("Video Player is ready");
+            }
+        );
+
+        // player.poster(`${videoState?.video?.thumbnail?.fileUrl}`); //youtube thumbnail
+        player.src({
+          src : `${process.env.REACT_APP_VIDEO_SERVER}/resources/${video.path}`,
+          type: "application/x-mpegURL",
+        });
+
+        return () => {
+          if (player) {
+            player.dispose();
+          }
+        };
+      }
+    }
+  }, [video]);
+
   useEffect(() => {
     if (nickName && poiId) {
       if (token)
-        fetchPOI(Number(poiId), token).then((data) => setPoi(data));
-      else fetchPOI(Number(poiId)).then((data) => setPoi(data));
+        fetchPOI(Number(poiId), token).then((data) => {
+          setPoi(data)
+          if (data.videos.length>0){
+            setVideos(data.videos[0])
+          }
+        });
+      else fetchPOI(Number(poiId)).then((data) => {
+        setPoi(data)
+        if (data.videos.length>0){
+          setVideos(data.videos[0])
+        }
+      });
     }
   }, [nickName, poiId]);
 
@@ -114,15 +174,15 @@ const POIView: React.FC<POIViewProps> = ({ poiId }) => {
   }
 
   const scrollToHighlightedComment = (
-    startIndex?: number,
-    endIndex?: number
+      startIndex?: number,
+      endIndex?: number
   ) => {
     if (startIndex === undefined || endIndex === undefined) return;
 
-    const comment = comments.find(
-      (c) =>
-        c.tagInfo?.startIndex === startIndex &&
-        c.tagInfo?.lastIndex === endIndex
+    const comment = useCommentHook.comments.find(
+        (c) =>
+            c.tagInfo?.startIndex === startIndex &&
+            c.tagInfo?.lastIndex === endIndex
     );
     if (comment) {
       const elementId = `comment-${comment.id}`;
@@ -144,10 +204,10 @@ const POIView: React.FC<POIViewProps> = ({ poiId }) => {
     const highlightElements = document.querySelectorAll(`[id^='highlight-']`);
     highlightElements.forEach((element) => {
       const id = element.id.replace("highlight-", "");
-      const comment = comments.find((c) => c.id.toString() === id);
+      const comment = useCommentHook.comments.find((c) => c.id.toString() === id);
       if (
-        comment?.tagInfo?.startIndex === startIndex &&
-        comment?.tagInfo?.lastIndex === endIndex
+          comment?.tagInfo?.startIndex === startIndex &&
+          comment?.tagInfo?.lastIndex === endIndex
       ) {
         (element as HTMLElement).scrollIntoView({
           behavior: "smooth",
@@ -157,7 +217,7 @@ const POIView: React.FC<POIViewProps> = ({ poiId }) => {
     });
   };
 
-  const processedComments = comments.map((comment) => ({
+  const processedComments = (comments:Comment[]) => comments.map((comment) => ({
     id: comment.id,
     content: comment.content,
     startIndex: comment.tagInfo?.startIndex || 0,
@@ -165,8 +225,8 @@ const POIView: React.FC<POIViewProps> = ({ poiId }) => {
   }));
 
   return (
-    <>
-      <VStack spacing={4} align="stretch" p={6}>
+    <HStack w={"100%"} justifyContent={"center"}>
+      <VStack spacing={4} align="stretch" w={"100%"} maxW={{base:"100%", md:"900px"}} minW={{base:"400px", md:"700px"}} p={6}>
         <Box position="relative" w="100%">
           <Heading
             size="lg"
@@ -200,7 +260,7 @@ const POIView: React.FC<POIViewProps> = ({ poiId }) => {
                     justifyContent="flex-start"
                     size={isMobile ? "md" : "sm"}
                     leftIcon={<FiEdit />}
-                    onClick={() => navigate(`/${nickName}/poi/${poiId}/modify`)}
+                    onClick={() => navigate(`/${nickName}/poi/${poiId}/modify`, {state:{poi:poi}})}
                   >
                     편집
                   </Button>
@@ -260,13 +320,20 @@ const POIView: React.FC<POIViewProps> = ({ poiId }) => {
             </Slider>
           </Box>
         )}
-        <Box minHeight="300px" px={6}>
-          {renderContentWithIcons(
-            poi?.content || " ",
-            processedComments,
-            scrollToHighlightedComment
-          )}
-        </Box>
+        {
+          poi && poi.videos.length>0 &&
+            <VideoPlayer video={poi.videos[0]}/>
+        }
+        {
+          poi &&
+            <Text px={6} py={5} whiteSpace={"pre-line"}>
+              {renderContentWithIcons(
+                  poi.content,
+                  processedComments(useCommentHook.comments),
+                  scrollToHighlightedComment
+              )}
+            </Text>
+        }
         <Divider borderColor="#828282" borderWidth="1px" mt={5} />
         {/*{poiId && nickName && (*/}
         {/*  <CommentList*/}
@@ -278,7 +345,7 @@ const POIView: React.FC<POIViewProps> = ({ poiId }) => {
         <CommentInput commentHook={useCommentHook} />
         {
           poi &&
-            <CommentPresenter targetId={poi.id} targetContent={poi.content} isHost={isHost} highlightComment={scrollToHighlightedComment} useCommentHook={useCommentHook} />
+            <CommentPresenter targetId={poi.id} targetContent={poi.content} isHost={isHost} highlightComment={scrollToHighlightedText} useCommentHook={useCommentHook} />
         }
 
         <AlertDialog
@@ -328,7 +395,7 @@ const POIView: React.FC<POIViewProps> = ({ poiId }) => {
           )}
         </ModalContent>
       </Modal>
-    </>
+    </HStack>
   );
 };
 

@@ -21,6 +21,7 @@ import OauthSignupPage from "./domains/signup/page/OauthSignupPage";
 import SignupInitialPage from "./domains/signup/page/SignupInitialPage";
 import OauthProcessingPage from "./domains/signup/page/OauthProcessingPage";
 import OauthSelectAccountPage from "./domains/signup/page/OauthSelectAccountPage";
+import PayPolicyPage from "./common/page/PayPolicyPage";
 
 const theme = extendTheme({
   fonts: {
@@ -53,6 +54,7 @@ function App() {
           <Route path="/signup/storybridge" element={<SignupPage />} />
           <Route path="/signup" element={<SignupInitialPage />} />
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/pay-policy" element={<PayPolicyPage />} />
           <Route
             path="/:nickName"
             element={<PrivateRoute element={<MainPage />} />}

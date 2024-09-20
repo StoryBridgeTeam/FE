@@ -13,7 +13,7 @@ import {useTranslation} from "react-i18next";
 const MAX_TITLE_LENGTH = 50;
 
 const CoverLetterCreatePage = () => {
-    const {nickName} = useAuthStore();
+    const {nickName, checkAuth} = useAuthStore();
 
     const [title, setTitle] = useState<string>("");
     const [content, setContent] = useState<string>("");
@@ -27,6 +27,7 @@ const CoverLetterCreatePage = () => {
 
     const handleClickCreate = async () => {
         setLoading(true);
+
         await postCoverLetters(nickName, {title:title, content:content, imageIds:imageHook.images.map(i => i.id)})
         setLoading(false);
         showToast(

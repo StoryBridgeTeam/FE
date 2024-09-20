@@ -15,7 +15,7 @@ const POIItem: React.FC<POIItemProps> = ({ id, title, isMobile, onClick }) => (
     bg="white"
     color="black"
     h="7%"
-    shadow="md"
+    // shadow="md"
     borderRadius="5"
     onClick={() => onClick(id)}
     _hover={{ cursor: "pointer", bg: "gray.200" }}

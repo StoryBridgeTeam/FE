@@ -31,14 +31,16 @@ const SelfIntroductionBox: React.FC = () => {
       bg="white"
       border="1px solid"
       _hover={{ bg: "gray.200" }}
-      shadow="md"
-      borderRadius="3xl"
+      // shadow="md"
+      // borderRadius="3xl"
+        borderRadius="10px"
       display="flex"
       alignItems="center"
       justifyContent="center"
-      flex={1}
+      // flex={1}
       cursor="pointer"
-      maxHeight="300px"
+      // maxHeight="50px"
+        height={"250px"}
       onClick={handleClick}
     >
       {t("main.CardComponent.self-introduction")}

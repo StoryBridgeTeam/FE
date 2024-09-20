@@ -1,4 +1,4 @@
-import {Box, Flex, useBreakpointValue} from "@chakra-ui/react";
+import {Box, Divider, Flex, useBreakpointValue} from "@chakra-ui/react";
 import LoginAppBar from "../../common/components/LoginAppBar";
 import { useAuthStore } from "../../common/stores/AuthStore";
 import { useToastMessage } from "../../common/hooks/useToastMessage";
@@ -25,8 +25,11 @@ const InfoPageLayout = ({nickname, children}:InfoPageLayoutProps) => {
         mt={isMobile ? "50px" : "60px"}
         minH={isMobile ? "calc(100vh - 50px)" : "calc(100vh - 60px)"}
         direction={isMobile ? "column" : "row"}
+        mx={"auto"} maxW={"1400px"} w={"100%"}
       >
-          {isMobile ? undefined : <ProfileSidebar nickname={nickname} />}
+          {isMobile ? undefined :
+          <ProfileSidebar nickname={nickname} />
+          }
           <Box w={"100%"}>
               {children}
           </Box>

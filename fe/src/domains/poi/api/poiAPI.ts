@@ -12,6 +12,7 @@ interface POI {
   title: string;
   content: string;
   images: number[];
+  videos:number[]
   index: number;
   createdAt?: string;
 }
@@ -20,6 +21,7 @@ interface POSTPOI {
   title: string;
   content: string;
   imageIds: number[];
+  videoIds:number[]
 }
 
 export const getTitles = async (
@@ -75,6 +77,7 @@ export const updatePOI = async (poiId: number, poiData: POI) => {
     content: poiData.content,
     index: poiData.index,
     imageIds: poiData.images,
+    videoIds:poiData.videos,
     createdAt: poiData.createdAt,
     updatedAt: null,
   });

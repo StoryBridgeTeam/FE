@@ -15,7 +15,7 @@ import {
   ModalContent,
   ModalCloseButton,
   useDisclosure,
-  IconButton,
+  IconButton, HStack, useBreakpointValue, Center,
 } from "@chakra-ui/react";
 import {
   Navigate,
@@ -31,6 +31,17 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import Slider from "react-slick";
 import { carouselSettings } from "../../amt/utils/carouselSetting";
+import AiWritting from "./AiWritting";
+import {useAiWritting} from "../hooks/useAiWritting";
+import {AddIcon, EditIcon} from "@chakra-ui/icons";
+import ImageUploader from "../../../common/components/image/ImageUploader";
+import {useImage} from "../../../common/hooks/useImage";
+import { FaRegImage } from "react-icons/fa6";
+import { FaFileVideo } from "react-icons/fa6";
+import useVideo from "../../../common/hooks/useVideo";
+import VideoPlayerEditor from "../../../common/components/video/VideoPlayerEditor";
+
+
 
 interface ImageData {
   id: number;
@@ -53,7 +64,7 @@ const POICreate: React.FC = () => {
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const token = queryParams.get("token");
-  const [images, setImages] = useState<ImageData[]>([]);
+  const isMobile = useBreakpointValue({ base: true, md: false });
   const {
     isOpen: isModalOpen,
     onOpen: onModalOpen,
@@ -65,30 +76,36 @@ const POICreate: React.FC = () => {
     setTitle(newTitle);
   };
 
+  const useAiWrittingHook = useAiWritting();
+  const imageHook = useImage();
+  const videoHook = useVideo();
+
   const handleContentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setContent(e.target.value);
   };
+
+  useEffect(() => {
+    if(useAiWrittingHook.result!=null && useAiWrittingHook.result!=""){
+      setContent(prevState => prevState+"\n\n"+useAiWrittingHook.result)
+    }
+  }, [useAiWrittingHook.result]);
 
   const handleImageClick = (imgSrc: ImageData) => {
     setSelectedImage(imgSrc);
     onModalOpen();
   };
 
-  const handleDeleteImage = async (imageId: number) => {
-    setImages((prevImages) =>
-      prevImages.filter((image) => image.id !== imageId)
-    );
-    await deleteImage(imageId);
-  };
 
   const isButtonDisabled = title.trim() === "" || content.trim() === "";
 
   const handleCreatePOI = useCallback(async () => {
+    const videoIds = videoHook.video!=null ? [videoHook.video.id] : []
     try {
       await addPOI(
         title,
         content,
-        images.map((image) => image.id)
+        imageHook.images.map((image) => image.id),
+          videoIds
       );
       navigate(`/${localNickname}`);
       showToast("POI 생성 성공", "POI가 성공적으로 생성되었습니다.", "success");
@@ -98,29 +115,6 @@ const POICreate: React.FC = () => {
     }
   }, [localNickname, title, content, addPOI, navigate, showToast]);
 
-  const handleUpload = async () => {
-    try {
-      const input = document.createElement("input");
-      input.type = "file";
-      input.accept = "image/*";
-      input.onchange = async (event: any) => {
-        const file = event.target.files[0];
-        if (file) {
-          const formData = new FormData();
-          formData.append("file", file);
-
-          const uploadType = "POI";
-
-          const uploadedImage = await uploadImage(uploadType, formData);
-          setImages((prevImages) => [...prevImages, uploadedImage]);
-        }
-      };
-
-      input.click();
-    } catch (error) {
-      console.error("Image upload failed:", error);
-    }
-  };
 
   if (!isHost) {
     if (token) return <Navigate to={`/${nickName}?token=${token}`} replace />;
@@ -132,12 +126,24 @@ const POICreate: React.FC = () => {
   }
 
   return (
-    <>
-      <VStack spacing={4} align="stretch" p={6}>
-        <Flex w="full" justifyContent="flex-end" alignItems="center" mb={5}>
-          <Button onClick={handleUpload} mr={2}>
-            <File size={24} color="black" />
-          </Button>
+    <Flex w={"100%"} gap={10} justifyContent={isMobile ? "start" : "center"} alignItems={"center"} h={"100%"} direction={isMobile?"column":"row"}>
+      <AiWritting useAiWritting={useAiWrittingHook} imageHook={imageHook}/>
+      {
+        isMobile &&
+          <IconButton aria-label={"modal"} position={"fixed"} bottom={4} right={4} size={"lg"}
+                      isRound={true} colorScheme={"purple"}
+                      onClick={useAiWrittingHook.onOpen}
+                      icon={<EditIcon />}
+          />
+      }
+      <VStack spacing={4} align="stretch" gap={1} p={6} h={"100%"} minWidth={{base:"100%", md:"700px"}} maxW={{base:"100%", md:"900px"}}>
+        <Flex justifyContent={"right"}>
+          <IconButton aria-label={"add"}
+                      isDisabled={isButtonDisabled}
+                      onClick={handleCreatePOI}
+          >
+            <EditIcon />
+          </IconButton>
         </Flex>
         <Input
           placeholder="제목"
@@ -156,59 +162,37 @@ const POICreate: React.FC = () => {
           {title.length}/{MAX_TITLE_LENGTH}
         </Text>
         <Divider borderColor="#828282" borderWidth="1px" />
-        {images.length !== 0 && (
-          <Box w={"80%"} margin={"auto"} minH={"30vh"}>
-            <Slider {...carouselSettings}>
-              {images.map((imgSrc, index) => (
-                <Box key={index} position="relative">
-                  <IconButton
-                    aria-label="Delete image"
-                    icon={<X size={18} />}
-                    position="absolute"
-                    colorScheme="red"
-                    top="5px"
-                    right="5px"
-                    size="xs"
-                    zIndex={1}
-                    onClick={() => handleDeleteImage(imgSrc.id)}
-                  />
-
-                  <Flex h="30vh" justifyContent="center" alignItems="center">
-                    <Image
-                      src={`http://image.storyb.kr/${imgSrc.path}`}
-                      alt={imgSrc.name}
-                      display="block"
-                      maxH="30vh"
-                      maxW="100%"
-                      objectFit="contain"
-                      borderRadius="10px"
-                      onClick={() => handleImageClick(imgSrc)}
-                    />
-                  </Flex>
-                </Box>
-              ))}
-            </Slider>
-          </Box>
-        )}
+          <Flex borderBottom={"0.5px solid gray"} w={"100%"} h={"35px"}
+                justifyContent={"end"} alignItems={"center"}
+          >
+            <IconButton variant={"outlined"} isDisabled={videoHook.video!=null} size={"sm"} aria-label={"image-add"} onClick={() => videoHook.handleUpload("POI")}>
+              <FaFileVideo />
+            </IconButton>
+            <IconButton variant={"outlined"} size={"sm"} aria-label={"image-add"} onClick={() => imageHook.handleUploadImage("POI")}>
+              <FaRegImage />
+            </IconButton>
+          </Flex>
+          <VStack w={"100%"} justifyContent={"start"} position={"relative"} minH={"30px"}>
+          {
+              (imageHook.loading || videoHook.loading) && <Center w={"100%"} h={"100%"} position={"absolute"} bgColor={"rgba(219,219,219,0.5)"} zIndex={99} >
+                <Spinner  zIndex={999}/>
+              </Center>
+          }
+          {
+              imageHook.images.length>0 && <ImageUploader imageHook={imageHook} imageType={"POI"} isUploadable={false}/>
+          }
+          <VideoPlayerEditor videoHook={videoHook} />
+        </VStack>
         <Textarea
-          minHeight="550px"
+          minHeight="500px"
+          resize={"none"}
           placeholder="본문 내용을 작성해주세요"
           variant="unstyled"
           px={6}
           value={content}
           onChange={handleContentChange}
-          isDisabled={loading}
+          isDisabled={loading || imageHook.loading || videoHook.loading}
         />
-        <Box textAlign="center">
-          <Button
-            isDisabled={isButtonDisabled}
-            colorScheme="blue"
-            onClick={handleCreatePOI}
-            leftIcon={loading ? <Spinner size="sm" /> : undefined}
-          >
-            {loading ? "생성 중..." : "POI 생성"}
-          </Button>
-        </Box>
       </VStack>
 
       <Modal isOpen={isModalOpen} onClose={onModalClose}>
@@ -224,7 +208,7 @@ const POICreate: React.FC = () => {
           )}
         </ModalContent>
       </Modal>
-    </>
+    </Flex>
   );
 };
 

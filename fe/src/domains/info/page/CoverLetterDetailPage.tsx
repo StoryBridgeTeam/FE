@@ -186,16 +186,21 @@ const CoverLetterDetailPage = () => {
                         </Slider>
                         </Box>
                     }
-                <Text minHeight={"200px"} padding={3}>
-                    {
-                        coverLetterEntry &&
+                {
+                    coverLetterEntry &&
+                    <Text minHeight={"200px"} padding={3}
+                          whiteSpace={"pre-line"}
+
+                    >
+                        {
                         renderContentWithIcons(
-                            coverLetterEntry.content,
-                            processedComments(commentHook.comments),
-                            scrollToHighlightedComment
+                        coverLetterEntry.content,
+                        processedComments(commentHook.comments),
+                        scrollToHighlightedComment
                         )
                     }
-                </Text>
+                    </Text>
+                }
                 <CommentInput commentHook={commentHook} />
                 {
                     coverLetterEntry &&

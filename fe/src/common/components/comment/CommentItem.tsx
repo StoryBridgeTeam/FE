@@ -312,9 +312,9 @@ const ConnectModal = ({connectDisclosure, useComment, targetContent}:ConnectModa
             </>
         }
     >
-        <Box onMouseUp={handleMouseUp} onTouchEnd={handleTouchEnd}>
+        <Text whiteSpace={"pre-line"} onMouseUp={handleMouseUp} onTouchEnd={handleTouchEnd}>
             {renderContentWithHighlights(targetContent, useComment.comments)}
-        </Box>
+        </Text>
         {selectedText && (
             <Tag
                 mt={7}
