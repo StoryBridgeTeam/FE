@@ -1,10 +1,12 @@
 import create from "zustand";
+import {type} from "os";
 
 type region = "KR" | "OTHER";
 type gender = "MALE" | "FEMALE";
 type telCompany = "SKT" | "KT" | "LGU" | "SKT_MVNO" | "KT_MVNO" | "LGU_MVNO";
 
 interface SignUpState {
+  signupType:string,
   nickname: string;
   email: string;
   phoneNumber: string;
@@ -25,6 +27,7 @@ interface SignUpState {
   invitationToken: string;
   identityVerificationToken: string;
 
+  setSignupType: (signupType: string) => void;
   setNickname: (nickname: string) => void;
   setEmail: (email: string) => void;
   setPhoneNumber: (phoneNumber: string) => void;
@@ -43,6 +46,7 @@ interface SignUpState {
 }
 
 export const useSignUpStore = create<SignUpState>((set) => ({
+  signupType:"",
   nickname: "",
   email: "",
   phoneNumber: "",
@@ -63,6 +67,7 @@ export const useSignUpStore = create<SignUpState>((set) => ({
   invitationToken: "", //테스트용
   identityVerificationToken: "",
 
+  setSignupType : (signupType) => set({signupType}),
   setNickname: (nickname) => set({ nickname }),
   setEmail: (email) => set({ email }),
   setPhoneNumber: (phoneNumber) => set({ phoneNumber }),

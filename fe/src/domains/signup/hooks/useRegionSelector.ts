@@ -2,11 +2,12 @@ import { useSignUpStore } from "../stores/SignUpStore";
 import { useStepsStore } from "../stores/StepsStore";
 
 export const useRegionSelector = () => {
-  const { setRegion } = useSignUpStore();
+  const { setRegion, setSignupType } = useSignUpStore();
   const { nextStep } = useStepsStore();
 
   const handleSelectRegion = (type: "KR" | "OTHER") => {
-    setRegion(type);
+    setRegion("OTHER");
+    setSignupType(type==="KR" ? "phone" : "email")
     nextStep();
   };
 

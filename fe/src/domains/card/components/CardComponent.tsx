@@ -114,24 +114,20 @@ const CardComponent: React.FC = () => {
         p={4}
         boxSizing={"border-box"}
       >
-        <VStack align="stretch" spacing={2} color="black" flex={1} h={"100%"}>
+        <VStack align="stretch" spacing={2} color="black" flex={1} h={"100%"} position={"relative"} p={5}>
+          {isHost && (
+              <Button size="sm" bg="white" onClick={onInviteModalOpen} position={"absolute"} right={0} top={0}>
+                <Share size={20} color="black" />
+              </Button>
+          )}
           {hasCard && (
             <Flex alignItems="center" justifyContent="space-between">
-              <Box flex="1" />
               <Heading
-                fontSize={isMobile ? "md" : "xl"}
-                textAlign="center"
-                flex="2"
+                fontSize={isMobile ? "md" : "x-large"}
+                textAlign="left"
               >
                 {name}
               </Heading>
-              <Box flex="1" textAlign="right">
-                {isHost && (
-                  <Button size="sm" bg="white" onClick={onInviteModalOpen}>
-                    <Share size={20} color="black" />
-                  </Button>
-                )}
-              </Box>
             </Flex>
           )}
           <CardInfoBox

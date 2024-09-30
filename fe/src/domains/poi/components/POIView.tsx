@@ -288,15 +288,15 @@ const POIView: React.FC<POIViewProps> = ({ poiId }) => {
           )}
         </Box>
         <Divider borderColor="#828282" borderWidth="1px" mt={5} />
-        {poi?.updatedAt ? (
-          <Text fontSize="sm" color="gray.500" textAlign="left">
-            {formatTimestamp(poi?.updatedAt || "")} (수정됨)
-          </Text>
-        ) : (
-          <Text fontSize="sm" color="gray.500" textAlign="left">
-            {formatTimestamp(poi?.createdAt || "")} (생성됨)
-          </Text>
-        )}
+        {/*{poi?.updatedAt ? (*/}
+        {/*  <Text fontSize="sm" color="gray.500" textAlign="left">*/}
+        {/*    {formatTimestamp(poi?.updatedAt || "")} (수정됨)*/}
+        {/*  </Text>*/}
+        {/*) : (*/}
+        {/*  <Text fontSize="sm" color="gray.500" textAlign="left">*/}
+        {/*    {formatTimestamp(poi?.createdAt || "")} (생성됨)*/}
+        {/*  </Text>*/}
+        {/*)}*/}
 
         {poi?.images.length !== 0 && (
           <Box w={"80%"} margin={"auto"} minH={"30vh"} mb={12}>

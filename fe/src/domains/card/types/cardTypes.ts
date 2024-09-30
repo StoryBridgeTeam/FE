@@ -45,6 +45,7 @@ export interface ModalElementProps {
 }
 
 export interface CardModalListProps {
+  name?:string,
   isEditing: boolean;
   entries: EntryState[];
   setEntries: (entries: EntryState[]) => void;

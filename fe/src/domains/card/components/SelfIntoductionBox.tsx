@@ -40,7 +40,7 @@ const SelfIntroductionBox: React.FC = () => {
       // flex={1}
       cursor="pointer"
       // maxHeight="50px"
-        height={"250px"}
+        height={"100%"}
       onClick={handleClick}
     >
       {t("main.CardComponent.self-introduction")}

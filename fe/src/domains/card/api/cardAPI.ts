@@ -2,6 +2,8 @@ import axiosInstance from "../../../common/api/axiosInstance";
 import { EntryState } from "../types/cardTypes";
 import { prepareEntriesForAPI } from "../utils/apiUtils";
 import {CreateCommentAPI, DeleteCommentsAPI, FetchCommentsAPI, ModifyCommentsAPI} from "../../../common/api/ApiType";
+import axios from "axios";
+import {useNavigate} from "react-router-dom";
 
 export const getIsCreatedCard = async (nickname: string, token?: string) => {
   const response = await axiosInstance.get(
@@ -48,16 +50,17 @@ export const updateOriginalCardInfo = async (
   return response.data;
 };
 
+
 export const getPublicCardInfo = async (
   nickname: string,
   type: string,
   token?: string
 ) => {
-  console.log("nickname: ", nickname);
-  const response = await axiosInstance.get(`/members/${nickname}/public-card`, {
-    params: { type, token },
-  });
-  return response.data;
+    const response = await axiosInstance.get(`/members/${nickname}/public-card`, {
+      params: { type, token },
+    });
+
+    return response.data;
 };
 
 export const updatePublicCardInfo = async (

@@ -25,23 +25,29 @@ import { useLocation } from "react-router-dom";
 const SignupPage: React.FC = () => {
   const isMobile = useBreakpointValue({ base: true, md: false });
   const currentStep = useStepsStore((state) => state.step);
-  const region = useSignUpStore((state) => state.region);
-  const { setInvitationToken } = useSignUpStore();
+  // const region = useSignUpStore((state) => state.region);
+  const { setInvitationToken, signupType } = useSignUpStore();
   const { i18n } = useTranslation();
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const token = queryParams.get("token");
 
+  // useEffect(() => {
+  //   if (region === "KR") {
+  //     i18n.changeLanguage("ko");
+  //   } else {
+  //     i18n.changeLanguage("en");
+  //   }
+  //   if (token) {
+  //     setInvitationToken(token);
+  //   }
+  // }, [region, i18n]);
+
   useEffect(() => {
-    if (region === "KR") {
-      i18n.changeLanguage("ko");
-    } else {
-      i18n.changeLanguage("en");
-    }
     if (token) {
       setInvitationToken(token);
     }
-  }, [region, i18n]);
+  }, []);
 
   const renderStep = () => {
     switch (currentStep) {
@@ -50,7 +56,7 @@ const SignupPage: React.FC = () => {
       case 2:
         return <TermsAgreement />;
       case 3:
-        return region === "KR" ? (
+        return signupType === "phone" ? (
           <PhoneVerificationForm />
         ) : (
           <EmailVerificationForm />

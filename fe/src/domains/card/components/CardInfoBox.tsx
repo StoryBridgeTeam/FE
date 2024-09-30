@@ -1,6 +1,6 @@
 import React from "react";
 import { EntryState } from "../types/cardTypes";
-import { Box, Center, ListItem, UnorderedList, Text } from "@chakra-ui/react";
+import {Box, Center, ListItem, UnorderedList, Text, VStack} from "@chakra-ui/react";
 import CardInfoItem from "./CardInfoItem";
 
 // 메인페이지에서 보여지는 명함카드 정보
@@ -11,24 +11,23 @@ const CardInfoBox: React.FC<{
   isHost: boolean;
 }> = ({ briefEntries = [], onClick, hasCard, isHost }) => (
   <Box
-    border="1px dashed black"
-    borderRadius="xl"
-    p={4}
+      borderBottom={"2px solid gray"}
+    // borderRadius="xl"
     onClick={onClick}
     cursor="pointer"
-    // h="100%"
+      // _hover={{ bg: "gray.200" }}
     h="200px"
-    _hover={{ bg: "gray.200" }}
+    boxSizing={"border-box"}
+    pt={"40px"}
+    px={1}
   >
     {hasCard ? (
       briefEntries.length > 0 ? (
-        <UnorderedList styleType="disc">
-          {briefEntries.map((entry) => (
-            <ListItem key={entry.id}>
-              <CardInfoItem {...entry} />
-            </ListItem>
-          ))}
-        </UnorderedList>
+          <VStack gap={1} w={"100%"} alignItems={"start"}>
+              {briefEntries.map((entry) => (
+                    <CardInfoItem {...entry} />
+              ))}
+          </VStack>
       ) : (
         <Center w="100%" h="100%">
           <Text fontSize="2xl" color="gray.500">

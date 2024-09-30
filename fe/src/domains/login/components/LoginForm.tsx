@@ -4,7 +4,7 @@ import {
   Stack,
   Text,
   Checkbox,
-  useBreakpointValue,
+  useBreakpointValue, Tabs, TabList, Tab, TabPanels, TabPanel,
 } from "@chakra-ui/react";
 import { useLoginForm } from "../hooks/useLoginForm";
 import { useTranslation } from "react-i18next";
@@ -12,6 +12,7 @@ import IdInput from "./IdInput";
 import PasswordInput from "./PasswordInput";
 import {GoogleLoginButton, KaKaoLoginButton, NaverLoginButton, SocialLogin} from "./SocailLogin";
 import {useSocialLogin} from "../hooks/useSocialLogin";
+import React from "react";
 
 const LoginForm = () => {
   const isMobile = useBreakpointValue({ base: true, md: false });
@@ -28,6 +29,8 @@ const LoginForm = () => {
     handlePasswordChange,
     toggleRememberMe,
     onSubmit,
+    loginType,
+    setLoginType
   } = useLoginForm();
 
   return (
@@ -48,24 +51,35 @@ const LoginForm = () => {
         <Text fontSize="sm" fontWeight="400" mb={6} textAlign="center">
           {t(`login.info`)}
         </Text>
+        <Tabs isFitted variant={"enclosed"} mb={5} onChange={i => {
+            handleIdChange("")
+            handlePasswordChange("")
+            if(i==0) setLoginType("tel");
+            else setLoginType("email");
+        }}>
+          <TabList>
+            <Tab>전화번호 로그인</Tab>
+            <Tab>이메일 로그인</Tab>
+          </TabList>
+        </Tabs>
         <Stack spacing={4}>
-          <IdInput id={id} idError={idError} handleIdChange={handleIdChange} />
+          <IdInput id={id} idError={idError} handleIdChange={handleIdChange} type={loginType}/>
           <PasswordInput
-            password={password}
-            passwordError={passwordError}
-            handlePasswordChange={handlePasswordChange}
+              password={password}
+              passwordError={passwordError}
+              handlePasswordChange={handlePasswordChange}
           />
           <Button type="submit" bg="black" color="white">
             {t(`login.login`)}
           </Button>
           <Checkbox
-            colorScheme="gray"
-            isChecked={rememberMe}
-            onChange={toggleRememberMe}
-            marginLeft={3}
-            size="sm"
-            fontSize="xs"
-            color={"gray"}
+              colorScheme="gray"
+              isChecked={rememberMe}
+              onChange={toggleRememberMe}
+              marginLeft={3}
+              size="sm"
+              fontSize="xs"
+              color={"gray"}
           >
             {t(`login.rememberMe`)}
           </Checkbox>
@@ -82,5 +96,8 @@ const LoginForm = () => {
     </Box>
   );
 };
+
+const LoginInputs = () => {
+}
 
 export default LoginForm;

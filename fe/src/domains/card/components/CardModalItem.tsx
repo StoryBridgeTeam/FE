@@ -3,6 +3,7 @@ import { Trash } from "tabler-icons-react";
 import CardInfoItem from "./CardInfoItem";
 import { EntryState } from "../types/cardTypes";
 import {
+  Box,
   Button,
   Checkbox,
   Flex,
@@ -42,9 +43,9 @@ const CardModalItem: React.FC<CardModalItemProps> = ({
   };
 
   return (
-    <ListItem>
+    <Box>
       {isEditing ? (
-        <Flex alignItems="center">
+        <Flex alignItems="center" w={"100%"} justifyContent={"start"}>
           <Checkbox
             isChecked={entry.isVisibleBriefCard}
             onChange={handleVisibilityChange}
@@ -84,7 +85,7 @@ const CardModalItem: React.FC<CardModalItemProps> = ({
           )}
         </Flex>
       )}
-    </ListItem>
+    </Box>
   );
 };
 

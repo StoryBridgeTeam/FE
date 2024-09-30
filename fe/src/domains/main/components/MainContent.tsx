@@ -81,9 +81,9 @@ const MainContent: React.FC = () => {
   return (
     <Box
       w="100%"
-      h={isMobile ? "auto" : "90vh"}
+      // h={isMobile ? "auto" : "100%"}
+        paddingBottom={10}
       overflow={isMobile ? "auto" : "hidden"}
-      p={isMobile? 0 :10}
     >
       <Grid
           maxW={"1400px"}

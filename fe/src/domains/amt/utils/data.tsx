@@ -4,6 +4,7 @@ import {milliseconds} from "date-fns";
 import React, {LegacyRef, useEffect, useRef, useState} from "react";
 import {NotAllowedIcon, ViewOffIcon} from "@chakra-ui/icons";
 import {useAuthStore} from "../../../common/stores/AuthStore";
+import {useNavigate} from "react-router-dom";
 
 export interface Card {
     id: number;
@@ -38,6 +39,7 @@ export const ProfileAvatar = ({
                               }: ProfileAvatarProps) => {
     const dropDownRef = useRef<HTMLDivElement>(null);
     const [isOpen, setIsOpen] = useState(false);
+    const navigate = useNavigate();
 
     const {isTokenUser} = useAuthStore();
 
@@ -122,6 +124,9 @@ export const ProfileAvatar = ({
                             setIsOpen(false);
                         }}>차단해제</MenuItem>
                     }
+                    <MenuItem fontSize={14} onClick={() => {
+                        navigate('/chat', {state:{targetId:ancestor.memberId}})
+                    }}>채팅</MenuItem>
                 </MenuList>
             }
         </Menu>

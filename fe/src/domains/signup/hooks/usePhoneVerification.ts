@@ -61,20 +61,20 @@ export const usePhoneVerification = () => {
 
   const handleSendRequestPhone = async () => {
     // 인증코드 발송 API 호출, 이후 setVerificationCode에 저장
-    try {
-      const response = await requestPhoneVerification({
-        phoneNumber,
-        name,
-        telCompany: telecom,
-        birth,
-        gender,
-      });
-      setVerificationCode(response.data.identityVerificationId);
+    // try {
+    //   const response = await requestPhoneVerification({
+    //     phoneNumber,
+    //     name,
+    //     telCompany: telecom,
+    //     birth,
+    //     gender,
+    //   });
+    //   setVerificationCode(response.data.identityVerificationId);
       nextStep();
-    } catch (error) {
-      console.log("Error:", error);
-      //에어로직 따로 추가하기
-    }
+    // } catch (error) {
+    //   console.log("Error:", error);
+    //   //에어로직 따로 추가하기
+    // }
   };
 
   const isInputValid = (): boolean => {

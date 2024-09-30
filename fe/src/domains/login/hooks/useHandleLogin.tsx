@@ -13,10 +13,11 @@ export const useHandleLogin = () => {
     refreshToken: string,
     rememberMe: boolean,
     nickname: string,
+    memberId:number,
     profileImage:ImageRes
   ) => {
     try {
-      login(accessToken, refreshToken, rememberMe, nickname, profileImage);
+      login(accessToken, refreshToken, rememberMe, nickname, memberId, profileImage);
       showToast("login.successTitle", "login.successDescription", "success");
       navigate(`/${nickname}`, { replace: true });
     } catch (error) {

@@ -1,5 +1,5 @@
 import React from "react";
-import { Text, Link } from "@chakra-ui/react";
+import {Text, Link, Box} from "@chakra-ui/react";
 import { EntryState } from "../types/cardTypes";
 
 const urlRegex =
@@ -10,9 +10,9 @@ const CardInfoItem: React.FC<EntryState> = ({ title, content }) => {
   const isUrl = urlRegex.test(content);
 
   return (
-    <>
-      <Text as="span" fontWeight="bold" fontSize="sm" mr={2}>
-        {title}:
+    <Box>
+      <Text as="span" fontWeight="bold" fontSize="md" mr={2}>
+        {title}.
       </Text>
       {isUrl ? (
         <Link
@@ -28,7 +28,7 @@ const CardInfoItem: React.FC<EntryState> = ({ title, content }) => {
           {content}
         </Text>
       )}
-    </>
+    </Box>
   );
 };
 

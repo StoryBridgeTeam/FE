@@ -30,13 +30,14 @@ const OauthProcessingPage = () => {
     }, []);
 
     const handleLogin = async () => {
-        const {accessToken, refreshToken, nickname, profileImage} = await loginOauth(atoken);
+        const {accessToken, refreshToken, nickname, memberId, profileImage} = await loginOauth(atoken);
 
         await login(
             accessToken,
             refreshToken,
             false,
             nickname,
+            memberId,
             profileImage
         );
 

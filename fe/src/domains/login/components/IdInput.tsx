@@ -6,28 +6,20 @@ interface IdInputProps {
   id: string;
   idError: string | null;
   handleIdChange: (value: string) => void;
+  type:string
 }
 
-const IdInput: React.FC<IdInputProps> = ({ id, idError, handleIdChange }) => {
+const IdInput: React.FC<IdInputProps> = ({ id, idError, handleIdChange, type}) => {
   const { t, i18n } = useTranslation();
-
-  const determineInputType = () => {
-    return i18n.language === "ko" ? "tel" : "email";
-  };
-
-  const determineAutocomplete = () => {
-    return i18n.language === "ko" ? "tel" : "username";
-  };
 
   return (
     <>
       <Input
-        type={determineInputType()}
-        placeholder={t(`login.id`)}
+        type={type}
+        placeholder={type=="tel" ? t(`login.id.tel`) : t('login.id.email')}
         value={id}
         onChange={(e) => handleIdChange(e.target.value)}
         isInvalid={!!idError}
-        autoComplete={determineAutocomplete()}
       />
       {idError && (
         <Text fontSize="sm" color="red.500">

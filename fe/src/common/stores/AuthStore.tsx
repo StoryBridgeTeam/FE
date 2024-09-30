@@ -7,6 +7,7 @@ interface AuthState {
     isTokenUser: boolean;
     accessToken: string | null;
     refreshToken: string | null;
+    memberId : number | null,
     nickName: string;
     profileImage: ImageRes | null,
     login: (
@@ -14,6 +15,7 @@ interface AuthState {
         refreshToken: string,
         rememberMe: boolean,
         nickName: string,
+        memberId:number,
         profileImage: ImageRes
     ) => void;
     logout: () => void;
@@ -85,6 +87,7 @@ export const useAuthStore = create(persist<AuthState>((set) => ({
         isTokenUser: false,
         accessToken: null,
         refreshToken: null,
+        memberId:null,
         nickName: "",
         profileImage: null,
         login: (
@@ -92,12 +95,13 @@ export const useAuthStore = create(persist<AuthState>((set) => ({
             refreshToken: string,
             rememberMe: boolean,
             nickName: string,
+            memberId : number,
             profileImage: ImageRes
         ) => {
             localStorage.setItem("accessToken", accessToken);
             localStorage.setItem("refreshToken", refreshToken);
             localStorage.setItem("nickName", nickName);
-            set({isAuthenticated: true, accessToken, refreshToken, nickName, profileImage});
+            set({isAuthenticated: true, accessToken, refreshToken, nickName, profileImage, memberId});
         },
         logout: () => {
             localStorage.removeItem("accessToken");

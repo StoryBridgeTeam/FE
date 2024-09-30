@@ -1,6 +1,7 @@
 import {ImageRes} from "../../../common/hooks/useImage";
 
 export interface DataNode {
+  memberId : number,
   nickname: string;
   profileImage?: ImageRes;
   isHide: boolean,
@@ -21,6 +22,7 @@ export interface Data {
 }
 
 export const data: DataNode = {
+  memberId : -1,
   nickname: "nickname",
   profileImage: undefined,
   isBlocked: false,

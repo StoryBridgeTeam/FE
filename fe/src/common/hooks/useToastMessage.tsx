@@ -1,7 +1,8 @@
-import { useToast } from "@chakra-ui/react";
+import {useBreakpointValue, useToast} from "@chakra-ui/react";
 import { useTranslation } from "react-i18next";
 
 export const useToastMessage = () => {
+  const isMobile = useBreakpointValue({ base: true, md: false });
   const toast = useToast();
   const { t } = useTranslation();
 
@@ -16,6 +17,7 @@ export const useToastMessage = () => {
       status,
       duration: 1500,
       isClosable: true,
+      position: isMobile ? "top" : "bottom"
     });
   };
 

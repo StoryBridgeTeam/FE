@@ -20,6 +20,8 @@ export const useLoginForm = () => {
   const { showToast } = useToastMessage();
   const { loginUser } = useLoginUser();
 
+  const [loginType, setLoginType] = useState<string>("tel");
+
   const [values, setValues] = useState<LoginFormValues>({
     id: "",
     password: "",
@@ -32,7 +34,7 @@ export const useLoginForm = () => {
   });
 
   const handleIdChange = (value: string) => {
-    if (i18n.language === "ko") {
+    if (loginType === "tel") {
       let formattedNumber = value.replace(/[^0-9]/g, "");
       if (formattedNumber.length > 3) {
         formattedNumber = `${formattedNumber.slice(
@@ -74,7 +76,7 @@ export const useLoginForm = () => {
 
   const validateId = () => {
     const { id } = values;
-    if (i18n.language === "ko") {
+    if (loginType === "tel") {
       const phoneRegex = /^010-[0-9]{4}-[0-9]{4}$/;
       if (!phoneRegex.test(id)) {
         setErrors((prev) => ({
@@ -136,7 +138,7 @@ export const useLoginForm = () => {
     }
 
     const formattedId =
-      i18n.language === "ko"
+      loginType=="tel"
         ? formatPhoneNumberWithoutHyphens(values.id)
         : values.id;
 
@@ -149,12 +151,13 @@ export const useLoginForm = () => {
 
       try {
         if (response && response.accessToken && response.refreshToken) {
-          const { accessToken, refreshToken, nickname, profileImage } = response;
+          const { accessToken, refreshToken, nickname, memberId, profileImage } = response;
           await handleLogin(
             accessToken,
             refreshToken,
             values.rememberMe,
             nickname,
+            memberId,
             profileImage
           );
         }
@@ -170,6 +173,8 @@ export const useLoginForm = () => {
     rememberMe: values.rememberMe,
     idError: errors.idError,
     passwordError: errors.passwordError,
+    loginType,
+    setLoginType,
     handleIdChange,
     handlePasswordChange,
     toggleRememberMe,

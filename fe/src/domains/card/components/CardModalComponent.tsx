@@ -113,12 +113,6 @@ const CardModalComponent: React.FC<CardViewProps> = ({
             <CardTypeToggle cardType={cardType} onToggle={handleToggle} />
           </Box>
         )}
-
-        <Box flex="1" textAlign="center">
-          <Text fontSize={isMobile ? "xl" : "4xl"} fontWeight="bold">
-            {name}
-          </Text>
-        </Box>
         {isHost && (
           <Box ml={14} mr={6}>
             <Share onClick={onInviteModalOpen} cursor="pointer" />
@@ -147,7 +141,7 @@ const CardModalComponent: React.FC<CardViewProps> = ({
         mx={{ base: 0, md: 4 }}
         mt={4}
         mb={12}
-        border={{ base: 0, md: "1px dashed black" }}
+        border={{ base: 0, md: "0.5px solid gray" }}
       >
         {isHost ? (
           <ModalActionButtons
@@ -162,6 +156,7 @@ const CardModalComponent: React.FC<CardViewProps> = ({
           <Box mb={10} />
         )}
         <CardModalList
+          name={name}
           isEditing={isEditing}
           entries={entries}
           setEntries={setEntries}

@@ -68,10 +68,11 @@ const CommentInput = ({commentHook}:CommentInputProps) =>{
     }
 
     return <Box
-        position={isMobile ? "absolute" : "relative"}
+        position={isMobile ? "fixed" : "relative"}
         bottom={0}
         left={0}
         width="100%"
+        zIndex={10}
         bg="white"
         border="1px solid #EEEEEE"
         p={isMobile ? 2 : 2}

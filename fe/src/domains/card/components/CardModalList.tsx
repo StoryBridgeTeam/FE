@@ -1,5 +1,5 @@
 import React from "react";
-import { UnorderedList, Flex, Box, Text } from "@chakra-ui/react";
+import {UnorderedList, Flex, Box, Text, VStack} from "@chakra-ui/react";
 import {
   DragDropContext,
   Droppable,
@@ -11,6 +11,7 @@ import CardModalItem from "./CardModalItem";
 import { GripVertical } from "tabler-icons-react";
 
 const CardModalList: React.FC<CardModalListProps> = ({
+    name,
   isEditing,
   entries = [],
   setEntries,
@@ -114,15 +115,11 @@ const CardModalList: React.FC<CardModalListProps> = ({
           </Droppable>
         </DragDropContext>
       ) : (
-        <Box px={10}>
-          <UnorderedList
-            styleType="disc"
-            px={{ base: 0, md: 8 }}
-            pb={{ base: 0, md: 10 }}
-            spacing={2}
-            maxHeight="400px"
-            overflowY="auto"
-          >
+        <Box px={10} paddingBottom={10} paddingTop={5}>
+          <Text fontSize={"2xl"} fontWeight="bold">
+            {name}
+          </Text>
+          <VStack px={1} gap={1} w={"100%"} alignItems={"start"} paddingY={10} borderBottom={"2px solid gray"}>
             {entries.map((entry) => (
               <CardModalItem
                 key={
@@ -136,7 +133,7 @@ const CardModalList: React.FC<CardModalListProps> = ({
                 onDeleteEntry={handleEntryDelete}
               />
             ))}
-          </UnorderedList>
+          </VStack>
         </Box>
       )}
     </>

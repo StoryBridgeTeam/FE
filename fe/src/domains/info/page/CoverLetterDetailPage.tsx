@@ -1,4 +1,5 @@
 import {
+    Accordion, AccordionButton, AccordionIcon, AccordionItem, AccordionPanel,
     Box,
     Button,
     Divider,
@@ -201,16 +202,36 @@ const CoverLetterDetailPage = () => {
                     }
                     </Text>
                 }
-                <CommentInput commentHook={commentHook} />
-                {
-                    coverLetterEntry &&
-                    <CommentPresenter targetId={coverLetterEntry.id}
-                                      targetContent={coverLetterEntry.content}
-                                      isHost={isHost}
-                                      highlightComment={scrollToHighlightedText}
-                                      useCommentHook={commentHook}
-                    />
-                }
+                <Accordion allowToggle>
+                    <AccordionItem>
+                        {
+                            ({isExpanded}) => (
+                                <>
+                                    <AccordionButton>
+                                        <Box>
+                                            {
+                                                isExpanded ? "댓글 접기" : "댓글 보기"
+                                            }
+                                        </Box>
+                                        <AccordionIcon />
+                                    </AccordionButton>
+                                    <AccordionPanel>
+                                        <CommentInput commentHook={commentHook} />
+                                        {
+                                            coverLetterEntry &&
+                                            <CommentPresenter targetId={coverLetterEntry.id}
+                                                              targetContent={coverLetterEntry.content}
+                                                              isHost={isHost}
+                                                              highlightComment={scrollToHighlightedText}
+                                                              useCommentHook={commentHook}
+                                            />
+                                        }
+                                    </AccordionPanel>
+                                </>
+                            )
+                        }
+                    </AccordionItem>
+                </Accordion>
             </Box>
         </VStack>
 

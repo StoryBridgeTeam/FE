@@ -1,4 +1,4 @@
-import { Box, Stack, Text, Input, Select, InputGroup } from "@chakra-ui/react";
+import {Box, Stack, Text, Input, Select, InputGroup, FormLabel} from "@chakra-ui/react";
 import { useTranslation } from "react-i18next";
 import { usePhoneVerification } from "../hooks/usePhoneVerification";
 import InputMask from "react-input-mask";
@@ -28,14 +28,17 @@ const PhoneVerificationForm = () => {
 
   return (
     <Box>
-      <Text fontSize="xl" fontWeight="800" mt={6} mb={14} textAlign="left">
+      <Text fontSize="xl" fontWeight="800" mt={6} textAlign="left">
         인증을 위한 정보를 입력해주세요
+      </Text>
+      <Text fontSize="sm" mb={10} textAlign="left">
+        * 표시된 사항은 필수입니다.
       </Text>
       <Stack spacing={10} mt={4} mb={6}>
         <InputGroup>
+          <FormLabel>*</FormLabel>
           <Select
             ml="2"
-            width="30%"
             value={isNational.toString()}
             variant="flushed"
             onChange={(e) => handleNationChange(e.target.value === "true")}
@@ -43,24 +46,11 @@ const PhoneVerificationForm = () => {
             <option value="true">내국인</option>
             <option value="false">외국인</option>
           </Select>
-          <Input
-            ml="2"
-            isInvalid={name !== "" && !isInputNameValid()}
-            variant="flushed"
-            borderColor="gray.300"
-            placeholder="성명"
-            value={name}
-            onChange={(e) => handleNameChange(e.target.value)}
-          />
-        </InputGroup>
-
-        <InputGroup>
           <Select
-            ml="2"
-            width="30%"
-            value={gender}
-            variant="flushed"
-            onChange={(e) => handleGenderChange(e.target.value as gender)}
+              ml="2"
+              value={gender}
+              variant="flushed"
+              onChange={(e) => handleGenderChange(e.target.value as gender)}
           >
             <option value="" disabled style={{ color: "gray" }}>
               성별
@@ -68,21 +58,36 @@ const PhoneVerificationForm = () => {
             <option value="MALE">남성</option>
             <option value="FEMALE">여성</option>
           </Select>
+        </InputGroup>
+        <InputGroup>
+          <FormLabel>*</FormLabel>
           <Input
-            ml="2"
-            isInvalid={birth !== "" && !isInputDateValid()}
-            variant="flushed"
-            borderColor="gray.300"
-            placeholder="생년월일 8자리"
-            as={InputMask}
-            mask="99999999"
-            maskChar={null}
-            value={birth}
-            onChange={(e) => handleBirthDateChange(e.target.value)}
+              ml="2"
+              isInvalid={name !== "" && !isInputNameValid()}
+              variant="flushed"
+              borderColor="gray.300"
+              placeholder="성명"
+              value={name}
+              onChange={(e) => handleNameChange(e.target.value)}
           />
         </InputGroup>
-
         <InputGroup>
+          <FormLabel>*</FormLabel>
+          <Input
+              ml="2"
+              isInvalid={birth !== "" && !isInputDateValid()}
+              variant="flushed"
+              borderColor="gray.300"
+              placeholder="생년월일 8자리"
+              as={InputMask}
+              mask="99999999"
+              maskChar={null}
+              value={birth}
+              onChange={(e) => handleBirthDateChange(e.target.value)}
+          />
+        </InputGroup>
+        <InputGroup>
+          <FormLabel>*</FormLabel>
           <Select
             ml="2"
             width="30%"
