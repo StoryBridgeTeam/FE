@@ -40,6 +40,7 @@ export const ProfileAvatar = ({
     const dropDownRef = useRef<HTMLDivElement>(null);
     const [isOpen, setIsOpen] = useState(false);
     const navigate = useNavigate();
+    const nickname = localStorage.getItem("nickName");
 
     const {isTokenUser} = useAuthStore();
 
@@ -94,7 +95,7 @@ export const ProfileAvatar = ({
         <Menu isOpen={isOpen}>
             <MenuButton position={"relative"} left={-6} top={-1}></MenuButton>
             {
-                !isTokenUser &&
+                !isTokenUser && nickname!=ancestor.nickname &&
                 <MenuList bg={"white"} zIndex={999}>
                     {
                         isHost && !ancestor.isHide && isHidable &&

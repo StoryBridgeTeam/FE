@@ -72,7 +72,7 @@ const MainContent: React.FC = () => {
   const gridTemplateRows = useMemo(() => {
     if (!isMobile) return "2fr 1fr";
     return mobileLayout
-      .map((section) => (section.area.startsWith("ad") ? "auto" : "400px"))
+      .map((section) => (section.area.startsWith("ad") ? "auto" : "auto"))
       .join(" ");
   }, [isMobile, mobileLayout]);
 

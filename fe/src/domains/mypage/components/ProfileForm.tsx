@@ -9,7 +9,7 @@ import {
   Flex,
   Text,
   Divider,
-  useBreakpointValue,
+  useBreakpointValue, Center, Spinner, Avatar,
 } from "@chakra-ui/react";
 import useProfileForm from "../hook/useProfileForm";
 import EmailVerificationModal from "./EmailVertificationModal";
@@ -23,6 +23,7 @@ const ProfileForm: React.FC = () => {
     requestVerification,
     saveNickname,
     savePassword,
+    loading
   } = useProfileForm();
 
   const isMobile = useBreakpointValue({ base: true, md: false });
@@ -37,7 +38,14 @@ const ProfileForm: React.FC = () => {
         height={"auto"}
         ml={isMobile ? undefined : "30px"}
         direction={"column"}
+        position={"relative"}
       >
+        {
+            loading &&
+            <Center bgColor={"#dbdbdb"} left={0} top={0} borderRadius={"30px"} opacity={0.5} w={"100%"} h={"100%"} position={"absolute"} zIndex={9999}>
+              <Spinner zIndex={9999}/>
+            </Center>
+        }
         <VStack align="stretch" spacing={4} w="full">
           <FormControl>
             <Flex m={"10px"} w={"100%"} direction={isMobile ? "column" : "row"}>
@@ -45,18 +53,16 @@ const ProfileForm: React.FC = () => {
                 이미지
               </Text>
               {image ? (
-                <Image
-                  src={`http://image.storyb.kr/${image}`}
-                  boxSize="200px"
-                  borderRadius="full"
+                <Avatar
+                    showBorder={true}
+                    border={"0.5px solid #dbdbdb"}
+                  src={`${process.env.REACT_APP_IMAGE_SERVER}/${image}`}
+                  size={"2xl"}
                 />
               ) : (
-                <Image
+                <Avatar
                   src={"/images/profile.png"}
-                  border={"1px solid"}
-                  borderColor={"gray.200"}
-                  boxSize="200px"
-                  borderRadius="full"
+                  size={"2xl"}
                 />
               )}
               <Flex flex={"1"} alignItems={"end"} justifyContent={"right"}>

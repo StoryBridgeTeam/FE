@@ -33,14 +33,6 @@ const ChatRoomList = ({useChatHook}: { useChatHook: UseChatReturn }) => {
         }
     }
 
-    const getLastMsg = (roomId : number) => {
-        if(roomMsgMap && roomMsgMap.hasOwnProperty(roomId)){
-            return roomMsgMap[roomId].sort().reverse()[0].message;
-        }else{
-            return "";
-        }
-    }
-
     return <Box w={"100%"} h={"100%"}>
         <Box h={"60px"}>
             <Heading p={3} size={"md"}>채팅</Heading>
@@ -48,7 +40,7 @@ const ChatRoomList = ({useChatHook}: { useChatHook: UseChatReturn }) => {
         <VStack w={"100%"} h={"calc(100% - 60px)"} gap={2} px={1} overflowY={"auto"}>
             {
                 useChatHook.chatRooms.map(r => (
-                    <ChatRoomRow selected={r.id===useChatHook.currentChatRoom?.id} name={r.name} msg={getLastMsg(r.id)} unReadCount={countUnReadMsg(r.id)}  profile={r.profile}
+                    <ChatRoomRow selected={r.id===useChatHook.currentChatRoom?.id} name={r.name} msg={r.lastMsg} unReadCount={countUnReadMsg(r.id)}  profile={r.profile}
                                  handleOnClick={e => useChatHook.handleSetCurrentChatRoom(r)}/>
                 ))
             }

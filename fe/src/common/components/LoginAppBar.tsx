@@ -9,7 +9,7 @@ import {
     InputLeftElement,
     Avatar,
     IconButton,
-    HStack, AvatarBadge,
+    HStack, AvatarBadge, useToast,
 } from "@chakra-ui/react";
 import {FaRegBell, FaSearch} from "react-icons/fa";
 import {useTranslation} from "react-i18next";
@@ -22,6 +22,7 @@ import SearchBar from "./search/SearchBar";
 import { IoChatboxOutline } from "react-icons/io5";
 import {ChatAlarmStore} from "../../domains/chat/store/GlobalChatStore";
 import {useChatAlarmToast} from "../../domains/chat/hook/useChatAlarmToast";
+import {useErrorStore} from "../stores/ErrorStore";
 
 interface LoginAppBarProps {
     isShowSearch?: boolean;
@@ -52,6 +53,20 @@ const LoginAppBar: React.FC<LoginAppBarProps> = ({isShowSearch}) => {
             consumeAlarmMsg();
         }
     }, [unAlarmMessage]);
+
+    const toast = useToast();
+    const errorStore = useErrorStore();
+
+    useEffect(() => {
+        if(errorStore.hasError){
+            errorStore.consumeError();
+            toast({title:"사용자 차단", description:"해당 사용자의 정보를 조회할 수 없습니다.", status:"error",
+                duration: 1500,
+                isClosable: true,
+            })
+            navigate("/")
+        }
+    }, [errorStore.hasError]);
 
     const handleNavigate = () => {
         if (token) {

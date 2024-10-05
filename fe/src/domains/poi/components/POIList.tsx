@@ -140,61 +140,91 @@ const POIList: React.FC = () => {
             borderRadius="3xl"
             h="100%"
             w="100%"
-            minWidth={"200px"}
-            maxWidth={"330px"}
+            // minWidth={"200px"}
+            // maxWidth={"330px"}
             overflow="hidden"
-            p={2}
+            p={4}
             color="#CDCDCD"
             border={isMobile ? "" : "1px solid"}
+            gap={3}
         >
             {ishost && (
                 <AddButton isMobile={isMobile as boolean} onClick={handleCreatePOI}/>
             )}
-            <DragDropContext onDragEnd={handleDragEnd}>
-                <Droppable droppableId={"poi-list"}>
-                    {(provided) => (
-                        <Box h="100%" overflowY="auto" css={scrollbarStyle}
-                             ref={provided.innerRef}
-                             {...provided.droppableProps}
-                        >
-                            {pois.length === 0 ? (
-                                <Center h="80%">
-                                    <Text color={"gray.500"}>{t("POI 목록이 비어 있습니다.")}</Text>
-                                </Center>
-                            ) : (
-                                <>
-                                    {pois.map((item) => (
-                                        <Draggable
-                                            key={item.id?.toString()}
-                                            draggableId={item.id?.toString() || ""}
-                                            index={item.index}>
-                                            {
-                                                (provided) => (
-                                                    <Box
-                                                        ref={provided.innerRef}
-                                                        {...provided.draggableProps}
-                                                        {...provided.dragHandleProps}
-                                                    >
-                                                        <POIItem
-                                                            // ref={provided.innerRef}
-                                                            key={item.id?.toString()}
-                                                            id={item.id as number}
-                                                            title={item.title}
-                                                            isMobile={isMobile as boolean}
-                                                            onClick={handleGetPOI}
-                                                        />
-                                                    </Box>
-                                                )
-                                            }
-                                        </Draggable>
-                                    ))}
-                                    {provided.placeholder}
-                                </>
+            {
+                ishost ?
+                    <DragDropContext onDragEnd={handleDragEnd}>
+                        <Droppable droppableId={"poi-list"}>
+                            {(provided) => (
+                                <Box h="100%" overflowY="auto" css={scrollbarStyle}
+                                     ref={provided.innerRef}
+                                     {...provided.droppableProps}
+                                     w={"100%"}
+                                >
+                                    {pois.length === 0 ? (
+                                        <Center h="80%">
+                                            <Text color={"gray.500"}>{t("POI 목록이 비어 있습니다.")}</Text>
+                                        </Center>
+                                    ) : (
+                                        <VStack
+                                            h="100%"
+                                            width="100%"
+                                            gap={3}
+                                        >
+                                            {pois.map((item) => (
+                                                <Draggable
+                                                    key={item.id?.toString()}
+                                                    draggableId={item.id?.toString() || ""}
+                                                    index={item.index}>
+                                                    {
+                                                        (provided) => (
+                                                            <Box
+                                                                w={"100%"}
+                                                                ref={provided.innerRef}
+                                                                {...provided.draggableProps}
+                                                                {...provided.dragHandleProps}
+                                                            >
+                                                                <POIItem
+                                                                    // ref={provided.innerRef}
+                                                                    key={item.id?.toString()}
+                                                                    id={item.id as number}
+                                                                    title={item.title}
+                                                                    isMobile={isMobile as boolean}
+                                                                    onClick={handleGetPOI}
+                                                                />
+                                                            </Box>
+                                                        )
+                                                    }
+                                                </Draggable>
+                                            ))}
+                                            {provided.placeholder}
+                                        </VStack>
+                                    )}
+                                </Box>
                             )}
-                        </Box>
-                    )}
-                </Droppable>
-            </DragDropContext>
+                        </Droppable>
+                    </DragDropContext> :
+                    <>
+                        {pois.length === 0 ? (
+                            <Center h="80%">
+                                <Text color={"gray.500"}>{t("POI 목록이 비어 있습니다.")}</Text>
+                            </Center>
+                        ) : (
+                            <>
+                                {pois.map((item) => (
+                                        <POIItem
+                                            // ref={provided.innerRef}
+                                            key={item.id?.toString()}
+                                            id={item.id as number}
+                                            title={item.title}
+                                            isMobile={isMobile as boolean}
+                                            onClick={handleGetPOI}
+                                        />
+                                ))}
+                            </>
+                        )}
+                    </>
+            }
             {!isLastPage && (
                 <Center>
                     <Button

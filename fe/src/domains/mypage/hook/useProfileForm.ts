@@ -8,6 +8,8 @@ import {
   uploadProfile,
 } from "../api/MyPageAPI";
 import { uploadImage } from "../../../common/api/imageAPI";
+import {useAuthStore} from "../../../common/stores/AuthStore";
+import {set} from "date-fns";
 
 const useProfileForm = () => {
   const toast = useToast();
@@ -20,6 +22,10 @@ const useProfileForm = () => {
   });
 
   const [image, setImage] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(false);
+
+  const {setProfileImage} = useAuthStore()
+
   const fetchProfile = async () => {
     try {
       const data = await getMyPageInfo();
@@ -45,7 +51,9 @@ const useProfileForm = () => {
   };
 
   useEffect(() => {
+    setLoading(true);
     fetchProfile();
+    setLoading(false);
   }, [toast]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -53,6 +61,7 @@ const useProfileForm = () => {
   };
 
   const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    setLoading(true);
     const file = e.target.files ? e.target.files[0] : null;
     if (file) {
       const formData = new FormData();
@@ -62,8 +71,10 @@ const useProfileForm = () => {
 
       const uploadedImage = await uploadImage(uploadType, formData);
       await uploadProfile(uploadedImage.id);
+      setProfileImage(uploadedImage);
       fetchProfile();
     }
+    setLoading(false);
   };
 
   const validatePassword = () => {
@@ -170,6 +181,7 @@ const useProfileForm = () => {
     requestVerification,
     saveNickname,
     savePassword,
+    loading
   };
 };
 

@@ -1,5 +1,6 @@
 import axiosInstance from "../../../common/api/axiosInstance";
 import {data} from "../../amt/utils/atmUtils";
+import axios from "axios";
 
 export const getCoverLetterEntry = async (id:number, token?:string|null) => {
     try{
@@ -34,8 +35,14 @@ export const getCoverLetters = async (nickname: string, token?: string) => {
     );
     return response.data.data;
   } catch (error) {
-    console.error("Failed to fetch cover letters:", error);
-    throw error;
+      if(axios.isCancel(error)){
+          console.log("========asdfasdfasd=======")
+          return {id:-1, entries:[]}
+      }else{
+          console.log("========asdfasdfasd222222222222222=======", error)
+          console.error("Failed to fetch cover letters:", error);
+          throw error;
+      }
   }
 };
 

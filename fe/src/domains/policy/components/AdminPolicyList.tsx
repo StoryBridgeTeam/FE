@@ -9,12 +9,12 @@ import {
   Flex,
   Spinner,
 } from "@chakra-ui/react";
-import usePolicy from "../hook/usePolicy";
+import useAdminPolicy from "../hook/useAdminPolicy";
 import { useTranslation } from "react-i18next";
 
-const PolicyList: React.FC = () => {
+const AdminPolicyList: React.FC = () => {
   const { loading, policies, isAdmin, handleValueChange, saveEditedPolicy } =
-    usePolicy();
+    useAdminPolicy();
   const isMobile = useBreakpointValue({ base: true, md: false });
   const { t } = useTranslation();
 
@@ -33,8 +33,8 @@ const PolicyList: React.FC = () => {
           color={isAdmin ? "black" : "red"}
         >
           {isAdmin
-            ? t("policy.PolicyList.pageTitle")
-            : t("policy.PolicyList.wrongAccess")}
+            ? t("policy.AdminPolicyList.pageTitle")
+            : t("policy.AdminPolicyList.wrongAccess")}
         </Text>
         {isAdmin &&
           policies.map((policy) => {
@@ -71,4 +71,4 @@ const PolicyList: React.FC = () => {
   );
 };
 
-export default PolicyList;
+export default AdminPolicyList;

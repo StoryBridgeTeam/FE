@@ -9,10 +9,11 @@ import ProfileSidebar from "./components/ProfileSideBar";
 
 interface InfoPageLayoutProps{
     nickname : string,
+    showProfile ?: boolean,
     children : React.ReactNode
 }
 
-const InfoPageLayout = ({nickname, children}:InfoPageLayoutProps) => {
+const InfoPageLayout = ({nickname, showProfile=true,  children}:InfoPageLayoutProps) => {
   const isMobile = useBreakpointValue({ base: true, md: false });
   const logout = useAuthStore((state) => state.logout);
   const { showToast } = useToastMessage();
@@ -27,10 +28,14 @@ const InfoPageLayout = ({nickname, children}:InfoPageLayoutProps) => {
         direction={isMobile ? "column" : "row"}
         mx={"auto"} maxW={"1400px"} w={"100%"}
       >
-          {isMobile ? undefined :
-          <ProfileSidebar nickname={nickname} />
+          {
+              showProfile &&
+              <ProfileSidebar nickname={nickname} />
           }
-          <Box w={"100%"}>
+          <Box>
+              <Divider orientation={"vertical"}/>
+          </Box>
+          <Box w={"100%"} >
               {children}
           </Box>
       </Flex>

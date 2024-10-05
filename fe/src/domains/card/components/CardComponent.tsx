@@ -17,6 +17,13 @@ import CardInfoBox from "./CardInfoBox";
 import SelfIntroductionBox from "./SelfIntoductionBox";
 import { Share } from "tabler-icons-react";
 import InviteModal from "../../../common/components/InviteModal";
+import {getCoverLetters} from "../../info/api/InfoAPI";
+
+export interface CoverLetter {
+  id: number;
+  title: string;
+  content: string;
+}
 
 //명함카드 영역 컴포넌트
 const CardComponent: React.FC = () => {
@@ -40,6 +47,8 @@ const CardComponent: React.FC = () => {
     onOpen: onInviteModalOpen,
     onClose: onInviteModalClose,
   } = useDisclosure();
+
+  const [coverLetter, setCoverLetter] = useState<CoverLetter[]>([]);
 
   useEffect(() => {
     if (nickName) {
@@ -70,8 +79,39 @@ const CardComponent: React.FC = () => {
           }
         });
       }
+
     }
   }, [nickName, token]);
+
+  useEffect(() => {
+    fetchCoverData();
+  }, [])
+
+  const fetchCoverData = async () => {
+    try {
+      // setLoading(true);
+      let entries;
+
+      if (token) {
+        const response = await getCoverLetters(nickName!, token);
+        entries = response.entries;
+      } else {
+        const response = await getCoverLetters(nickName!);
+        entries = response.entries;
+      }
+
+      if (entries.content === null) {
+        setCoverLetter([]);
+      } else {
+        setCoverLetter(entries.content);
+      }
+    } catch (error) {
+      // console.error("cover error:", error);
+      setCoverLetter([]);
+    } finally {
+      // setLoading(false);
+    }
+  };
 
   const handleClick = () => {
     const url = `/${nickName}/card`;
@@ -100,8 +140,7 @@ const CardComponent: React.FC = () => {
       w="100%"
       overflow="hidden"
       p={5}
-      color="#CDCDCD"
-      border={isMobile ? "none" : "1px solid"}
+      border={isMobile ? "none" : "1px solid #cdcdcd"}
       spacing={5}
       minWidth={"300px"}
     >
@@ -110,7 +149,7 @@ const CardComponent: React.FC = () => {
         bg={"white"}
         height={"auto"}
         borderRadius={"3xl"}
-        shadow={"md"}
+        // shadow={"md"}
         p={4}
         boxSizing={"border-box"}
       >
@@ -138,7 +177,7 @@ const CardComponent: React.FC = () => {
           />
         </VStack>
       </Box>
-      <SelfIntroductionBox />
+      <SelfIntroductionBox coverLetters={coverLetter}/>
       {isInviteModalOpen && (
         <InviteModal isOpen={isInviteModalOpen} onClose={onInviteModalClose} />
       )}

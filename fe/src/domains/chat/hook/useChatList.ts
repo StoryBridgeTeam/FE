@@ -49,7 +49,7 @@ const useChatList = () => {
 
                 const curResult = {
                     id: curChatRoom.roomId,
-                    lastMsg: "안녕하세요..",
+                    lastMsg: curChatRoom.lastMsg,
                     name: otherInfo.name,
                     profile: otherInfo.profileImage
                 }
@@ -76,7 +76,7 @@ const useChatList = () => {
 
             setCurrentChatRoom({
                 id: chatRoom.roomId,
-                lastMsg: "안녕하세요..",
+                lastMsg: chatRoom.lastMsg,
                 name: otherInfo.name,
                 profile: otherInfo.profileImage
             });

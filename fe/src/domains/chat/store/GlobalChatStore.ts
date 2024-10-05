@@ -6,6 +6,7 @@ interface ChatAlarmState{
     unReadMessages : ChatMessageType[] | [],
     unAlarmMessage : ChatMessageType | null,
     addMessage : (msg : ChatMessageType) => void,
+    initBulkMessage : (msg : ChatMessageType[]) => void,
     addBulkMessage : (msg : ChatMessageType[]) => void,
     consumeAlarmMsg : () => void,
     readMessage : (roomId : number) => void
@@ -16,6 +17,7 @@ export const ChatAlarmStore = create<ChatAlarmState>((set) => ({
     unReadMessages : [],
     unAlarmMessage : null,
     addMessage : (msg:ChatMessageType) => {set(prev => ({unReadMessages:[...prev.unReadMessages, msg], unAlarmMessage:msg}))},
+    initBulkMessage : (msg:ChatMessageType[]) => {set(prev => ({unReadMessages:[...msg], unAlarmMessage:msg.sort().reverse()[0]}))},
     addBulkMessage : (msg:ChatMessageType[]) => {set(prev => ({unReadMessages:[...prev.unReadMessages, ...msg], unAlarmMessage:msg.sort().reverse()[0]}))},
     consumeAlarmMsg : () => { set(prev => ({unAlarmMessage:null}))},
     readMessage : (roomId:number) => {set(prev => {

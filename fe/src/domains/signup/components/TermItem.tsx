@@ -1,34 +1,35 @@
-import { Box, IconButton } from "@chakra-ui/react";
+import {Box, IconButton, Link} from "@chakra-ui/react";
 import { MdOutlineArrowForwardIos } from "react-icons/md";
 import CheckboxStyled from "./CheckboxStyled";
 
 interface TermItemProps {
   isChecked: boolean;
-  hasDetail: boolean;
   onChange: () => void;
-  children: string;
+  hasDetail : boolean,
+    title:string,
+  detailPath?:string
 }
 
 const TermItem = ({
   isChecked,
   onChange,
   hasDetail,
-  children,
+    title,
+    detailPath
 }: TermItemProps) => {
   return (
     <Box display="flex" alignItems="center">
       <CheckboxStyled isChecked={isChecked} onChange={onChange}>
-        {children}
+        {title}
       </CheckboxStyled>
-      {hasDetail && (
-        <IconButton
-          size="xs"
-          ml="auto"
-          aria-label="View Terms"
-          icon={<MdOutlineArrowForwardIos />}
-          variant="ghost"
-        ></IconButton>
-      )}
+        {
+            hasDetail && detailPath &&
+            <Link href={detailPath} isExternal>
+              <IconButton aria-label={"detail"} bgColor={"white"}>
+                <MdOutlineArrowForwardIos />
+              </IconButton>
+            </Link>
+        }
     </Box>
   );
 };

@@ -1,6 +1,7 @@
 import {create} from "zustand";
 import {ImageRes} from "../hooks/useImage";
 import {persist} from "zustand/middleware";
+import {set} from "date-fns";
 
 interface AuthState {
     isAuthenticated: boolean;
@@ -10,6 +11,7 @@ interface AuthState {
     memberId : number | null,
     nickName: string;
     profileImage: ImageRes | null,
+    setProfileImage:(image:ImageRes) => void,
     login: (
         accessToken: string,
         refreshToken: string,
@@ -113,6 +115,7 @@ export const useAuthStore = create(persist<AuthState>((set) => ({
                 refreshToken: null,
             });
         },
+        setProfileImage:(image:ImageRes) => {set({profileImage :image })},
         checkAuth: async () => {
             const accessToken = localStorage.getItem("accessToken");
             const refreshToken = localStorage.getItem("refreshToken");

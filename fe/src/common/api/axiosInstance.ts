@@ -123,6 +123,55 @@ const axiosInstance = axios.create({
   },
 });
 
+export const setUpAxiosInstance = (errorStore:any) => {
+    axiosInstance.interceptors.response.use(
+        (response) => response,
+        async (error) => {
+            const originalRequest = error.config;
+            if(error.code=="ERR_CANCELED"){
+                // errorStore.setError("사용자 차단", "상대방이 차단하여 조회할 수 없습니다.");
+                // return {status:"canceled", message:error.message}
+                return Promise.reject(error);
+            }
+
+            if (error.response.status === 401 && !originalRequest._retry) {
+                originalRequest._retry = true;
+                try {
+                    const refreshToken = localStorage.getItem("refreshToken");
+                    const refreshResponse = await axios.post(
+                        `${API_BASE_URL}/auth/token/refresh`,
+                        { refreshToken },
+                        {
+                            headers: {
+                                "Content-Type": "application/json",
+                            },
+                        }
+                    );
+                    const { accessToken } = refreshResponse.data.data;
+                    localStorage.setItem("accessToken", accessToken);
+                    axiosInstance.defaults.headers[
+                        "Authorization"
+                        ] = `Bearer ${accessToken}`;
+                    return axiosInstance(originalRequest);
+                } catch (err) {
+                    localStorage.removeItem("accessToken");
+                    localStorage.removeItem("refreshToken");
+                    return Promise.reject(err);
+                }
+            }else if(error.response.data.code==4030201){
+                errorStore.setError("사용자 차단", "상대방이 차단하여 조회할 수 없습니다.");
+                cancelSource.cancel('blocked');
+                cancelSource = axios.CancelToken.source();
+            }
+
+            return Promise.reject(error);
+        }
+    );
+}
+
+
+let cancelSource = axios.CancelToken.source();
+
 axiosInstance.interceptors.request.use(
   (config) => {
     const accessToken = localStorage.getItem("accessToken");
@@ -134,6 +183,7 @@ axiosInstance.interceptors.request.use(
       }
     }
 
+    config.cancelToken = cancelSource.token;
 
     return config;
   },
@@ -142,38 +192,6 @@ axiosInstance.interceptors.request.use(
   }
 );
 
-axiosInstance.interceptors.response.use(
-  (response) => response,
-  async (error) => {
-    const originalRequest = error.config;
-    if (error.response.status === 401 && !originalRequest._retry) {
-      originalRequest._retry = true;
-      try {
-        const refreshToken = localStorage.getItem("refreshToken");
-        const refreshResponse = await axios.post(
-          `${API_BASE_URL}/auth/token/refresh`,
-          { refreshToken },
-          {
-            headers: {
-              "Content-Type": "application/json",
-            },
-          }
-        );
-        const { accessToken } = refreshResponse.data.data;
-        localStorage.setItem("accessToken", accessToken);
-        axiosInstance.defaults.headers[
-          "Authorization"
-        ] = `Bearer ${accessToken}`;
-        return axiosInstance(originalRequest);
-      } catch (err) {
-        localStorage.removeItem("accessToken");
-        localStorage.removeItem("refreshToken");
-        return Promise.reject(err);
-      }
-    }
 
-    return Promise.reject(error);
-  }
-);
 
 export default axiosInstance;

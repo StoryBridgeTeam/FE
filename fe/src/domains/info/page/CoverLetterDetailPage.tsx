@@ -10,7 +10,7 @@ import {
     Input,
     Spinner, Tag,
     Text,
-    Textarea, useDisclosure,
+    Textarea, useBreakpointValue, useDisclosure,
     VStack
 } from "@chakra-ui/react";
 import InfoPageLayout from "../InfoPageLayout";
@@ -39,6 +39,7 @@ interface CoverLetter {
 }
 
 const CoverLetterDetailPage = () => {
+    const isMobile = useBreakpointValue({ base: true, md: false });
     const location = useLocation();
     const queryParams = new URLSearchParams(location.search);
     const token = queryParams.get("token");
@@ -135,14 +136,14 @@ const CoverLetterDetailPage = () => {
     };
 
     if(loading){
-        return <InfoPageLayout nickname={nickName}>
+        return <InfoPageLayout nickname={nickName} showProfile={!isMobile}>
             <Flex justifyContent={"center"} alignItems={"center"} padding={4}>
                 <Spinner />
             </Flex>
         </InfoPageLayout>
     }
 
-    return <InfoPageLayout nickname={nickName}>
+    return <InfoPageLayout nickname={nickName} showProfile={!isMobile}>
         <VStack w={"100%"} alignItems={"center"} padding={4}>
             <Box maxW={"600px"} w={"100%"}>
                 <Flex justifyContent={"right"} gap={2}>

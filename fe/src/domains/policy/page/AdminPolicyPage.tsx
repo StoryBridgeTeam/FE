@@ -1,14 +1,14 @@
 import React from "react";
 import { Flex, Box, useBreakpointValue } from "@chakra-ui/react";
 import { useParams } from "react-router-dom";
-import { useAuthStore } from "../../common/stores/AuthStore";
-import { useToastMessage } from "../../common/hooks/useToastMessage";
+import { useAuthStore } from "../../../common/stores/AuthStore";
+import { useToastMessage } from "../../../common/hooks/useToastMessage";
 import { useNavigate } from "react-router-dom";
 
-import LoginAppBar from "../../common/components/LoginAppBar";
-import PolicyList from "./components/PolicyList";
+import LoginAppBar from "../../../common/components/LoginAppBar";
+import AdminPolicyList from "../components/AdminPolicyList";
 
-const PolicyPage: React.FC = () => {
+const AdminPolicyPage: React.FC = () => {
   const isMobile = useBreakpointValue({ base: true, md: false });
   const logout = useAuthStore((state) => state.logout);
   const { showToast } = useToastMessage();
@@ -29,7 +29,7 @@ const PolicyPage: React.FC = () => {
           bg="white"
           p={4}
         >
-          <PolicyList />
+          <AdminPolicyList />
         </Flex>
         <Box flex={1} />
       </Flex>
@@ -37,4 +37,4 @@ const PolicyPage: React.FC = () => {
   );
 };
 
-export default PolicyPage;
+export default AdminPolicyPage;

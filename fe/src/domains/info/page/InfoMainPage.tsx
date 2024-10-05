@@ -1,4 +1,16 @@
-import {Box, Button, Container, Flex, Heading, Spinner, Text, useDisclosure, VStack} from "@chakra-ui/react";
+import {
+    Box,
+    Button,
+    Container,
+    Flex,
+    Heading,
+    HStack,
+    Spinner,
+    Text,
+    useBreakpointValue,
+    useDisclosure,
+    VStack
+} from "@chakra-ui/react";
 import InfoPageLayout from "../InfoPageLayout";
 import {Check, Edit, Link} from "tabler-icons-react";
 import InviteModal from "../../../common/components/InviteModal";
@@ -16,6 +28,7 @@ interface MockData {
 }
 
 const InfoMainPage = () => {
+    const isMobile = useBreakpointValue({ base: true, md: false });
     const location = useLocation();
     const queryParams = new URLSearchParams(location.search);
     const token = queryParams.get("token");
@@ -73,14 +86,14 @@ const InfoMainPage = () => {
     }
 
     return <InfoPageLayout nickname={nickName}>
-        <Container maxW="3xl" paddingX={10} paddingY={5}>
+        <Flex width={"100%"} paddingX={10} paddingY={isMobile ? 0 : 5} mx={0} direction={"column"} alignItems={"center"}>
             {isLoading ? (
                 <Flex justifyContent="center" alignItems="center" h="100vh">
                     <Spinner />
                 </Flex>
             ) : (
-                <>
-                    <Flex direction={"row"} justifyContent="space-between" alignItems={"center"}>
+                <Box w={"100%"} maxW={"600px"} >
+                    <Flex  direction={"row"} justifyContent="space-between" alignItems={"center"}>
                         <Box textAlign={"left"}>
                             <Heading size="md" >{t(`info.info`)}</Heading>
                         </Box>
@@ -116,9 +129,9 @@ const InfoMainPage = () => {
                             />
                         ))}
                     </VStack>
-                </>
+                </Box>
             )}
-        </Container>
+        </Flex>
         <InviteModal isOpen={isOpen} onClose={onClose} />
     </InfoPageLayout>;
 }

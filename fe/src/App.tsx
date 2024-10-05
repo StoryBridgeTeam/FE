@@ -1,7 +1,7 @@
 import {Box, ChakraProvider, extendTheme, useToast} from "@chakra-ui/react";
 import LoginPage from "./domains/login/LoginPage";
 import SignupPage from "./domains/signup/SignupPage";
-import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
+import {BrowserRouter, Route, Routes, Navigate, useNavigate} from "react-router-dom";
 import { useAuthStore } from "./common/stores/AuthStore";
 import React, { useEffect, useState } from "react";
 import PrivateRoute from "./domains/login/utils/PrivateRoute";
@@ -14,14 +14,14 @@ import DetailPage from "./domains/info/components/DetailPage";
 import CardPage from "./domains/card/CardPage";
 import CoverLetterCreatePage from "./domains/info/page/CoverLetterCreatePage";
 import InfoMainPage from "./domains/info/page/InfoMainPage";
-import PolicyPage from "./domains/policy/PolicyPage";
+import AdminPolicyPage from "./domains/policy/page/AdminPolicyPage";
 import CoverLetterDetailPage from "./domains/info/page/CoverLetterDetailPage";
 import CoverLetterEditPage from "./domains/info/page/CoverLetterEditPage";
 import OauthSignupPage from "./domains/signup/page/OauthSignupPage";
 import SignupInitialPage from "./domains/signup/page/SignupInitialPage";
 import OauthProcessingPage from "./domains/signup/page/OauthProcessingPage";
 import OauthSelectAccountPage from "./domains/signup/page/OauthSelectAccountPage";
-import PayPolicyPage from "./common/page/PayPolicyPage";
+import PayPolicyPage from "./domains/policy/page/PayPolicyPage";
 import ChatMainPage from "./domains/chat/page/ChatMainPage";
 import axios from "axios";
 import {Stomp} from "@stomp/stompjs";
@@ -31,6 +31,11 @@ import {ChatAlarmStore} from "./domains/chat/store/GlobalChatStore";
 import {useToastMessage} from "./common/hooks/useToastMessage";
 import {useChatAlarmToast} from "./domains/chat/hook/useChatAlarmToast";
 import {retrieveUnReadMessages} from "./domains/chat/api/ChatAPI";
+import ServicePolicyPage from "./domains/policy/page/ServicePolicyPage";
+import PrivacyPolicyPage from "./domains/policy/page/PrivacyPolicyPage";
+import RefundPolicyPage from "./domains/policy/page/RefundPolicyPage";
+import {setUpAxiosInstance} from "./common/api/axiosInstance";
+import {useErrorStore} from "./common/stores/ErrorStore";
 
 const theme = extendTheme({
   fonts: {
@@ -43,8 +48,10 @@ function App() {
   const [initialized, setInitialized] = useState(false);
   const nickName = localStorage.getItem("nickName");
   const {memberId : myId} = useAuthStore();
-  const {stompClient, setStompClient} = SocketStore();
-  const {addMessage, addBulkMessage} = ChatAlarmStore();
+  const {stompClient, setStompClient, loading:stompLoading, setLoading:setStompLoading} = SocketStore();
+  const {addMessage, initBulkMessage} = ChatAlarmStore();
+
+  const errorStore = useErrorStore();
 
   useEffect(() => {
     checkAuth().then(() => {
@@ -52,39 +59,49 @@ function App() {
     });
   }, [checkAuth]);
 
+  useEffect(() => {
+    setUpAxiosInstance(errorStore);
+  }, []);
+
+
   async function initChatSocket() {
-    if(isAuthenticated){
-      const socket = new WebSocket("ws://localhost:8788/ws");
-      const newStompClient = Stomp.over(socket);
-      newStompClient.connect({"Authorization" : `Bearer ${accessToken}`}, () => {
-        fetchUnReadMsg();
+    setStompLoading(true);
+    if(isAuthenticated && (!stompClient || !stompClient?.connected)){
+      if(!stompLoading){
+        const socket = new WebSocket(`${process.env.REACT_APP_WEBSOCKET_CHAT_SERVER}/ws`);
+        const newStompClient = Stomp.over(socket);
+        newStompClient.connect({"Authorization" : `Bearer ${accessToken}`}, () => {
+          fetchUnReadMsg();
 
-        newStompClient.subscribe(`/sub/myRoom/${myId}`, (message) => {
-          const newMessage = JSON.parse(message.body);
-          addMessage(newMessage);
+          newStompClient.subscribe(`/sub/myRoom/${myId}`, (message) => {
+            const newMessage = JSON.parse(message.body);
+            addMessage(newMessage);
+          });
         });
-      });
 
-      // newStompClient.onDisconnect = () => {
-      //   setTimeout(() => {initChatSocket()}, 1000);
-      // }
-      //
-      // socket.onclose = () => {
-      //   setTimeout(() => {initChatSocket()}, 1000);
-      // }
-      setStompClient(newStompClient);
+        // newStompClient.onDisconnect = () => {
+        //   setTimeout(() => {initChatSocket()}, 1000);
+        // }
+        //
+        // socket.onclose = () => {
+        //   setTimeout(() => {initChatSocket()}, 1000);
+        // }
+        setStompClient(newStompClient);
+      }
     }
+    setStompLoading(false);
   }
 
   const fetchUnReadMsg = async () => {
     const unReadMsgs = await retrieveUnReadMessages();
-    addBulkMessage(unReadMsgs);
+    initBulkMessage(unReadMsgs.filter(msg => msg.senderId!=myId));
   }
 
   useEffect(() => {
-    if(isAuthenticated && (!stompClient || !stompClient?.connected)){
+    if(isAuthenticated && (!stompClient || !stompClient?.connected===false)){
       initChatSocket();
     }
+
   }, [isAuthenticated, stompClient?.connected]);
 
   if (!initialized) {
@@ -101,7 +118,10 @@ function App() {
           <Route path="/signup/storybridge" element={<SignupPage />} />
           <Route path="/signup" element={<SignupInitialPage />} />
           <Route path="/login" element={<LoginPage />} />
-          <Route path="/pay-policy" element={<PayPolicyPage />} />
+          <Route path="/policy/service" element={<ServicePolicyPage />} />
+          <Route path="/policy/privacy" element={<PrivacyPolicyPage />} />
+          <Route path="/policy/pay" element={<PayPolicyPage />} />
+          <Route path="/policy/refund" element={<RefundPolicyPage />} />
           <Route
               path="/chat"
               element={<PrivateRoute element={<ChatPage />} />}
@@ -152,7 +172,7 @@ function App() {
           />
           <Route
             path="/admin/policy"
-            element={<PrivateRoute element={<PolicyPage />} />}
+            element={<PrivateRoute element={<AdminPolicyPage />} />}
           />
           <Route
             path="*"

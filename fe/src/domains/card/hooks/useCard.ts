@@ -155,9 +155,13 @@ export const useCard = ({nickname}:UseCardProps): UseCardResult => {
         entries: data.data.entries,
       };
     } catch (error) {
-      setError("카드를 가져오는 중 오류가 발생했습니다.");
-      console.log("fetchPublicCard_error:", error);
-      throw error;
+      if(axios.isCancel(error)){
+        setError("카드를 가져오는 중 오류가 발생했습니다.");
+        return {id : -1, name: "", entries:[]};
+      }else{
+        setError("카드를 가져오는 중 오류가 발생했습니다.");
+        throw error;
+      }
     } finally {
       setLoading(false);
     }

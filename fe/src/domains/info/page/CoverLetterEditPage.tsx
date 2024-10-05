@@ -1,5 +1,18 @@
 import React, {useEffect, useState} from "react";
-import {Box, Button, Divider, Flex, HStack, IconButton, Input, Spinner, Text, Textarea, VStack} from "@chakra-ui/react";
+import {
+    Box,
+    Button,
+    Divider,
+    Flex,
+    HStack,
+    IconButton,
+    Input,
+    Spinner,
+    Text,
+    Textarea,
+    useBreakpointValue,
+    VStack
+} from "@chakra-ui/react";
 import InfoPageLayout from "../InfoPageLayout";
 import {AddIcon, CheckIcon, EditIcon} from "@chakra-ui/icons";
 import {ImageRes, useImage} from "../../../common/hooks/useImage";
@@ -24,6 +37,7 @@ interface CoverLetterCreatePageProps{
 }
 
 const CoverLetterCreatePage = () => {
+    const isMobile = useBreakpointValue({ base: true, md: false });
     const {nickName} = useAuthStore();
     const location = useLocation();
     const queryParams = new URLSearchParams(location.search);
@@ -60,7 +74,7 @@ const CoverLetterCreatePage = () => {
         navigate(`/${nickName}/info/${entry.id}`,{replace:true})
     };
 
-    return <InfoPageLayout nickname={nickName}>
+    return <InfoPageLayout nickname={nickName} showProfile={!isMobile}>
         <VStack w={"100%"} alignItems={"center"} padding={4}>
             <Box maxW={"600px"} w={"100%"}>
                 <Flex justifyContent={"right"}>

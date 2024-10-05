@@ -13,29 +13,19 @@ const TermsAgreement = () => {
   interface Term {
     name: keyof typeof agreements;
     label: string;
-    required: boolean;
+    detailPath : string
   }
 
   const terms: Term[] = [
     {
       name: "required1",
       label: t("signup.TermsAgreement.agreeRequired1"),
-      required: true,
+      detailPath : "/policy/service"
     },
     {
       name: "required2",
       label: t("signup.TermsAgreement.agreeRequired2"),
-      required: true,
-    },
-    {
-      name: "optional1",
-      label: t("signup.TermsAgreement.agreeOptional1"),
-      required: false,
-    },
-    {
-      name: "optional2",
-      label: t("signup.TermsAgreement.agreeOptional2"),
-      required: false,
+      detailPath : "/policy/privacy"
     },
   ];
 
@@ -66,9 +56,8 @@ const TermsAgreement = () => {
           isChecked={Object.values(agreements).every(Boolean)}
           onChange={handleAgreeAll}
           hasDetail={false}
-        >
-          {t("signup.TermsAgreement.agreeAll")}
-        </TermItem>
+          title={t("signup.TermsAgreement.agreeAll")}
+        />
         <hr />
 
         {terms.map((term) => (
@@ -77,9 +66,9 @@ const TermsAgreement = () => {
             isChecked={agreements[term.name]}
             onChange={() => handleAgreeChange(term.name)}
             hasDetail={true}
-          >
-            {term.label}
-          </TermItem>
+            title={term.label}
+            detailPath={term.detailPath}
+          />
         ))}
       </Stack>
     </Box>

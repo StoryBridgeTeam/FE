@@ -18,7 +18,7 @@ import {
   ModalCloseButton,
   ModalBody,
   ModalFooter,
-  Avatar,
+  Avatar, HStack,
 } from "@chakra-ui/react";
 import { FC, useEffect, useState, useCallback } from "react";
 import { FiPlus, FiMinus } from "react-icons/fi";
@@ -216,33 +216,44 @@ const ProfileSidebar = ({nickname}:ProfileSidebarProps) => {
   };
 
   return (
-    <VStack
-      w={"280px"}
+    <Flex
+        direction={"column"}
+      w={isMobile ? "100%" : "400px"}
       minWidth={"280px"}
         // w={"100%"}
       p={5}
       alignItems="center"
       // bg="#F6F6F6"
-      spacing={4}
+      gap={4}
     >
-      <Avatar
-        size="2xl"
-        src={image ? `http://image.storyb.kr/${image}` : `/images/profile.png`}
-        mr={2}
-      />
-      <Heading size="md">{nickname}</Heading>
-      <Divider borderColor="#C5C5C5" />
-      <InfoSection
-        title={t(`info.personal`)}
-        content={formatAboutMe(aboutMe, t)}
-      />
-      <InfoSection
-        title={t(`info.education`)}
-        content={formatEducation(education, t)}
-        actions={
-          ishost && <FiPlus onClick={onAddEducationOpen} cursor="pointer" />
-        }
-      />
+      <VStack w={"100%"} maxW={"600px"}>
+        <Flex
+            w={"100%"}
+            justifyContent={"center"}
+            alignItems={"center"}
+            gap={4}
+            direction={"column"}
+        >
+          <Avatar
+              size="2xl"
+              src={image ? `${process.env.REACT_APP_IMAGE_SERVER}/${image}` : `/images/profile.png`}
+              mr={2}
+          />
+          <Heading size="md">{nickname}</Heading>
+        </Flex>
+        <Divider borderColor="#C5C5C5" orientation={isMobile ? "vertical" : "horizontal"}/>
+        <InfoSection
+            title={t(`info.personal`)}
+            content={formatAboutMe(aboutMe, t)}
+        />
+        <InfoSection
+            title={t(`info.education`)}
+            content={formatEducation(education, t)}
+            actions={
+                ishost && <FiPlus onClick={onAddEducationOpen} cursor="pointer" />
+            }
+        />
+      </VStack>
       <Modal isOpen={isAddEducationOpen} onClose={onAddEducationClose}>
         <ModalOverlay />
         <ModalContent>
@@ -316,7 +327,7 @@ const ProfileSidebar = ({nickname}:ProfileSidebarProps) => {
           </ModalFooter>
         </ModalContent>
       </Modal>
-    </VStack>
+    </Flex>
   );
 };
 
@@ -328,45 +339,46 @@ const InfoSection: FC<{
   const isMobile = useBreakpointValue({ base: true, md: false });
 
   return (
-    <Box w="full" justifyContent="center" p={2}>
+    <Box w="full" justifyContent="center" p={4}>
       <Flex align="center" justify="space-between" mb={2}>
         <Box
           w="full"
           h="25px"
           lineHeight="25px"
-          bg="#dbdbdb"
-          borderRadius="full"
-          fontSize="xs"
+          // bg="#dbdbdb"
+          // borderRadius="full"
+            px={2}
+          fontSize="md"
           fontWeight="bold"
-          textAlign="center"
+          textAlign="left"
           display="flex"
           alignItems="center"
-          justifyContent="center"
-          position="relative"
+          justifyContent="start"
+          zIndex={999}
         >
           <Text>{title}</Text>
-          {actions && (
-            <Box position="absolute" ml={2} right={3}>
-              {actions}
-            </Box>
-          )}
+          <Box flex="1"  borderBottom="2px" ml={2} />
         </Box>
       </Flex>
       <Box
         w="full"
-        maxW="90%"
-        fontSize="xs"
+        fontSize="sm"
         textAlign="left"
         whiteSpace="pre-wrap"
-        mt={2}
-        p={isMobile ? 5 : 3}
-        mx="auto"
+        mt={-5}
+        p={5}
         bg="white"
         borderRadius={"md"}
         border={"1px"}
+        borderTop={"none"}
         borderColor="#dbdbdb"
       >
-        {content}
+          {content}
+        {actions && (
+            <HStack  w={"100%"} justifyContent={"center"} mt={2}>
+              {actions}
+            </HStack>
+        )}
       </Box>
     </Box>
   );

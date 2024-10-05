@@ -80,21 +80,24 @@ const NetworkStatus: React.FC = () => {
         flex="1"
         overflow="auto"
       >
-        <HStack spacing={1}>
-          <Avatar
-            src={
-              amt?.parent?.profileImage
-                ? `http://image.storyb.kr/${amt?.parent.profileImage.path}`
-                : "/images/profile.png"
-            }
-            size="sm"
-          />
-        </HStack>
+        {
+          amt?.parent &&
+            <HStack spacing={1}>
+              <Avatar
+                  src={
+                    amt?.parent?.profileImage
+                        ? `${process.env.REACT_APP_IMAGE_SERVER}/${amt?.parent.profileImage.path}`
+                        : "/images/profile.png"
+                  }
+                  size="sm"
+              />
+            </HStack>
+        }
         <HStack spacing={1}>
           <Avatar
             src={
               amt?.target?.profileImage
-                ? `http://image.storyb.kr/${amt.target.profileImage.path}`
+                ? `${process.env.REACT_APP_IMAGE_SERVER}/${amt.target.profileImage.path}`
                 : "/images/profile.png"
             }
             size="sm"

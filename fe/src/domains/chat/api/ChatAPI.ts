@@ -4,7 +4,9 @@ import {ChatMessageType} from "../hook/useChatList";
 export interface ChatRoomResponse {
     roomId : number,
     memberIds : number[],
-    messageReadStatus : string
+    messageReadStatus : string,
+    lastMsg : string
+
 }
 
 export const retrieveUnReadMessages = async () : Promise<ChatMessageType[]> => {
@@ -35,4 +37,22 @@ export const getChatRoom = async (memberIds:number[]) => {
     })
 
     return response.data.data;
+}
+
+export const uploadFile = async (file : FormData) => {
+    try {
+        const response = await axiosInstance.post(
+            `/files`,
+            file,
+            {
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                },
+            }
+        );
+        return response.data.data;
+    } catch (error) {
+        console.error("Failed to fetch comments:", error);
+        throw error;
+    }
 }

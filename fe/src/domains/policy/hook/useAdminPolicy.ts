@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useToast } from "@chakra-ui/react";
-import { getPolicy, updatePolicy } from "../api/PolicyAPI";
+import { getPolicy, updatePolicy } from "../api/AdminPolicyAPI";
 
 interface Policy {
   id: number;
@@ -8,7 +8,7 @@ interface Policy {
   value: number;
 }
 
-const usePolicy = () => {
+const useAdminPolicy = () => {
   const toast = useToast();
   const [loading, setLoading] = useState<boolean>(false);
   const [isAdmin, setIsAdmin] = useState<boolean>(false);
@@ -76,4 +76,4 @@ const usePolicy = () => {
   };
 };
 
-export default usePolicy;
+export default useAdminPolicy;

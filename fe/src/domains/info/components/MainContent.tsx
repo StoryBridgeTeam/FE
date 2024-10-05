@@ -23,6 +23,7 @@ import { useCommentStore } from "../Store/CommentStore";
 import { getComments } from "../api/CommentAPI";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import InviteModal from "../../../common/components/InviteModal";
+import axios from "axios";
 
 interface MockData {
   id: number;
@@ -71,8 +72,12 @@ const MainContent = ({children}:MainContentProps) => {
         setMockData(entries.content);
       }
     } catch (error) {
-      console.error("cover error:", error);
-      setMockData([]);
+      if(axios.isCancel(error)){
+        navigate("/")
+      }else{
+        console.error("cover error:", error);
+        setMockData([]);
+      }
     } finally {
       setLoading(false);
     }

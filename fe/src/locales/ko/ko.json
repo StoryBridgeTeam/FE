@@ -99,9 +99,7 @@
       "title": "약관에 동의해주세요",
       "agreeAll": "모두 동의해요.",
       "agreeRequired1": "[필수] 필수 서비스 이용 약관",
-      "agreeRequired2": "[필수] 개인정보 수집 및 이용 동의",
-      "agreeOptional1": "[선택] 프로필정보 추가 수집 동의",
-      "agreeOptional2": "[선택] 광고메세지 수신 동의"
+      "agreeRequired2": "[필수] 개인정보 수집 및 이용 동의"
     },
     "VerificationCode": {
       "title": "인증코드를 입력해주세요",

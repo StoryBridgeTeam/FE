@@ -10,12 +10,8 @@ interface POIItemProps {
 
 const POIItem: React.FC<POIItemProps> = ({ id, title, isMobile, onClick }) => (
   <Box
-    mx={4}
-    my={3}
     bg="white"
     color="black"
-    h="7%"
-    // shadow="md"
     borderRadius="5"
     onClick={() => onClick(id)}
     _hover={{ cursor: "pointer", bg: "gray.200" }}
@@ -23,7 +19,8 @@ const POIItem: React.FC<POIItemProps> = ({ id, title, isMobile, onClick }) => (
     alignItems="center"
     border="1px solid #CDCDCD"
     overflow="hidden"
-    p={isMobile ? 4 : 2.5}
+    px={5}
+    py={3}
   >
     <Text isTruncated textAlign={"left"} fontSize={12}>
       {title}
