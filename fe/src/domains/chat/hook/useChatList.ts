@@ -62,9 +62,14 @@ const useChatList = () => {
     }
 
     const fetchChatRooms = async () => {
-        const rooms = await retrieveChatRooms();
-        const proccessedChatRooms = await processChatRoomData(rooms);
-        setChatRooms(proccessedChatRooms);
+        try {
+            const chatRoomsData = await retrieveChatRooms();
+            const proccessedChatRooms = await processChatRoomData(chatRoomsData);
+            setChatRooms(proccessedChatRooms);
+        } catch (error) {
+            console.error("Error in fetchChatRooms:", error);
+            // 에러 상태 설정 또는 다른 에러 처리 로직
+        }
     }
 
     const handleSetCurrentChatRoomByMemberIds = async (memberIds: number[]) => {

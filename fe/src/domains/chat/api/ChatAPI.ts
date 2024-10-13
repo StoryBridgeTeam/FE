@@ -27,8 +27,13 @@ export const retrieveMemberInfo = async (memberInfo :number) => {
 }
 
 export const retrieveChatRooms = async () : Promise<ChatRoomResponse[]> => {
-   const response = await chatServerAxiosInstance.get("/chatRooms")
-    return response.data.data;
+   try {
+     const response = await chatServerAxiosInstance.get("/chatRooms")
+     return response.data.data;
+   } catch (error) {
+     console.error("Error fetching chat rooms:", error);
+     return [];
+   }
 }
 
 export const getChatRoom = async (memberIds:number[]) => {

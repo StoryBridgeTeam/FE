@@ -70,7 +70,7 @@ function App() {
       if(!stompLoading){
         const socket = new WebSocket(`${process.env.REACT_APP_WEBSOCKET_CHAT_SERVER}/ws`);
         const newStompClient = Stomp.over(socket);
-        newStompClient.connect({"Authorization" : `Bearer ${accessToken}`}, () => {
+        newStompClient.connect({}, () => {
           fetchUnReadMsg();
 
           newStompClient.subscribe(`/sub/myRoom/${myId}`, (message) => {
@@ -123,8 +123,8 @@ function App() {
           <Route path="/policy/pay" element={<PayPolicyPage />} />
           <Route path="/policy/refund" element={<RefundPolicyPage />} />
           <Route
-              path="/chat"
-              element={<PrivateRoute element={<ChatPage />} />}
+            path="/chat"
+            element={<ChatPage />}
           />
           <Route
             path="/:nickName"

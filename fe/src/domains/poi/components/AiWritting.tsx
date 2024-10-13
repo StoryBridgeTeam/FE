@@ -21,7 +21,8 @@ import {
     Textarea,
     useBreakpointValue,
     useDisclosure,
-    VStack
+    VStack,
+    Select
 } from "@chakra-ui/react";
 import {AddIcon, ChevronLeftIcon, ChevronRightIcon, DeleteIcon, MinusIcon} from "@chakra-ui/icons";
 import {UseAiWrittingReturn} from "../hooks/useAiWritting";
@@ -51,36 +52,41 @@ const AiWritting = ({useAiWritting, imageHook}:{useAiWritting:UseAiWrittingRetur
 };
 
 const AiWrittingBody = ({aiWrittingHook, imageHook}:{aiWrittingHook:UseAiWrittingReturn, imageHook:useImageResponse}) => {
+    const [selectedModel, setSelectedModel] = useState<string>("gpt-3.5-turbo");
+
     return <Tabs variant={"enclosed"} w="100%" minW={{base:"100%", md:"300px"}} maxW={"400px"} h={"100%"}
               border={"0.5px solid #cdcdcd"} p={3} borderRadius={10} maxH={{base:"350px", md:"600px"}} minH={{base:"200px", md:"400px"}} overflowY={"auto"}>
             <TabList>
                 <Tab isDisabled={aiWrittingHook.loading}>기본</Tab>
-                <Tab
-                    isDisabled={aiWrittingHook.loading}
-                >문장</Tab>
-                <Tab
-                    isDisabled={aiWrittingHook.loading}
-                >뉴스</Tab>
-                <Tab
-                    isDisabled={aiWrittingHook.loading}
-                >이미지</Tab>
+                <Tab isDisabled={aiWrittingHook.loading}>문장</Tab>
+                <Tab isDisabled={aiWrittingHook.loading}>뉴스</Tab>
+                <Tab isDisabled={aiWrittingHook.loading}>이미지</Tab>
             </TabList>
+            <Select
+                value={selectedModel}
+                onChange={(e) => setSelectedModel(e.target.value)}
+                mb={3}
+                mt={3}
+            >
+                <option value="gpt-3.5-turbo">GPT-3.5 Turbo</option>
+                <option value="gpt-4">GPT-4</option>
+            </Select>
             <TabPanels height={"100%"} maxH={{base:"250px", md:"500px"}}>
-                <TabPanel height={"100%"}><BaseWritting aiWrittingHook={aiWrittingHook}/></TabPanel>
-                <TabPanel height={"100%"}><SentWritting aiWrittingHook={aiWrittingHook}/></TabPanel>
-                <TabPanel height={"100%"}><NewsWritting aiWrittingHook={aiWrittingHook}/></TabPanel>
-                <TabPanel height={"100%"}><ImageWritting aiWrittingHook={aiWrittingHook} imageHook={imageHook}/></TabPanel>
+                <TabPanel height={"100%"}><BaseWritting aiWrittingHook={aiWrittingHook} selectedModel={selectedModel}/></TabPanel>
+                <TabPanel height={"100%"}><SentWritting aiWrittingHook={aiWrittingHook} selectedModel={selectedModel}/></TabPanel>
+                <TabPanel height={"100%"}><NewsWritting aiWrittingHook={aiWrittingHook} selectedModel={selectedModel}/></TabPanel>
+                <TabPanel height={"100%"}><ImageWritting aiWrittingHook={aiWrittingHook} imageHook={imageHook} selectedModel={selectedModel}/></TabPanel>
             </TabPanels>
         </Tabs>
 }
 
-const BaseWritting = ({aiWrittingHook}:{aiWrittingHook:UseAiWrittingReturn}) => {
+const BaseWritting = ({aiWrittingHook, selectedModel}:{aiWrittingHook:UseAiWrittingReturn, selectedModel: string}) => {
     const [content, setContent] = useState<string>("");
 
     const handleOnClick = async () => {
         if(content==null || content=="") return;
 
-        aiWrittingHook.handleBaseWritting(content)
+        aiWrittingHook.handleBaseWritting(content, selectedModel)
     }
 
     return <VStack gap={3} height={"100%"} justifyContent={"space-between"} position={"relative"} >
@@ -95,13 +101,13 @@ const BaseWritting = ({aiWrittingHook}:{aiWrittingHook:UseAiWrittingReturn}) => 
     </VStack>
 }
 
-const NewsWritting = ({aiWrittingHook}:{aiWrittingHook:UseAiWrittingReturn}) => {
+const NewsWritting = ({aiWrittingHook, selectedModel}:{aiWrittingHook:UseAiWrittingReturn, selectedModel: string}) => {
     const [link, setLink] = useState<string>("");
 
     const handleClickWrittingBtn = async () => {
         if(link==null || link.length<=0) return;
 
-        aiWrittingHook.handleNewsWritting(link);
+        aiWrittingHook.handleNewsWritting(link, selectedModel);
     }
 
     return <VStack gap={3} height={"100%"} justifyContent={"space-between"}>
@@ -117,7 +123,7 @@ const NewsWritting = ({aiWrittingHook}:{aiWrittingHook:UseAiWrittingReturn}) => 
     </VStack>
 }
 
-const ImageWritting = ({aiWrittingHook, imageHook}:{aiWrittingHook:UseAiWrittingReturn, imageHook:useImageResponse}) => {
+const ImageWritting = ({aiWrittingHook, imageHook, selectedModel}:{aiWrittingHook:UseAiWrittingReturn, imageHook:useImageResponse, selectedModel: string}) => {
     const [viewIndex, setViewIndex] = useState(0);
     const [carouselTransition, setCarouselTransition] = useState(
         "transform 500ms ease-in-out"
@@ -134,7 +140,7 @@ const ImageWritting = ({aiWrittingHook, imageHook}:{aiWrittingHook:UseAiWritting
     const handleClickWrittingBtn = () => {
         if(imageHook.images.length<=0) return;
 
-        aiWrittingHook.handleImageWritting(imageHook.images[viewIndex].path);
+        aiWrittingHook.handleImageWritting(imageHook.images[viewIndex].path, selectedModel);
     }
 
     return <VStack gap={3} height={"100%"} justifyContent={"space-between"} position={"relative"}>
@@ -197,15 +203,15 @@ const ImageWritting = ({aiWrittingHook, imageHook}:{aiWrittingHook:UseAiWritting
     </VStack>
 }
 
-const SentWritting = ({aiWrittingHook}:{aiWrittingHook:UseAiWrittingReturn}) => {
+const SentWritting = ({aiWrittingHook, selectedModel}:{aiWrittingHook:UseAiWrittingReturn, selectedModel: string}) => {
     const [sents, setSents] = useState<string[]>([""]);
 
     const handleClickAddBtn = () => {
         setSents(prevState => [...prevState, ""])
     }
-
+ 
     const handleClickWrittingBtn = async () => {
-        aiWrittingHook.handleSentenceWritting(sents.filter(s => s!=null && s.length>0));
+        aiWrittingHook.handleSentenceWritting(sents.filter(s => s!=null && s.length>0), selectedModel);
     }
 
     return <VStack gap={3} height={"100%"} justifyContent={"space-between"} position={"relative"}>
