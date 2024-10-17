@@ -43,9 +43,9 @@ export interface UseCardResult {
     nickname: string,
     type: FetchType,
     token?: string
-  ) => Promise<{ id: number; name: string; entries: EntryState[] }>;
-  editOriginalCard: (nickname: string, entries: EntryState[]) => Promise<void>;
-  editPublicCard: (nickname: string, entries: EntryState[]) => Promise<void>;
+  ) => Promise<{ id: number; name: string; nickName:string; entries: EntryState[] }>;
+  // editOriginalCard: (nickname: string, entries: EntryState[]) => Promise<void>;
+  // editPublicCard: (nickname: string, entries: EntryState[]) => Promise<void>;
   // addComment: (
   //   poiId: number,
   //   nickname: string,
@@ -148,16 +148,16 @@ export const useCard = ({nickname}:UseCardProps): UseCardResult => {
     setError(null);
     try {
       const data = await getPublicCardInfo(nickname, type, token);
-      console.log("fdd1:", data);
       return {
         id: data.data.id,
         name: data.data.name,
+        nickName : data.data.nickName,
         entries: data.data.entries,
       };
     } catch (error) {
       if(axios.isCancel(error)){
         setError("카드를 가져오는 중 오류가 발생했습니다.");
-        return {id : -1, name: "", entries:[]};
+        return {id : -1, name: "", nickName:"", entries:[]};
       }else{
         setError("카드를 가져오는 중 오류가 발생했습니다.");
         throw error;
@@ -166,38 +166,38 @@ export const useCard = ({nickname}:UseCardProps): UseCardResult => {
       setLoading(false);
     }
   };
-
-  const editOriginalCard = async (nickname: string, entries: EntryState[]) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const data = await updateOriginalCardInfo(nickname, entries);
-      console.log("edit5Card_data:", data);
-      return data;
-    } catch (error) {
-      setError("카드를 수정하는 중 오류가 발생했습니다.");
-      console.log("editOriginalCard_error:", error);
-      throw error;
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const editPublicCard = async (nickname: string, entries: EntryState[]) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const data = await updatePublicCardInfo(nickname, entries);
-      console.log("editPublicCard_data:", data);
-      return data;
-    } catch (error) {
-      setError("카드를 수정하는 중 오류가 발생했습니다.");
-      console.log("editPublicCard_error:", error);
-      throw error;
-    } finally {
-      setLoading(false);
-    }
-  };
+  //
+  // const editOriginalCard = async (nickname: string, entries: EntryState[]) => {
+  //   setLoading(true);
+  //   setError(null);
+  //   try {
+  //     const data = await updateOriginalCardInfo(nickname, entries);
+  //     console.log("edit5Card_data:", data);
+  //     return data;
+  //   } catch (error) {
+  //     setError("카드를 수정하는 중 오류가 발생했습니다.");
+  //     console.log("editOriginalCard_error:", error);
+  //     throw error;
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+  //
+  // const editPublicCard = async (nickname: string, entries: EntryState[]) => {
+  //   setLoading(true);
+  //   setError(null);
+  //   try {
+  //     const data = await updatePublicCardInfo(nickname, entries);
+  //     console.log("editPublicCard_data:", data);
+  //     return data;
+  //   } catch (error) {
+  //     setError("카드를 수정하는 중 오류가 발생했습니다.");
+  //     console.log("editPublicCard_error:", error);
+  //     throw error;
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
   // const addComment = async (
   //   poiId: number,
@@ -278,8 +278,8 @@ export const useCard = ({nickname}:UseCardProps): UseCardResult => {
     createNewCard,
     fetchOriginalCard,
     fetchPublicCard,
-    editOriginalCard,
-    editPublicCard,
+    // editOriginalCard,
+    // editPublicCard,
     formatTimestamp,
     checkCard,
     isExists : commonCardInfo.isExist,

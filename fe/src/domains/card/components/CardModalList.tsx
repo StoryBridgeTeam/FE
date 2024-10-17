@@ -57,69 +57,72 @@ const CardModalList: React.FC<CardModalListProps> = ({
           </Text>
         </Box>
       ) : isEditing ? (
-        <DragDropContext onDragEnd={onDragEnd}>
-          <Droppable droppableId="entries">
-            {(provided) => (
-              <UnorderedList
-                {...provided.droppableProps}
-                ref={provided.innerRef}
-                styleType="none"
-                px={{ base: 0, md: 20 }}
-                pb={{ base: 0, md: 10 }}
-                spacing={2}
-                maxHeight="400px"
-                overflowY="auto"
-                width="100%"
-              >
-                {entries.map((entry, index) => (
-                  <Draggable
-                    key={
-                      entry.id !== null ? entry.id.toString() : `temp-${index}`
-                    }
-                    draggableId={
-                      entry.id !== null ? entry.id.toString() : `temp-${index}`
-                    }
-                    index={index}
-                  >
-                    {(provided) => (
-                      <Flex
-                        ref={provided.innerRef}
-                        {...provided.draggableProps}
-                        {...provided.dragHandleProps}
-                        mb={2}
-                        p={3}
-                        borderWidth="1px"
-                        borderRadius="lg"
-                        alignItems="center"
-                        bg="gray.100"
-                      >
-                        <GripVertical />
-                        <CardModalItem
-                          key={
-                            entry.id !== null
-                              ? entry.id.toString()
-                              : `temp-${index}`
-                          }
-                          entry={entry}
-                          isEditing={isEditing}
-                          onChangeEntry={handleEntryChange}
-                          onDeleteEntry={handleEntryDelete}
-                        />
-                      </Flex>
-                    )}
-                  </Draggable>
-                ))}
-                {provided.placeholder}
-              </UnorderedList>
-            )}
-          </Droppable>
-        </DragDropContext>
+              <Box px={10} paddingBottom={10} paddingTop={5}>
+                <Text fontSize={"2xl"} fontWeight="bold">
+                  {name}
+                </Text>
+                <VStack px={1} gap={1} w={"100%"} alignItems={"start"} paddingY={10} borderBottom={"2px solid gray"}>
+                  <DragDropContext onDragEnd={onDragEnd}>
+                    <Droppable droppableId="entries">
+                      {(provided) => (
+                          <Box
+                              w={"100%"}
+                              {...provided.droppableProps}
+                              ref={provided.innerRef}
+                          >
+                            {entries.map((entry, index) => (
+                                <Draggable
+                                    key={
+                                      entry.id !== null ? entry.id.toString() : `temp-${index}`
+                                    }
+                                    draggableId={
+                                      entry.id !== null ? entry.id.toString() : `temp-${index}`
+                                    }
+                                    index={index}
+                                >
+                                  {(provided) => (
+                                      <Flex
+                                          w={"100%"}
+                                          ref={provided.innerRef}
+                                          {...provided.draggableProps}
+                                          {...provided.dragHandleProps}
+                                          // mb={2}
+                                          p={1}
+                                          borderWidth="1px"
+                                          borderRadius="lg"
+                                          justifyContent={"space-between"}
+                                          alignItems="center"
+                                      >
+                                        <GripVertical />
+                                        <CardModalItem
+                                            key={
+                                              entry.id !== null
+                                                  ? entry.id.toString()
+                                                  : `temp-${index}`
+                                            }
+                                            entry={entry}
+                                            isEditing={isEditing}
+                                            onChangeEntry={handleEntryChange}
+                                            onDeleteEntry={handleEntryDelete}
+                                        />
+                                      </Flex>
+                                  )}
+                                </Draggable>
+                            ))}
+                            {provided.placeholder}
+                          </Box>
+                      )}
+                    </Droppable>
+                  </DragDropContext>
+                </VStack>
+              </Box>
       ) : (
         <Box px={10} paddingBottom={10} paddingTop={5}>
           <Text fontSize={"2xl"} fontWeight="bold">
             {name}
           </Text>
-          <VStack px={1} gap={1} w={"100%"} alignItems={"start"} paddingY={10} borderBottom={"2px solid gray"}>
+          <VStack
+              px={1} gap={1} w={"100%"} alignItems={"start"} paddingY={10} borderBottom={"2px solid gray"}>
             {entries.map((entry) => (
               <CardModalItem
                 key={

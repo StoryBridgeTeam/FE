@@ -85,8 +85,8 @@ const NetworkStatus: React.FC = () => {
             <HStack spacing={1}>
               <Avatar
                   src={
-                    amt?.parent?.profileImage
-                        ? `${process.env.REACT_APP_IMAGE_SERVER}/${amt?.parent.profileImage.path}`
+                    amt?.parent?.card?.profileImage
+                        ? `${process.env.REACT_APP_IMAGE_SERVER}/${amt?.parent?.card.profileImage.path}`
                         : "/images/profile.png"
                   }
                   size="sm"
@@ -96,8 +96,8 @@ const NetworkStatus: React.FC = () => {
         <HStack spacing={1}>
           <Avatar
             src={
-              amt?.target?.profileImage
-                ? `${process.env.REACT_APP_IMAGE_SERVER}/${amt.target.profileImage.path}`
+              amt?.target?.card?.profileImage
+                ? `${process.env.REACT_APP_IMAGE_SERVER}/${amt.target.card.profileImage.path}`
                 : "/images/profile.png"
             }
             size="sm"

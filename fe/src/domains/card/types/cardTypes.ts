@@ -1,12 +1,16 @@
 import {UseCardResult} from "../hooks/useCard";
+import {UseCardHookReturn} from "../hooks/useCardHook";
 
 export interface CardInfo{
   id:number,
   name:string,
+  nickName : string,
+  designType : string,
   entries:EntryState[]
 }
+
 export interface EntryState {
-  id: number;
+  id: number | null;
   title: string;
   content: string;
   index: number;
@@ -27,7 +31,8 @@ export type ModalTabType = "명함" | "댓글";
 
 export interface CardViewProps {
   nickName: string;
-  useCardHook:UseCardResult
+  // useCardHook:UseCardResult
+  useCardHook:UseCardHookReturn
 }
 
 export interface FirstCardModalProps {

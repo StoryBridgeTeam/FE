@@ -12,7 +12,7 @@ const ModalActionButtons: React.FC<ModalElementProps> = ({
   setIsEditing,
   setEntries,
 }) => {
-  const { editOriginalCard, editPublicCard } = useCard({nickname:nickName});
+  // const { editOriginalCard, editPublicCard } = useCard({nickname:nickName});
   const savedNickName = localStorage.getItem("nickName");
   const isHost = nickName === savedNickName;
 
@@ -20,17 +20,17 @@ const ModalActionButtons: React.FC<ModalElementProps> = ({
     setIsEditing(true);
   };
 
-  const onSave = () => {
-    setIsEditing(false);
-    if (cardType === "NEW") {
-      // editPublicCard(nickName, entries);
-      // editOriginalCard(nickName, entries);
-    } else if (cardType === "PUBLIC") {
-      editPublicCard(nickName, entries);
-    } else if (cardType === "ORIGINAL") {
-      editOriginalCard(nickName, entries);
-    }
-  };
+  // const onSave = () => {
+  //   setIsEditing(false);
+  //   if (cardType === "NEW") {
+  //     // editPublicCard(nickName, entries);
+  //     // editOriginalCard(nickName, entries);
+  //   } else if (cardType === "PUBLIC") {
+  //     editPublicCard(nickName, entries);
+  //   } else if (cardType === "ORIGINAL") {
+  //     editOriginalCard(nickName, entries);
+  //   }
+  // };
 
   const onAddNew = () => {
     setEntries([
@@ -53,9 +53,9 @@ const ModalActionButtons: React.FC<ModalElementProps> = ({
           <Button size="xs" mr={2} onClick={onAddNew} bg="#C9C9C9">
             <Plus size={20} color="black" />
           </Button>
-          <Button size="xs" mr={2} onClick={onSave} bg="#C9C9C9">
-            <Check size={20} color="black" />
-          </Button>
+          {/*<Button size="xs" mr={2} onClick={onSave} bg="#C9C9C9">*/}
+          {/*  <Check size={20} color="black" />*/}
+          {/*</Button>*/}
         </Box>
       ) : (
         <Button size="xs" onClick={onEdit} bg="#C9C9C9">

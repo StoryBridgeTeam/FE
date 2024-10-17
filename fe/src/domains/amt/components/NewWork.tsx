@@ -6,7 +6,7 @@ import {
   CircularProgressLabel,
   Avatar,
   AvatarGroup,
-  useBreakpointValue, VStack, HStack, Stat, StatNumber, StatLabel, StatHelpText, StatArrow,
+  useBreakpointValue, VStack, HStack, Stat, StatNumber, StatLabel, StatHelpText, StatArrow, Heading,
 } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
 import { getNetwork } from "../api/AmtAPI";
@@ -85,10 +85,10 @@ const NetWork = () => {
       >
         Activity 지수
       </Text>
-      <Flex direction={"row"} gap={2} justifyContent={"space-between"} w={"100%"}
+      <Flex direction={"column"} gap={2} justifyContent={"space-between"} w={"100%"}
             flexWrap={"wrap"}
       >
-        <Box>
+        <HStack justifyContent={"center"} w={"100%"}>
           <CircularProgress
               value={network?.monthlyTotalPoint}
               size={"180px"}
@@ -102,14 +102,15 @@ const NetWork = () => {
               총 점수 {network?.monthlyTotalPoint}점
             </CircularProgressLabel>
           </CircularProgress>
-        </Box>
+        </HStack>
         <VStack justifyContent={"start"} alignItems={"center"} gap={1} overflowY={"auto"} maxH={"250px"}>
           {
             network &&
-            network.mostActivityDetails.map(n =>
-                  <HStack gap={5} _hover={{cursor:"pointer", bgColor:"gray.200"}} paddingX={2} paddingY={1} borderRadius={10}
+            network.mostActivityDetails.map((n, idx) =>
+                  <HStack gap={5} _hover={{cursor:"pointer", bgColor:"gray.200"}} paddingX={2} paddingY={1} borderRadius={10} w={"100%"}
                           onClick={() => token ? navigate(`/${n.activistNickname}?token=${token}`) :  navigate(`/${n.activistNickname}`)}
                   >
+                    <Heading size={"md"}>{idx+1}</Heading>
                     <Avatar
                         border={"0.5px solid grey"}
                         src={
@@ -125,6 +126,7 @@ const NetWork = () => {
                         온라인 {n.monthlyTotalOnlinePoint}점 / 오프라인 {n.monthlyTotalOfflinePoint}점
                       </StatHelpText>
                     </Stat>
+                    <Heading size={"md"}>{n.monthlyTotalPoint} 점</Heading>
                   </HStack>
             )
           }

@@ -162,6 +162,10 @@ export const setUpAxiosInstance = (errorStore:any) => {
                 errorStore.setError("사용자 차단", "상대방이 차단하여 조회할 수 없습니다.");
                 cancelSource.cancel('blocked');
                 cancelSource = axios.CancelToken.source();
+            }else if(error.response.data.code==4030001){
+                errorStore.setError("명함 생성", "명함 생성을 해야 다른사람의 정보를 볼 수 있습니다.");
+                cancelSource.cancel('blocked');
+                cancelSource = axios.CancelToken.source();
             }
 
             return Promise.reject(error);

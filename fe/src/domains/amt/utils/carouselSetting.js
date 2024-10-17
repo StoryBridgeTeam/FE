@@ -22,14 +22,14 @@ export function SampleNextArrow(props) {
         ...style,
         display: "block",
         borderRadius: "50%",
-        width: "40px",
-        height: "40px",
+        // width: "20px",
+        // height: "20px",
         textAlign: "center",
         cursor: "pointer",
         color: "#333", // 아이콘 색상
         zIndex: 1, // Ensure the button is above the slider content
         // Optional: Add padding to the arrow
-        padding: "5px",
+        // padding: "5px",
       }}
       onClick={onClick}
     >
@@ -47,14 +47,14 @@ export function SamplePrevArrow(props) {
         ...style,
         display: "block",
         borderRadius: "50%",
-        width: "40px",
-        height: "40px",
+        // width: "20px",
+        // height: "20px",
         textAlign: "center",
         cursor: "pointer",
         color: "#333", // 아이콘 색상
         zIndex: 1, // Ensure the button is above the slider content
         // Optional: Add padding to the arrow
-        padding: "5px",
+        // padding: "5px",
       }}
       onClick={onClick}
     >

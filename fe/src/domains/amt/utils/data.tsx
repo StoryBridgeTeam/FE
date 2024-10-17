@@ -69,8 +69,8 @@ export const ProfileAvatar = ({
             border={isAmtOwner ? "3px solid green" : "0.5px solid grey"}
             cursor={isHost ? "pointer" : (ancestor.isHide || ancestor.nickname == null ? "not-allowed" : "pointer")}
             src={
-                ancestor.profileImage
-                    ? `http://image.storyb.kr/${ancestor.profileImage.path}`
+                ancestor?.card?.profileImage
+                    ? `http://image.storyb.kr/${ancestor.card.profileImage.path}`
                     : `/images/profile.png`
             }
             size="md"

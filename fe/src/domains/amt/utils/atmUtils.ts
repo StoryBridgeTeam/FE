@@ -2,12 +2,29 @@ import {ImageRes} from "../../../common/hooks/useImage";
 
 export interface DataNode {
   memberId : number,
-  nickname: string;
-  profileImage?: ImageRes;
+  nickname : string,
+  name : string,
+  card :CardResponse | undefined,
   isHide: boolean,
   isBlocked: boolean;
   top?: number;
   left?: number;
+}
+
+export interface CardResponse{
+  id : number,
+  name : string,
+  nickName : string,
+  profileImage : ImageRes,
+  entries : CardEntry[]
+}
+
+interface CardEntry{
+  id : number,
+  title : string,
+  content : string,
+  index : number,
+  isVisibleBriefCard : boolean
 }
 
 export interface Data {
@@ -23,8 +40,9 @@ export interface Data {
 
 export const data: DataNode = {
   memberId : -1,
-  nickname: "nickname",
-  profileImage: undefined,
+  nickname : "",
+  name : "",
+  card : undefined,
   isBlocked: false,
   isHide:false,
 };

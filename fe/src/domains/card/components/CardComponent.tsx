@@ -12,12 +12,15 @@ import {
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { useCard } from "../hooks/useCard";
-import { EntryState } from "../types/cardTypes";
+import {CardInfo, EntryState} from "../types/cardTypes";
 import CardInfoBox from "./CardInfoBox";
 import SelfIntroductionBox from "./SelfIntoductionBox";
 import { Share } from "tabler-icons-react";
 import InviteModal from "../../../common/components/InviteModal";
 import {getCoverLetters} from "../../info/api/InfoAPI";
+import DesignedCard from "./DesigendCards";
+import useCardHook from "../hooks/useCardHook";
+import {Simulate} from "react-dom/test-utils";
 
 export interface CoverLetter {
   id: number;
@@ -29,59 +32,54 @@ export interface CoverLetter {
 const CardComponent: React.FC = () => {
   const isMobile = useBreakpointValue({ base: true, md: false });
   const { nickName = "" } = useParams<{ nickName: string }>();
-  const { loading, error, checkCard, fetchPublicCard } = useCard({
-    nickname: nickName,
-  });
-  const [hasCard, setHasCard] = useState<boolean>(false);
-  const [briefEntries, setBriefEntries] = useState<EntryState[]>([]);
   const savedNickName = localStorage.getItem("nickName");
   const isHost = nickName === savedNickName;
-  const [name, setName] = useState<string>("");
-  const [cardId, setCardId] = useState<number | null>(null);
+
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const token = queryParams.get("token");
-  const navigate = useNavigate();
-  const {
-    isOpen: isInviteModalOpen,
-    onOpen: onInviteModalOpen,
-    onClose: onInviteModalClose,
-  } = useDisclosure();
+
+  const [cardInfo, setCardInfo ] = useState<CardInfo>();
+
+  const useCard = useCardHook(nickName);
+  const {loading} = useCard;
 
   const [coverLetter, setCoverLetter] = useState<CoverLetter[]>([]);
 
-  useEffect(() => {
-    if (nickName) {
-      if (token) {
-        checkCard(nickName, token).then((result) => {
-          if (result) {
-            setHasCard(true);
-            fetchPublicCard(nickName, "BRIEF", token).then((data) => {
-              setBriefEntries(data.entries);
-              setName(data.name);
-              setCardId(data.id);
-            });
-          } else {
-            setHasCard(false);
-          }
-        });
-      } else {
-        checkCard(nickName).then((result) => {
-          if (result) {
-            setHasCard(true);
-            fetchPublicCard(nickName, "BRIEF").then((data) => {
-              setBriefEntries(data.entries);
-              setName(data.name);
-              setCardId(data.id);
-            });
-          } else {
-            setHasCard(false);
-          }
-        });
-      }
-
-    }
-  }, [nickName, token]);
+  // useEffect(() => {
+  //   if (nickName) {
+  //     if (token) {
+  //       checkCard(nickName, token).then((result) => {
+  //         if (result) {
+  //           setHasCard(true);
+  //           fetchPublicCard(nickName, "BRIEF", token).then((data) => {
+  //             setBriefEntries(data.entries);
+  //             setName(data.name);
+  //             setCardId(data.id);
+  //             setCardInfo(data);
+  //           });
+  //         } else {
+  //           setHasCard(false);
+  //         }
+  //       });
+  //     } else {
+  //       checkCard(nickName).then((result) => {
+  //         if (result) {
+  //           setHasCard(true);
+  //           fetchPublicCard(nickName, "BRIEF").then((data) => {
+  //             setCardInfo(data);
+  //             setBriefEntries(data.entries);
+  //             setName(data.name);
+  //             setCardId(data.id);
+  //           });
+  //         } else {
+  //           setHasCard(false);
+  //         }
+  //       });
+  //     }
+  //
+  //   }
+  // }, [nickName, token]);
 
   useEffect(() => {
     fetchCoverData();
@@ -113,24 +111,13 @@ const CardComponent: React.FC = () => {
     }
   };
 
-  const handleClick = () => {
-    const url = `/${nickName}/card`;
-    const searchParams = new URLSearchParams();
-
-    if (token) {
-      searchParams.append("token", token);
-    }
-
-    navigate(`${url}?${searchParams.toString()}`);
-  };
-
   if (loading) {
     return <Spinner />;
   }
 
-  if (error) {
-    return <Text color="red.500">{error}</Text>;
-  }
+  // if (error) {
+  //   return <Text color="red.500">{error}</Text>;
+  // }
 
   return (
     <VStack
@@ -148,39 +135,15 @@ const CardComponent: React.FC = () => {
         w={"100%"}
         bg={"white"}
         height={"auto"}
-        borderRadius={"3xl"}
+        borderRadius={"5"}
         // shadow={"md"}
-        p={4}
+        // p={4}
         boxSizing={"border-box"}
       >
-        <VStack align="stretch" spacing={2} color="black" flex={1} h={"100%"} position={"relative"} p={5}>
-          {isHost && (
-              <Button size="sm" bg="white" onClick={onInviteModalOpen} position={"absolute"} right={0} top={0}>
-                <Share size={20} color="black" />
-              </Button>
-          )}
-          {hasCard && (
-            <Flex alignItems="center" justifyContent="space-between">
-              <Heading
-                fontSize={isMobile ? "md" : "x-large"}
-                textAlign="left"
-              >
-                {name}
-              </Heading>
-            </Flex>
-          )}
-          <CardInfoBox
-            briefEntries={briefEntries}
-            onClick={handleClick}
-            hasCard={hasCard}
-            isHost={isHost}
-          />
-        </VStack>
+        <DesignedCard cardHook={useCard} isHost={isHost}
+        />
       </Box>
       <SelfIntroductionBox coverLetters={coverLetter}/>
-      {isInviteModalOpen && (
-        <InviteModal isOpen={isInviteModalOpen} onClose={onInviteModalClose} />
-      )}
     </VStack>
   );
 };

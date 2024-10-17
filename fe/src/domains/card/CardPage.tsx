@@ -13,31 +13,21 @@ import CommentPresenter from "../../common/components/comment/CommentPresenter";
 import useComment from "../../common/hooks/useComment";
 import {createCardComment, deleteComment, getCardComments, updateComment} from "./api/cardAPI";
 import CommentInput from "../../common/components/comment/CommentInput";
+import useCardHook from "./hooks/useCardHook";
 
 const CardPage: React.FC = () => {
   const { nickName="" } = useParams<{ nickName: string }>();
   const isMobile = useBreakpointValue({ base: true, md: false });
-  const logout = useAuthStore((state) => state.logout);
-  const { showToast } = useToastMessage();
-  const navigate = useNavigate();
   const location = useLocation();
-  // const { name, cardId, hasCard } = location.state || {};
   const queryParams = new URLSearchParams(location.search);
   const token = queryParams.get("token");
 
-    const savedNickName = localStorage.getItem("nickName");
-    const isHost = nickName === savedNickName;
+  const savedNickName = localStorage.getItem("nickName");
+  const isHost = nickName === savedNickName;
 
-  const useCardHook = useCard({nickname:nickName});
-const { loading, error, createNewCard, isExists, cardId} = useCardHook;
 
-    useEffect(() => {
-        if(token){
-            useCardHook.checkCard(nickName, token);
-        }else{
-            useCardHook.checkCard(nickName);
-        }
-    }, []);
+  const useCard = useCardHook(nickName, true);
+  const {isCreated : isExists} = useCard;
 
   return (
     <Flex minH="100vh" direction="column">
@@ -63,14 +53,15 @@ const { loading, error, createNewCard, isExists, cardId} = useCardHook;
                       bg="white"
                       p={4}
                   >
-                      {isExists ? (
-                          <CardModalComponent
-                              nickName={nickName!}
-                              useCardHook={useCardHook}
-                          />
-                      ) : (
-                          <FirstCardModal nickName={nickName!} useCardHook={useCardHook}/>
-                      )}
+                      <CardModalComponent nickName={nickName} useCardHook={useCard}/>
+                      {/*{isExists ? (*/}
+                      {/*    <CardModalComponent*/}
+                      {/*        nickName={nickName!}*/}
+                      {/*        useCardHook={useCardHook}*/}
+                      {/*    />*/}
+                      {/*) : (*/}
+                      {/*    <FirstCardModal nickName={nickName!} useCardHook={useCardHook}/>*/}
+                      {/*)}*/}
                   </Flex>
                   {
                       isMobile ?
@@ -80,12 +71,13 @@ const { loading, error, createNewCard, isExists, cardId} = useCardHook;
                   }
                       <Box flex={1} padding={2}  minWidth={"330px"} maxWidth={isMobile? "none" : "500px"}>
                       {
-                          isExists &&
-                          <CommentBox cardId={cardId} isHost={isHost} token={token}/>
+                          isExists && useCard.profileCardId &&
+                          <CommentBox cardId={useCard.profileCardId} isHost={isHost} token={token}/>
                       }
-                      {/*{isExist ? (*/}
-                      {/*  <CommentList nickName={nickName!} cardId={cardId} />*/}
-                      {/*) : null}*/}
+                      {isExists && useCard.profileCardId ?
+                          (
+                        <CommentList nickName={nickName!} cardId={useCard.profileCardId} />
+                      ) : null}
                   </Box>
                   </>
           }

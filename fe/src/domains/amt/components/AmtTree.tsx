@@ -19,7 +19,7 @@ import { SlideUpSmallModal } from "../../../common/components/SlideUpSmallModal"
 import { Card, ProfileAvatar } from "../utils/data";
 import { ChevronRightIcon } from "@chakra-ui/icons";
 import {amtBlock, amtBlockReset, getAmt, userBlock, userUnBlock} from "../api/AmtAPI";
-import { data, Data, DataNode } from "../utils/atmUtils";
+import {CardResponse, data, Data, DataNode} from "../utils/atmUtils";
 import { getCard } from "../../info/api/SideBarAPI";
 import { MdBlock } from "react-icons/md";
 import { useToastMessage } from "../../../common/hooks/useToastMessage";
@@ -50,7 +50,7 @@ const AmtTree = () => {
   const token = queryParams.get("token");
   const { nickName } = useParams<{ nickName: string }>();
   const [amt, setAmt] = useState<Data>();
-  const [cards, setCards] = useState<Card[]>();
+  const [cards, setCards] = useState<CardResponse>();
   const [isLoading, setIsLoading] = useState(false);
   const name = localStorage.getItem("nickName");
   const ishost = name === nickName;
@@ -115,11 +115,11 @@ const AmtTree = () => {
 
   useEffect(() => {
     if (selectedAncestor) {
-      fetchCard(selectedAncestor!.nickname);
+      setCards(selectedAncestor.card);
     }
 
     if (hoveredAncestor && !isHoveringCard) {
-      fetchCard(hoveredAncestor!.nickname);
+      setCards(hoveredAncestor.card);
     }
   }, [selectedAncestor, hoveredAncestor, isHoveringCard]);
 
@@ -495,8 +495,8 @@ const AmtTree = () => {
                               <Spinner size="sm" color="blue.500" />
                           ) : (
                               <UnorderedList>
-                                {cards && cards.length > 0 ? (
-                                    cards.map((card) => (
+                                {cards ? (
+                                    cards.entries.map((card) => (
                                         <ListItem key={card.id} display="flex">
                                           <Text
                                               as="span"
@@ -514,7 +514,8 @@ const AmtTree = () => {
                                     ))
                                 ) : (
                                     <>명함이 등록되지 않은 사용자입니다.</>
-                                )}
+                                )
+                                }
                               </UnorderedList>
                           )}
                         </Box>
@@ -545,8 +546,8 @@ const AmtTree = () => {
               <Spinner size="sm" color="blue.500" />
             ) : (
               <UnorderedList>
-                {cards && cards.length > 0 ? (
-                  cards.map((card) => (
+                {cards ? (
+                  cards.entries.map((card) => (
                     <ListItem key={card.id} display="flex" mb={2}>
                       <Text as="span" fontWeight="bold" fontSize="sm" mr={2}>
                         {card.title}:

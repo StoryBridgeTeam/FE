@@ -33,18 +33,28 @@ export const getOriginalCardInfo = async (
   type: string,
   token?: string
 ) => {
-  const response = await axiosInstance.get(`/members/${nickname}/origin-card`, {
-    params: { type, token },
-  });
-  return response.data;
+  try{
+    const response = await axiosInstance.get(`/members/${nickname}/origin-card`, {
+      params: { type, token },
+    });
+    return response.data;
+  }catch (e){
+    if(axios.isAxiosError(e)){
+      if(e.response && e.response.data.code==4040000){
+        return {};
+      }
+    }
+  }
 };
 
 export const updateOriginalCardInfo = async (
   nickname: string,
+  designType : string,
   entries: EntryState[]
 ) => {
   const preparedEntries = prepareEntriesForAPI(entries); // ID를 처리
   const response = await axiosInstance.put(`/members/${nickname}/origin-card`, {
+    designType : designType,
     entries: preparedEntries,
   });
   return response.data;
@@ -56,19 +66,31 @@ export const getPublicCardInfo = async (
   type: string,
   token?: string
 ) => {
+  try{
     const response = await axiosInstance.get(`/members/${nickname}/public-card`, {
       params: { type, token },
     });
 
     return response.data;
+  }catch (e){
+    if(axios.isAxiosError(e)){
+      if(e.response && e.response.data.code==4040000){
+        return {};
+      }
+    }
+  }
+
+
 };
 
 export const updatePublicCardInfo = async (
   nickname: string,
+  designType : string,
   entries: EntryState[]
 ) => {
   const preparedEntries = prepareEntriesForAPI(entries);
   const response = await axiosInstance.put(`/members/${nickname}/public-card`, {
+    designType : designType,
     entries: preparedEntries,
   });
   return response.data;

@@ -27,32 +27,25 @@ const CardModalItem: React.FC<CardModalItemProps> = ({
   const isHost = nickName === savedNickName;
 
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    onChangeEntry(entry.id, { title: e.target.value });
+    // onChangeEntry(entry.id, { title: e.target.value });
   };
 
   const handleContentChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    onChangeEntry(entry.id, { content: e.target.value });
+    // onChangeEntry(entry.id, { content: e.target.value });
   };
 
   const handleVisibilityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    onChangeEntry(entry.id, { isVisibleBriefCard: e.target.checked });
+    // onChangeEntry(entry.id, { isVisibleBriefCard: e.target.checked });
   };
 
   const handleDeleteClick = () => {
-    onDeleteEntry(entry.id);
+    // onDeleteEntry(entry.id);
   };
 
   return (
-    <Box>
+    <>
       {isEditing ? (
-        <Flex alignItems="center" w={"100%"} justifyContent={"start"}>
-          <Checkbox
-            isChecked={entry.isVisibleBriefCard}
-            onChange={handleVisibilityChange}
-            m={2}
-            size="lg"
-          />
-
+        <Flex alignItems="center" w={"100%"} justifyContent={"start"} gap={2}>
           <Input
             value={entry.title}
             onChange={handleTitleChange}
@@ -68,6 +61,12 @@ const CardModalItem: React.FC<CardModalItemProps> = ({
             size="sm"
             width="65%"
             placeholder="설명"
+          />
+          <Icon
+              // onClick={() => onChangeEntry(entry.id, {isVisibleBriefCard: !entry.isVisibleBriefCard})}
+              as={entry.isVisibleBriefCard ? FaEye : FaEyeSlash}
+              color={entry.isVisibleBriefCard ? "black" : "gray"}
+              ml={2}
           />
           <Button size="sm" onClick={handleDeleteClick} bg="white">
             <Trash color="red" />
@@ -85,7 +84,7 @@ const CardModalItem: React.FC<CardModalItemProps> = ({
           )}
         </Flex>
       )}
-    </Box>
+    </>
   );
 };
 

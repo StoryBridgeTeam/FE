@@ -59,8 +59,10 @@ const LoginAppBar: React.FC<LoginAppBarProps> = ({isShowSearch}) => {
 
     useEffect(() => {
         if(errorStore.hasError){
+            const title = errorStore.title;
+            const content = errorStore.content;
             errorStore.consumeError();
-            toast({title:"사용자 차단", description:"해당 사용자의 정보를 조회할 수 없습니다.", status:"error",
+            toast({title:title, description:content, status:"error",
                 duration: 1500,
                 isClosable: true,
             })
