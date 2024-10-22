@@ -10,7 +10,7 @@ import {
   Button,
   Input,
   Spinner,
-  useToast,
+  useToast, Text,
 } from "@chakra-ui/react";
 import { getInvitationToken } from "../api/invitationAPI";
 
@@ -24,12 +24,12 @@ const InviteModal: React.FC<InviteModalProps> = ({ isOpen, onClose }) => {
   const [inviteLink, setInviteLink] = useState("");
   const toast = useToast();
 
-  const handleInvite = async () => {
+  const handleInvite = async (type : string) => {
     setLoading(true);
     try {
-      const token = await getInvitationToken();
+      const token = await getInvitationToken(type);
       const currentUrl = window.location.href;
-      const linkWithToken = `${currentUrl}?token=${token}`;
+      const linkWithToken = `${currentUrl}?token=${token}&type=${type}`;
       setInviteLink(linkWithToken);
 
       navigator.clipboard.writeText(linkWithToken);
@@ -79,20 +79,32 @@ const InviteModal: React.FC<InviteModalProps> = ({ isOpen, onClose }) => {
           ) : inviteLink ? (
             <Input value={inviteLink} isReadOnly />
           ) : (
-            "초대하기 버튼을 클릭하면 링크가 생성됩니다."
+              <Text>
+                초대링크를 생성해보세요!
+              </Text>
           )}
         </ModalBody>
 
         <ModalFooter>
           {!inviteLink && (
-            <Button
-              colorScheme="blue"
-              mr={3}
-              onClick={handleInvite}
-              disabled={loading}
-            >
-              초대하기
-            </Button>
+              <>
+                <Button
+                    colorScheme="blue"
+                    mr={3}
+                    onClick={ () => handleInvite("NORMAL")}
+                    disabled={loading}
+                >
+                  일반
+                </Button>
+                <Button
+                    colorScheme="blue"
+                    mr={3}
+                    onClick={() => handleInvite("READ_ONLY")}
+                    disabled={loading}
+                >
+                  읽기 전용
+                </Button>
+              </>
           )}
           {inviteLink && (
             <Button colorScheme="teal" mr={3} onClick={handleShare}>

@@ -10,6 +10,7 @@ import {
 import { uploadImage } from "../../../common/api/imageAPI";
 import {useAuthStore} from "../../../common/stores/AuthStore";
 import {set} from "date-fns";
+import {getIsCreatedCard} from "../../card/api/cardAPI";
 
 const useProfileForm = () => {
   const toast = useToast();
@@ -19,6 +20,7 @@ const useProfileForm = () => {
     originPassword: "",
     newPassword: "",
     confirmNewPassword: "",
+    isCardCreated : false,
   });
 
   const [image, setImage] = useState<string>("");
@@ -35,6 +37,7 @@ const useProfileForm = () => {
         originPassword: "",
         newPassword: "",
         confirmNewPassword: "",
+        isCardCreated : data.isCardCreated
       });
       if (data.profileImage) {
         setImage(data.profileImage.path || "");
@@ -60,9 +63,36 @@ const useProfileForm = () => {
     setProfile({ ...profile, [e.target.name]: e.target.value });
   };
 
+  const checkCreatedProfile = () => {
+    if(!profile.isCardCreated){
+      toast({
+        title : "명함 미생성",
+        description : "명함을 생성하여야 프로필 이미지를 설정할 수 있습니다.",
+        status : "error",
+        duration : 3000,
+        isClosable: true
+      })
+
+      return false;
+    }
+
+    return true;
+  }
+
   const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    setLoading(true);
     const file = e.target.files ? e.target.files[0] : null;
+    if(file && file.size>(1024*1024*3)){
+      toast({
+        title : "이미지 용량 초과",
+        description : "이미지 용량은 최대 3MB까지 가능합니다.",
+        status : "error",
+        duration : 3000,
+        isClosable: true
+      })
+      return;
+    }
+
+    setLoading(true);
     if (file) {
       const formData = new FormData();
       formData.append("file", file);
@@ -181,7 +211,8 @@ const useProfileForm = () => {
     requestVerification,
     saveNickname,
     savePassword,
-    loading
+    loading,
+    checkCreatedProfile
   };
 };
 

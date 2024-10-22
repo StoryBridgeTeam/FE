@@ -20,6 +20,7 @@ export const useVerificationCode = () => {
   };
 
   const checkVerificationCode = async () => {
+
     const { region, email, phoneNumber } = useSignUpStore.getState();
     try {
       let response;

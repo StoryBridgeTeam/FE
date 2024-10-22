@@ -44,6 +44,7 @@ const LoginAppBar: React.FC<LoginAppBarProps> = ({isShowSearch}) => {
 
     const queryParams = new URLSearchParams(location.search);
     const token = queryParams.get("token");
+    const type = queryParams.get("type");
 
     const {alarmChat} = useChatAlarmToast();
 
@@ -179,7 +180,7 @@ const LoginAppBar: React.FC<LoginAppBarProps> = ({isShowSearch}) => {
                             <IoIosLogOut fontSize={"24px"}/>
                         </IconButton>
                     )}
-                    {token && (
+                    {token && type=="NORMAL" && (
                         <Text
                             marginLeft={3}
                             fontSize={isMobile ? "xs" : "md"}

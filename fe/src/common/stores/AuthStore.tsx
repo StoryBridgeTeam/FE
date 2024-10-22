@@ -103,7 +103,7 @@ export const useAuthStore = create(persist<AuthState>((set) => ({
             localStorage.setItem("accessToken", accessToken);
             localStorage.setItem("refreshToken", refreshToken);
             localStorage.setItem("nickName", nickName);
-            set({isAuthenticated: true, accessToken, refreshToken, nickName, profileImage, memberId});
+            set({isAuthenticated: true,isTokenUser:false, accessToken, refreshToken, nickName, profileImage, memberId});
         },
         logout: () => {
             localStorage.removeItem("accessToken");
@@ -111,6 +111,10 @@ export const useAuthStore = create(persist<AuthState>((set) => ({
             localStorage.removeItem("nickName");
             set({
                 isAuthenticated: false,
+                isTokenUser:false,
+                profileImage:null,
+                nickName : "",
+                memberId : null,
                 accessToken: null,
                 refreshToken: null,
             });

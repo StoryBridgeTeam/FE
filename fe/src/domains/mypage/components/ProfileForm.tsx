@@ -23,7 +23,8 @@ const ProfileForm: React.FC = () => {
     requestVerification,
     saveNickname,
     savePassword,
-    loading
+    loading,
+      checkCreatedProfile
   } = useProfileForm();
 
   const isMobile = useBreakpointValue({ base: true, md: false });
@@ -34,8 +35,10 @@ const ProfileForm: React.FC = () => {
         p={5}
         border={"1px solid #CDCDCD"}
         borderRadius={"30px"}
-        w={isMobile ? "350px" : "800px"}
-        height={"auto"}
+        // w={isMobile ? "350px" : "100"}
+        width={"100%"}
+        // height={"auto"}
+        height={isMobile ? "auto " : "calc(100vh - 200px)"}
         ml={isMobile ? undefined : "30px"}
         direction={"column"}
         position={"relative"}
@@ -46,7 +49,7 @@ const ProfileForm: React.FC = () => {
               <Spinner zIndex={9999}/>
             </Center>
         }
-        <VStack align="stretch" spacing={4} w="full">
+        <VStack align="stretch"  spacing={4} w="full">
           <FormControl>
             <Flex m={"10px"} w={"100%"} direction={isMobile ? "column" : "row"}>
               <Text fontWeight={"bold"} minW={"70px"} mr={"50px"}>
@@ -68,8 +71,11 @@ const ProfileForm: React.FC = () => {
               <Flex flex={"1"} alignItems={"end"} justifyContent={"right"}>
                 <Button
                   mr={3}
-                  onClick={() =>
-                    document.getElementById("imageUpload")?.click()
+                  onClick={() => {
+                    if(checkCreatedProfile()) {
+                      document.getElementById("imageUpload")?.click()
+                    }
+                  }
                   }
                 >
                   수정
