@@ -17,6 +17,7 @@ interface SlideUpSmallModalProps {
   title?: string;
   children?: React.ReactNode;
   footerContent?: React.ReactNode;
+  headerLeft ?: React.ReactNode
 }
 
 export const SlideUpSmallModal: React.FC<SlideUpSmallModalProps> = ({
@@ -25,6 +26,7 @@ export const SlideUpSmallModal: React.FC<SlideUpSmallModalProps> = ({
   title,
   children,
   footerContent,
+  headerLeft
 }) => {
   const isMobile = useBreakpointValue({ base: true, md: false });
 
@@ -55,10 +57,13 @@ export const SlideUpSmallModal: React.FC<SlideUpSmallModalProps> = ({
         overflow="hidden"
         mb={0}
       >
-        <ModalCloseButton _focus={{ boxShadow: "none" }} mt={2} mr={2} />
         {title && (
-          <ModalHeader fontSize="lg" fontWeight="bold" textAlign="center">
+          <ModalHeader fontSize="lg" fontWeight="bold" textAlign="center" position={"relative"} mt={2}>
+            <Box position={"absolute"} top={4}>
+              {headerLeft}
+            </Box>
             {title}
+            <ModalCloseButton _focus={{ boxShadow: "none" }} />
           </ModalHeader>
         )}
         <ModalBody

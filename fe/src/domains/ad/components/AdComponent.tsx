@@ -1,40 +1,27 @@
 import React, { useEffect } from "react";
 import { VStack, Box, Text, useBreakpointValue } from "@chakra-ui/react";
 import { useAdStore } from "../stores/AdStore";
+import Advertisement from "./Advertisement";
 
 const AdComponent: React.FC = () => {
   const isMobile = useBreakpointValue({ base: true, md: false });
-  const { ads, fetchAds } = useAdStore();
-
-  useEffect(() => {
-    fetchAds();
-  }, [fetchAds]);
+  const { desktopAds} = useAdStore();
 
   return (
     <Box
       bg="#F6F6F6"
       borderRadius="3xl"
       w="100%"
-      minWidth={"200px"}
+      minWidth={"320px"}
       maxWidth={"330px"}
-      h="100%"
-      p={6}
-      color="#CDCDCD"
-      border={isMobile ? "" : "1px solid"}
+      height={"100%"}
+      // p={6}
+      // color="#CDCDCD"
+      // border={isMobile ? "" : "1px solid"}
     >
-      <VStack spacing={4} align="stretch" width="100%" height="100%">
-        {ads.map((ad) => (
-          <Box
-            key={ad.id}
-            bg="#E9E9E9"
-            borderRadius="md"
-            height="22%"
-            width="100%"
-          >
-            <Text color="gray.500" textAlign="center">
-              {ad.content}
-            </Text>
-          </Box>
+      <VStack align="stretch" width="100%" gap={0}>
+        {desktopAds.map((ad) => (
+            <Advertisement ad={ad} />
         ))}
       </VStack>
     </Box>

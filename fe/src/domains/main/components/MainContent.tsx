@@ -11,13 +11,15 @@ import { useAdStore } from "../../ad/stores/AdStore";
 
 interface Ad {
   id: number;
-  content: string;
+  code : string,
+  width : number,
+  height : number
 }
 
 const MainContent: React.FC = () => {
   const isMobile = useBreakpointValue({ base: true, md: false });
   const { t } = useTranslation();
-  const { ads } = useAdStore();
+  const { mobileAds } = useAdStore();
   const sections: SectionData[] = [
     {
       area: "card",
@@ -38,9 +40,9 @@ const MainContent: React.FC = () => {
 
   const mobileLayout = useMemo(() => {
     const result: SectionData[] = [];
-    const adGroups: Ad[][] = [[], [], []];
+    const adGroups: Ad[][] = [[],[],[]];
 
-    ads.forEach((ad, index) => {
+    mobileAds.forEach((ad, index) => {
       adGroups[index % 3].push(ad);
     });
 
@@ -62,7 +64,7 @@ const MainContent: React.FC = () => {
     });
 
     return result;
-  }, [sections, ads]);
+  }, [sections, mobileAds]);
 
   const gridTemplateAreas = useMemo(() => {
     if (!isMobile) return `"poi card ad" "poi network ad"`;

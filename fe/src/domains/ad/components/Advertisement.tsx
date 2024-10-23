@@ -1,27 +1,41 @@
-import React from "react";
-import { Box, Text } from "@chakra-ui/react";
+import React, {useEffect, useRef} from "react";
+import {Box, HStack, Text} from "@chakra-ui/react";
 
 interface AdProps {
   ad: {
     id: number;
-    content: string;
+      code : string,
+      width : number,
+      height : number
   };
 }
 
 const Advertisement: React.FC<AdProps> = ({ ad }) => {
-  //   useEffect(() => {
-  //   fetchAds();
-  //   // if (nickName) {
-  //   //   fetchPOIs(nickName); //초대토큰이 들어갈 수 있다
-  //   // }
-  // }, [fetchAds]);
+    const scriptElement = useRef<HTMLDivElement>(null);
 
-  return (
-    <Box bg="#E9E9E9" borderRadius="md" p={4} width="100%">
-      <Text color="gray.500" textAlign="center">
-        {ad.content}
-      </Text>
-    </Box>
+    useEffect(() => {
+        const script = document.createElement("script");
+        script.setAttribute(
+            "src",
+            "https://t1.daumcdn.net/kas/static/ba.min.js"
+        );
+        script.setAttribute(
+            "charset",
+            "utf-8"
+        );
+
+        script.setAttribute("async", "true");
+        scriptElement.current?.appendChild(script);
+    }, []);
+
+
+    return (
+    <HStack  p={4} width="100%" ref={scriptElement} justifyContent={"center"} alignItems={"center"}>
+      <ins className="kakao_ad_area" style={{display:"none"}}
+           data-ad-unit = {ad.code}
+           data-ad-width = {ad.width}
+           data-ad-height = {ad.height} />
+    </HStack>
   );
 };
 

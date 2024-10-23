@@ -12,12 +12,12 @@ import {
   Icon,
   useDisclosure,
   IconButton,
-  Spinner, Avatar,
+  Spinner, Avatar, Menu, MenuItem, MenuButton, MenuList,
 } from "@chakra-ui/react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { SlideUpSmallModal } from "../../../common/components/SlideUpSmallModal";
 import { Card, ProfileAvatar } from "../utils/data";
-import { ChevronRightIcon } from "@chakra-ui/icons";
+import {ChevronRightIcon, HamburgerIcon} from "@chakra-ui/icons";
 import {amtBlock, amtBlockReset, getAmt, userBlock, userUnBlock} from "../api/AmtAPI";
 import {CardResponse, data, Data, DataNode} from "../utils/atmUtils";
 import { getCard } from "../../info/api/SideBarAPI";
@@ -25,6 +25,9 @@ import { MdBlock } from "react-icons/md";
 import { useToastMessage } from "../../../common/hooks/useToastMessage";
 import UnblockUserModal from "./UnBlockUserModal";
 import {randomUUID} from "crypto";
+import DesignedCard from "../../card/components/DesigendCards";
+import useCardHook from "../../card/hooks/useCardHook";
+import {useAuthStore} from "../../../common/stores/AuthStore";
 
 const AmtTree = () => {
   const {
@@ -54,6 +57,8 @@ const AmtTree = () => {
   const [isLoading, setIsLoading] = useState(false);
   const name = localStorage.getItem("nickName");
   const ishost = name === nickName;
+
+  const {isTokenUser} = useAuthStore();
 
   const MAXIMUM_LIST = [10, 100, 500, 1000, 5000, 10000, 100000];
   const LIMIT = () => {
@@ -532,6 +537,46 @@ const AmtTree = () => {
           isOpen={isOpen}
           onClose={onClose}
           title={selectedAncestor.nickname}
+          headerLeft={
+          !isTokenUser && nickName!=selectedAncestor.nickname &&
+            <Menu>
+              <MenuButton>
+                <HamburgerIcon />
+              </MenuButton>
+              <MenuList>
+                <MenuItem onClick={() => navigate('/chat', {state:{targetId:selectedAncestor?.memberId}})}>채팅</MenuItem>
+                {
+                  ishost && !selectedAncestor.isHide &&
+                    <MenuItem onClick={() => {
+                      hideUser(selectedAncestor?.nickname)
+                      onClose();
+                    }}>AMT에서 가리기</MenuItem>
+                }
+                {
+                    ishost && selectedAncestor.isHide &&
+                    <MenuItem onClick={() => {
+                      handleUnhideUser(selectedAncestor?.nickname)
+                      onClose();
+                    }}>AMT에서 보이기</MenuItem>
+
+                }
+                {
+                  !selectedAncestor.isBlocked &&
+                    <MenuItem onClick={() => {
+                      handleUserBlock(selectedAncestor?.nickname)
+                      onClose();
+                    }}>차단하기</MenuItem>
+                }
+                {
+                    selectedAncestor.isBlocked &&
+                    <MenuItem onClick={() => {
+                      handleUserUnBlock(selectedAncestor?.nickname)
+                      onClose();
+                    }}>차단해제</MenuItem>
+                }
+              </MenuList>
+            </Menu>
+          }
         >
           <Box
             mt={-5}

@@ -1,27 +1,27 @@
 import create from "zustand";
+import {ReactNode} from "react";
 
 interface Ad {
   id: number;
-  content: string;
+  code : string,
+  width : number,
+  height : number
 }
 
 interface AdStore {
-  ads: Ad[];
-  setAds: (ads: Ad[]) => void;
-  fetchAds: () => Promise<void>;
+  desktopAds: Ad[];
+  mobileAds : Ad[]
 }
 
 export const useAdStore = create<AdStore>((set) => ({
-  ads: [],
-  setAds: (ads) => set({ ads }),
-  fetchAds: async () => {
-    // 여기에 실제 API 호출 로직을 추가할 수 있습니다.
-    const dummyAds = [
-      { id: 1, content: "광고 1" },
-      { id: 2, content: "광고 2" },
-      { id: 3, content: "광고 3" },
-      { id: 4, content: "광고 4" },
-    ];
-    set({ ads: dummyAds });
-  },
+  desktopAds: [
+    { id: 1, code:"DAN-lNsvtWhE2kHG5VCh", width:300, height:250},
+    { id: 2, code:"DAN-Qn08yiR50lay3Bl1", width:300, height:250},
+    { id: 2, code:"DAN-XgxbMfDBeeNAfXmq", width:300, height:250},
+  ],
+  mobileAds : [
+    { id: 1, code:"DAN-aRe3tlh9DiYnV8C0", width:320, height:150},
+    { id: 2, code:"DAN-0g9UbGS8DIYyDqnC", width:320, height:150},
+    { id: 2, code:"DAN-SXj3EyGevnY0Hg9F", width:320, height:150},
+  ]
 }));
