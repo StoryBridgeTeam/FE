@@ -79,13 +79,13 @@ function App() {
           });
         });
 
-        // newStompClient.onDisconnect = () => {
-        //   setTimeout(() => {initChatSocket()}, 1000);
-        // }
-        //
-        // socket.onclose = () => {
-        //   setTimeout(() => {initChatSocket()}, 1000);
-        // }
+        newStompClient.onDisconnect = () => {
+          setTimeout(() => {initChatSocket()}, 1000);
+        }
+
+        socket.onclose = () => {
+          setTimeout(() => {initChatSocket()}, 1000);
+        }
         setStompClient(newStompClient);
       }
     }

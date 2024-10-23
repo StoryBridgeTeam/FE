@@ -28,12 +28,17 @@ export const useChatAlarmToast = () => {
                             <Avatar size={"md"} src={`${process.env.REACT_APP_IMAGE_SERVER}/${senderInfo.profileImage.path}`}/> :
                             <Avatar size={"md"} src={'images/profile.png'}/>
                     }
-                    {chat.message}
                     <VStack w={"100%"} gap={0} overflow={"hidden"} px={4}>
                         <HStack w={"100%"}>
                             <Text fontWeight={900} fontSize={18}>{senderInfo.name}</Text>
                         </HStack>
-                        <Text w={"100%"} fontSize={15} isTruncated>{chat.message}</Text>
+                        <Text w={"100%"} fontSize={15} isTruncated>
+                            {
+                                chat.chatType=="FILE" ?
+                                    "파일" :
+                                    chat.message
+                            }
+                        </Text>
                     </VStack>
                 </HStack>
         )
